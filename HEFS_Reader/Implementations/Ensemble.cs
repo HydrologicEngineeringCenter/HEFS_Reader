@@ -10,6 +10,7 @@ namespace HEFS_Reader.Implementations
 		private DateTime _issuanceDate;
 		private DateTime _referenceDate;
 		private Enumerations.Timesteps _timeStep;
+		private string _locationName;
 		private DateTime _times;
 		private IEnsembleMember[] _members;
 		public DateTime getIssueDate()
@@ -20,6 +21,10 @@ namespace HEFS_Reader.Implementations
 		public DateTime getRefereceDate()
 		{
 			return _referenceDate;
+		}
+		public string getLocationName()
+		{
+			return _locationName;
 		}
 
 		public Enumerations.Timesteps getTimestep()

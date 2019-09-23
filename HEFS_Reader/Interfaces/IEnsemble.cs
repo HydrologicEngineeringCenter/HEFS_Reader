@@ -6,6 +6,7 @@ namespace HEFS_Reader.Interfaces
 	{
 		DateTime getRefereceDate();
 		DateTime getIssueDate();
+		string getLocationName();
 		Enumerations.Timesteps getTimestep();
 		IEnsembleMember[] getMembers();
 	}

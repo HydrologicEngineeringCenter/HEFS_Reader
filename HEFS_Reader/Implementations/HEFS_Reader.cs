@@ -10,10 +10,23 @@ namespace HEFS_Reader.Implementations
 		{
 			//is this zipped or not zipped?
 			//split based on new lines into rows for each element.
-			string[] newlines = { "/r/n" };
-			string[] rows = data.Split(newlines,StringSplitOptions.None);
+			char[] newlines = { '\n' };
+			string[] rows = data.Split(newlines);
+			List<string> locationNames = new List<string>();
+			
 			//split based on comma
-
+			string[] header = rows[0].Split(',');
+			List<int> locStarts = new List<int>();
+			string currHeader = "";
+			for (int i = 1; i < header.Length; i++)//first data element in header is timezone.
+			{
+				if (!currHeader.Equals(header[i])){
+					currHeader = header[i];
+					locationNames.Add(currHeader);
+					locStarts.Add(i);
+				}
+			}
+			//
 			return false;
 		}
 	}
