@@ -6,9 +6,9 @@ using System.Text;
 
 namespace HEFS_Reader.Implementations
 {
-	class HEFS_Downloader
+	public class HEFS_Downloader
 	{
-		private string _rootUrl = "https://www.cnrfc.noaa.gov/csv/";
+		private const string _rootUrl = "https://www.cnrfc.noaa.gov/csv/";
 		private IList<Interfaces.IEnsemble> _Result;//if i make an abstract result, errors could be stored in the result property.
 		public IList<Interfaces.IEnsemble> Result
 		{
@@ -18,9 +18,10 @@ namespace HEFS_Reader.Implementations
 		public string Response { get; set; }
 		public bool FetchData(HEFSRequestArgs args)
 		{
-			string webrequest = _rootUrl;
-			webrequest += args.date;
-			webrequest += args.location;
+            //https://www.cnrfc.noaa.gov/csv/2019092312_RussianNapa_hefs_csv_hourly.zip
+            string webrequest = _rootUrl;
+            webrequest += args.date + "_";
+            webrequest += args.location;
 			webrequest += "_hefs_csv_hourly.zip";
 
             string zipFileName = Path.GetTempFileName();
