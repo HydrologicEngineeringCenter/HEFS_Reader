@@ -30,25 +30,37 @@ namespace HEFS_Reader.Implementations
 			}
 			//second line is Blank,QINE,...QINE
 			//
+			bool isFirstPass = true;
+			List<List<List<float>>> FullTable = new List<List<List<float>>>();//location, Ensemble member, values - because 64bit allows me to be careless
+			List<DateTime> times = new List<DateTime>();
 			for (int j = 2; j < rows.Length; j++) {
 				string[] values = rows[j].Split(',');
 				DateTime dt = ParseDateTime(values[0]);
-				List<float> timesliceAcrossMembers = new List<float>();
+				times.Add(dt);
 				int locationNum = -1;//
+				
+				int ensembleMemberNum = 0;
 				for (int i = 1; i < values.Length; i++)
 				{
 					//these are the values for the date dt.
 					if (locStarts.Contains(i))
 					{
-						locationNum++;
-						if (locationNum != 0) {
-							ensembles[locationNum-1].AddSlice(dt, timesliceAcrossMembers);
-							timesliceAcrossMembers = new List<float>();
+						if (isFirstPass)
+						{
+							//add a location list.
+							FullTable.Add(new List<List<float>>());
 						}
-						
-						timesliceAcrossMembers.Add(float.Parse(values[i]));
+						locationNum++;
+						ensembleMemberNum = 0;
 					}
+					if (isFirstPass)
+					{
+						//add an ensemble member list.
+						FullTable[locationNum].Add(new List<float>());
+					}
+					FullTable[locationNum][ensembleMemberNum].Add(float.Parse(values[i]));
 				}
+				isFirstPass = false;
 			}
 			return false;
 		}
