@@ -12,7 +12,14 @@ namespace HEFS_Reader.Implementations
 		private Enumerations.Timesteps _timeStep;
 		private string _locationName;
 		private DateTime _times;
-		private IEnsembleMember[] _members;
+		private IList<IEnsemble> _members;
+		public Ensemble(string name, DateTime issueDate)
+		{
+			_locationName = name;
+			_issuanceDate = issueDate;
+			_members = new List<IEnsemble>();
+
+		}
 		public DateTime getIssueDate()
 		{
 			return _issuanceDate;

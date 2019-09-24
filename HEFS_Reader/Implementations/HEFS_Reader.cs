@@ -6,29 +6,39 @@ namespace HEFS_Reader.Implementations
 {
 	class HEFS_Reader
 	{
-		public bool readData(string data)
+		public bool readData(string data, DateTime issueDate)
 		{
 			//is this zipped or not zipped?
 			//split based on new lines into rows for each element.
 			char[] newlines = { '\n' };
 			string[] rows = data.Split(newlines);
-			List<string> locationNames = new List<string>();
 			
 			//split based on comma
 			string[] header = rows[0].Split(',');
 			List<int> locStarts = new List<int>();
 			string currHeader = "";
+
+			List <Interfaces.IEnsemble> ensembles = new List<Interfaces.IEnsemble>();
+
 			for (int i = 1; i < header.Length; i++)//first data element in header is timezone.
 			{
 				if (!currHeader.Equals(header[i])){
 					currHeader = header[i];
-					locationNames.Add(currHeader);
+					ensembles.Add(new Ensemble(currHeader, issueDate));
 					locStarts.Add(i);
 				}
 			}
 			//second line is Blank,QINE,...QINE
 			//
+			for (int j = 2; j < rows.Length; j++) {
+				string[] values = rows[j].Split(',');
+				DateTime dt = ParseDateTime(values[0]);
+				for (int i = 1; i < values.Length; i++)
+				{
+					//these are the values for the date dt.
 
+				}
+			}
 			return false;
 		}
 		private DateTime ParseDateTime(string dt)
