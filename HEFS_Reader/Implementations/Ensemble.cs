@@ -12,12 +12,12 @@ namespace HEFS_Reader.Implementations
 		private Enumerations.Timesteps _timeStep;
 		private string _locationName;
 		private DateTime _times;
-		private IList<IEnsemble> _members;
+		private IList<IEnsembleMember> _members;
 		public Ensemble(string name, DateTime issueDate)
 		{
 			_locationName = name;
 			_issuanceDate = issueDate;
-			_members = new List<IEnsemble>();
+			_members = new List<IEnsembleMember>();
 
 		}
 		public DateTime getIssueDate()
@@ -39,9 +39,14 @@ namespace HEFS_Reader.Implementations
 			return _timeStep;
 		}
 
-		public IEnsembleMember[] getMembers()
+		public IList<IEnsembleMember> getMembers()
 		{
 			return _members;
+		}
+
+		public void AddSlice(DateTime time, IList<float> values)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

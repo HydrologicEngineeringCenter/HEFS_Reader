@@ -33,10 +33,21 @@ namespace HEFS_Reader.Implementations
 			for (int j = 2; j < rows.Length; j++) {
 				string[] values = rows[j].Split(',');
 				DateTime dt = ParseDateTime(values[0]);
+				List<float> timesliceAcrossMembers = new List<float>();
+				int locationNum = -1;//
 				for (int i = 1; i < values.Length; i++)
 				{
 					//these are the values for the date dt.
-
+					if (locStarts.Contains(i))
+					{
+						locationNum++;
+						if (locationNum != 0) {
+							ensembles[locationNum-1].AddSlice(dt, timesliceAcrossMembers);
+							timesliceAcrossMembers = new List<float>();
+						}
+						
+						timesliceAcrossMembers.Add(float.Parse(values[i]));
+					}
 				}
 			}
 			return false;

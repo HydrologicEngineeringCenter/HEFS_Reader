@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace HEFS_Reader.Interfaces
 {
@@ -8,6 +9,7 @@ namespace HEFS_Reader.Interfaces
 		DateTime getIssueDate();
 		string getLocationName();
 		Enumerations.Timesteps getTimestep();
-		IEnsembleMember[] getMembers();
+		IList<IEnsembleMember> getMembers();
+		void AddSlice(DateTime time, IList<float> values);
 	}
 }
