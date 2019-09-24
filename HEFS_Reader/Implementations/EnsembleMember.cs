@@ -8,6 +8,13 @@ namespace HEFS_Reader.Implementations
 	{
 		private DateTime[] _times;
 		private float[] _values;
+
+		public EnsembleMember(float[] em, DateTime[] times)
+		{
+			_values = em;
+			_times = times;
+		}
+
 		public DateTime[] getTimes()
 		{
 			return _times;

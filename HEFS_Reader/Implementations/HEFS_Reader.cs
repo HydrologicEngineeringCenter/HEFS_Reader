@@ -6,7 +6,7 @@ namespace HEFS_Reader.Implementations
 {
 	class HEFS_Reader
 	{
-		public bool readData(string data, DateTime issueDate)
+		public IList<Interfaces.IEnsemble> readData(string data, DateTime issueDate)
 		{
 			//is this zipped or not zipped?
 			//split based on new lines into rows for each element.
@@ -17,14 +17,14 @@ namespace HEFS_Reader.Implementations
 			string[] header = rows[0].Split(',');
 			List<int> locStarts = new List<int>();
 			string currHeader = "";
-
+			List<string> headers = new List<string>();
 			List <Interfaces.IEnsemble> ensembles = new List<Interfaces.IEnsemble>();
 
 			for (int i = 1; i < header.Length; i++)//first data element in header is timezone.
 			{
 				if (!currHeader.Equals(header[i])){
 					currHeader = header[i];
-					ensembles.Add(new Ensemble(currHeader, issueDate));
+					headers.Add(currHeader);
 					locStarts.Add(i);
 				}
 			}
@@ -62,7 +62,14 @@ namespace HEFS_Reader.Implementations
 				}
 				isFirstPass = false;
 			}
-			return false;
+			//push into ensembles.
+			for (int i = 0; i < FullTable.Count; i++)
+			{
+				ensembles.Add(new Ensemble(headers[i], issueDate, FullTable[i], times));
+			}
+
+
+			return ensembles;
 		}
 		private DateTime ParseDateTime(string dt)
 		{

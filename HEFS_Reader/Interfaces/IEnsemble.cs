@@ -10,6 +10,5 @@ namespace HEFS_Reader.Interfaces
 		string getLocationName();
 		Enumerations.Timesteps getTimestep();
 		IList<IEnsembleMember> getMembers();
-		void AddSlice(DateTime time, IList<float> values);
 	}
 }
