@@ -20,7 +20,7 @@ namespace HEFS_Reader.Implementations
 			string webrequest = _rootUrl;
 			webrequest += args.date;
 			webrequest += args.location;
-			webrequest += "_hefs_csv_daily.zip";
+			webrequest += "_hefs_csv_hourly.zip";
 
 			//System.Net.WebClient wc = new System.Net.WebClient();
 			//Response = wc.DownloadString(webrequest);
@@ -37,4 +37,4 @@ namespace HEFS_Reader.Implementations
 //https://www.cnrfc.noaa.gov/ensembleHourlyProductCSV.php 
 //var filetoget = '/csv/'+yyyy+monnum+daynew+hh+'_'+theprod+'_hefs_csv_hourly.zip'
 //var printfiletoget = yyyy + monnum + daynew + hh + '_' + theprod + '_hefs_csv_hourly.zip
-//https://www.cnrfc.noaa.gov/csv/2019092312_RussianNapa_hefs_csv_daily.zip
+//https://www.cnrfc.noaa.gov/csv/2019092312_RussianNapa_hefs_csv_hourly.zip

@@ -26,8 +26,18 @@ namespace HEFS_Reader.Implementations
 					locStarts.Add(i);
 				}
 			}
+			//second line is Blank,QINE,...QINE
 			//
+
 			return false;
+		}
+		private DateTime ParseDateTime(string dt)
+		{
+			string[] dateTime = dt.Split(' ');
+			string[] yyyymmdd = dateTime[0].Split('-');
+			string[] hhmmss = dateTime[1].Split(':');
+			DateTime output = new DateTime(int.Parse(yyyymmdd[0]), int.Parse(yyyymmdd[1]), int.Parse(yyyymmdd[2]), int.Parse(hhmmss[0]), int.Parse(hhmmss[1]), int.Parse(hhmmss[2]));
+			return output;
 		}
 	}
 }
