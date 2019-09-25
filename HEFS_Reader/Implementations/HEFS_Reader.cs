@@ -61,6 +61,7 @@ namespace HEFS_Reader.Implementations
 						FullTable[locationNum].Add(new List<float>());
 					}
 					FullTable[locationNum][ensembleMemberNum].Add(float.Parse(values[i]));
+                    ensembleMemberNum++;
 				}
 				isFirstPass = false;
 			}
