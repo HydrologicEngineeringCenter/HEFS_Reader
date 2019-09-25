@@ -6,7 +6,7 @@ namespace HEFS_Reader.Implementations
 {
 	class HEFS_Reader
 	{
-		public IList<Interfaces.IEnsemble> readData(string data, DateTime issueDate)
+		public static IList<Interfaces.IEnsemble> readData(string data, DateTime issueDate)
 		{
 			//is this zipped or not zipped?
 			//split based on new lines into rows for each element.
@@ -71,7 +71,7 @@ namespace HEFS_Reader.Implementations
 
 			return ensembles;
 		}
-		private DateTime ParseDateTime(string dt)
+		private static DateTime ParseDateTime(string dt)
 		{
 			string[] dateTime = dt.Split(' ');
 			string[] yyyymmdd = dateTime[0].Split('-');
