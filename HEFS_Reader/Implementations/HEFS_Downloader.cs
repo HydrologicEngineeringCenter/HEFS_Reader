@@ -27,7 +27,12 @@ namespace HEFS_Reader.Implementations
 
             Reclamation.Core.ZipFileUtility.UnzipFile(zipFileName, csvFileName);
             Response = File.ReadAllText(csvFileName);
-			return true;
+            File.Delete(zipFileName);
+            File.Delete(csvFileName);
+
+
+
+            return true;
 		}
 
         /// <summary>

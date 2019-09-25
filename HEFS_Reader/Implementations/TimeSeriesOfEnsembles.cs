@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HEFS_Reader.Implementations
 {
-	class TimeSeriesOfEnsembles
+	public class TimeSeriesOfEnsembles
 	{
 		public IList<IList<Interfaces.IEnsemble>> getDataForWatershedAndTimeRange(Enumerations.Watersheds watershed, DateTime startTime, DateTime endTime)
 		{
@@ -35,7 +35,7 @@ namespace HEFS_Reader.Implementations
 			
 			while (!startTime.Equals(endTime))
 			{
-				startTime.AddDays(1.0);
+				startTime = startTime.AddDays(1.0);
 				args.date = StringifyDateTime(startTime);
 				if (dl.FetchData(args))
 				{

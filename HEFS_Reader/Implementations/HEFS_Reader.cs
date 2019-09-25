@@ -34,6 +34,8 @@ namespace HEFS_Reader.Implementations
 			List<List<List<float>>> FullTable = new List<List<List<float>>>();//location, Ensemble member, values - because 64bit allows me to be careless
 			List<DateTime> times = new List<DateTime>();
 			for (int j = 2; j < rows.Length; j++) {
+                if (rows[j].Trim() == "")
+                    continue;
 				string[] values = rows[j].Split(',');
 				DateTime dt = ParseDateTime(values[0]);
 				times.Add(dt);

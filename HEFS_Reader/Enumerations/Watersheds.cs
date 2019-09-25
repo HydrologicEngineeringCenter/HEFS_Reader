@@ -22,6 +22,6 @@ namespace HEFS_Reader.Enumerations
 		SanJoaquin,
 		n_sanjoaquin,
 		EastSierra,
-		Humboldt;
+		Humboldt
 	}
 }
