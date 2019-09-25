@@ -50,6 +50,7 @@
     <Compile Include="Implementations\HEFSRequestArgs.cs" />
     <Compile Include="Implementations\HEFS_Downloader.cs" />
     <Compile Include="Implementations\HEFS_Reader.cs" />
+    <Compile Include="Implementations\TimeSeriesOfEnsembles.cs" />
     <Compile Include="Implementations\ZipFileUtility.cs" />
     <Compile Include="Interfaces\IEnsemble.cs" />
     <Compile Include="Interfaces\IEnsembleMember.cs" />

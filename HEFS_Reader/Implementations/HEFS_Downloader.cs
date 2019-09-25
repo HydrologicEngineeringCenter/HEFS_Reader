@@ -9,12 +9,6 @@ namespace HEFS_Reader.Implementations
 	public class HEFS_Downloader
 	{
 		private const string _rootUrl = "https://www.cnrfc.noaa.gov/csv/";
-		private IList<Interfaces.IEnsemble> _Result;//if i make an abstract result, errors could be stored in the result property.
-		public IList<Interfaces.IEnsemble> Result
-		{
-			get { return _Result; }
-			set { _Result = value; }
-		}
 		public string Response { get; set; }
 		public bool FetchData(HEFSRequestArgs args)
 		{
@@ -34,9 +28,6 @@ namespace HEFS_Reader.Implementations
             Reclamation.Core.ZipFileUtility.UnzipFile(zipFileName, csvFileName);
             Response = File.ReadAllText(csvFileName);
 			return true;
-			//new webconnection.
-
-			//_Result = new ECAMResult(response);
 		}
 
         /// <summary>
