@@ -8,7 +8,7 @@ namespace HEFS_Reader.Implementations
 {
 	class TimeSeriesOfEnsembles
 	{
-		public IList<IList<Interfaces.IEnsemble>> getDataForWatershedAndTimeRange(string watershed, DateTime startTime, DateTime endTime)
+		public IList<IList<Interfaces.IEnsemble>> getDataForWatershedAndTimeRange(Enumerations.Watersheds watershed, DateTime startTime, DateTime endTime)
 		{
 			if (startTime.Hour != 12) {
 				//start time must be 12 (actually i think it is supposed to be 10AM

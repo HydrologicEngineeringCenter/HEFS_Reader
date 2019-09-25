@@ -3,6 +3,6 @@
 	public class HEFSRequestArgs
 	{
 		public string date { get; set; }
-		public string location { get; set; }
+		public Enumerations.Watersheds location { get; set; }
 	}
 }

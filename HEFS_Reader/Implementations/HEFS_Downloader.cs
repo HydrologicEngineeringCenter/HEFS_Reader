@@ -15,7 +15,7 @@ namespace HEFS_Reader.Implementations
             //https://www.cnrfc.noaa.gov/csv/2019092312_RussianNapa_hefs_csv_hourly.zip
             string webrequest = _rootUrl;
             webrequest += args.date + "_";
-            webrequest += args.location;
+            webrequest += args.location.ToString();
 			webrequest += "_hefs_csv_hourly.zip";
 
             string zipFileName = Path.GetTempFileName();

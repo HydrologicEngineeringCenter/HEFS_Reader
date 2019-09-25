@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enumerations\Timesteps.cs" />
+    <Compile Include="Enumerations\Watersheds.cs" />
     <Compile Include="Implementations\Ensemble.cs" />
     <Compile Include="Implementations\EnsembleMember.cs" />
     <Compile Include="Implementations\HEFSRequestArgs.cs" />
