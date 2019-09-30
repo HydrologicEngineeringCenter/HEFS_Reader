@@ -46,24 +46,26 @@ namespace HEFS_Reader.Implementations
                 Response = File.ReadAllText(csvFileName);
                 return true;
             }
+
+      Console.WriteLine("Warning: "+csvFileName+" not found, skipping");
            
-                Console.WriteLine("GET "+webrequest);
-            File.Delete(zipFileName);
-            File.Delete(csvFileName);
-            try
-            {
-                GetFile(webrequest, zipFileName);
-            }
-            catch( Exception exception)
-            {
-                Console.WriteLine("download failed");
-                File.Delete(zipFileName);
-                File.Delete(csvFileName);
-                return false;
-            }
-            Reclamation.Core.ZipFileUtility.UnzipFile(zipFileName, csvFileName);
-            Response = File.ReadAllText(csvFileName);
-            Console.WriteLine("sucessfully downloaded to "+csvFileName);
+            //    Console.WriteLine("GET "+webrequest);
+            //File.Delete(zipFileName);
+            //File.Delete(csvFileName);
+            //try
+            //{
+            //    GetFile(webrequest, zipFileName);
+            //}
+            //catch( Exception exception)
+            //{
+            //    Console.WriteLine("download failed");
+            //    File.Delete(zipFileName);
+            //    File.Delete(csvFileName);
+            //    return false;
+            //}
+            //Reclamation.Core.ZipFileUtility.UnzipFile(zipFileName, csvFileName);
+            //Response = File.ReadAllText(csvFileName);
+            //Console.WriteLine("sucessfully downloaded to "+csvFileName);
 
 
             return true;
