@@ -4,7 +4,7 @@ using System.Text;
 
 namespace HEFS_Reader.Implementations
 {
-	class EnsembleMember : Interfaces.IEnsembleMember
+	public class EnsembleMember : Interfaces.IEnsembleMember
 	{
 		private DateTime[] _times;
 		private float[] _values;

@@ -6,25 +6,40 @@ using System.Text;
 
 namespace HEFS_Reader.Implementations
 {
-	public class HEFS_Downloader
+	public class HEFS_DataServiceProvider : Interfaces.IHEFS_DataServiceProvider
 	{
 		private const string _rootUrl = "https://www.cnrfc.noaa.gov/csv/";
-		public string Response { get; set; }
-		public bool FetchData(HEFSRequestArgs args, string cacheDirectory = "")
+        private readonly string _cacheDirectory;
+
+        public string Response { get; set; }
+
+        public string CacheDirectory
+        {
+            get { return _cacheDirectory; }
+            //private set { _cacheDirectory = value; }
+        }
+        public HEFS_DataServiceProvider()
+        {
+             _cacheDirectory = Path.GetTempPath();
+        }
+        public HEFS_DataServiceProvider(string cacheDir)
+        {
+            _cacheDirectory = cacheDir;
+        }
+        public bool FetchData(HEFSRequestArgs args)
 		{
             //https://www.cnrfc.noaa.gov/csv/2019092312_RussianNapa_hefs_csv_hourly.zip
             string webrequest = _rootUrl;
 
-            if (cacheDirectory == "")
-                cacheDirectory = Path.GetTempPath();
+
              string fileName  = args.date + "_";
             fileName += args.location.ToString();
             fileName += "_hefs_csv_hourly";
             webrequest += fileName+".zip";
 
             
-            string zipFileName = Path.Combine(cacheDirectory, fileName+".zip");
-            string csvFileName = Path.Combine(cacheDirectory, fileName + ".csv");
+            string zipFileName = Path.Combine(CacheDirectory, fileName+".zip");
+            string csvFileName = Path.Combine(CacheDirectory, fileName + ".csv");
             if (File.Exists(csvFileName))
             {
                 Console.WriteLine("Found "+ csvFileName+" in cache.  Reading...");
@@ -83,7 +98,6 @@ namespace HEFS_Reader.Implementations
                 }
             }
         }
-
 
     }
 

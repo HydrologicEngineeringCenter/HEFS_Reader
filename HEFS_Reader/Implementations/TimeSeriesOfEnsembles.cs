@@ -8,7 +8,7 @@ namespace HEFS_Reader.Implementations
 {
 	public class TimeSeriesOfEnsembles
 	{
-		public IList<IList<Interfaces.IEnsemble>> getDataForWatershedAndTimeRange(Enumerations.Watersheds watershed, DateTime startTime, DateTime endTime)
+		public IList<IList<Interfaces.IEnsemble>> getDataForWatershedAndTimeRange(Enumerations.Watersheds watershed, DateTime startTime, DateTime endTime, Interfaces.IHEFS_DataServiceProvider dataServiceProvider)
 		{
 			if (startTime.Hour != 12) {
 				//start time must be 12 (actually i think it is supposed to be 10AM
@@ -27,19 +27,20 @@ namespace HEFS_Reader.Implementations
 			args.location = watershed;
 			args.date = StringifyDateTime(startTime);
 			List<IList<Interfaces.IEnsemble>> output = new List<IList<Interfaces.IEnsemble>>();
-			HEFS_Downloader dl = new HEFS_Downloader();
-			if (dl.FetchData(args))
+			//HEFS_DataServiceProvider dl = new HEFS_DataServiceProvider();
+
+			if (dataServiceProvider.FetchData(args))
 			{
-				output.Add(HEFS_Reader.readData(dl.Response, startTime));
+				output.Add(HEFS_Reader.readData(dataServiceProvider.Response, startTime));
 			}
 			
 			while (!startTime.Equals(endTime))
 			{
 				startTime = startTime.AddDays(1.0);
 				args.date = StringifyDateTime(startTime);
-				if (dl.FetchData(args))
+				if (dataServiceProvider.FetchData(args))
 				{
-					output.Add(HEFS_Reader.readData(dl.Response, startTime));
+					output.Add(HEFS_Reader.readData(dataServiceProvider.Response, startTime));
 				}
 			}
 			return output;

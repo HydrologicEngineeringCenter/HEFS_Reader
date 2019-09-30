@@ -5,7 +5,7 @@ using HEFS_Reader.Interfaces;
 
 namespace HEFS_Reader.Implementations
 {
-	class Ensemble : Interfaces.IEnsemble
+	public class Ensemble : Interfaces.IEnsemble
 	{
 		private DateTime _issuanceDate;
 		private DateTime _referenceDate;
