@@ -45,27 +45,10 @@ namespace HEFS_Reader.Implementations
                 Console.WriteLine("Found "+ csvFileName+" in cache.  Reading...");
 				return HEFS_CSV_Parser.parseCSVData(File.ReadAllText(csvFileName), HEFS_CSV_Parser.ParseDateTime(args.date), args.location);
             }
+
+			Console.WriteLine("Warning: "+csvFileName+" not found, skipping");
 			return null;
-            //    Console.WriteLine("GET "+webrequest);
-            //File.Delete(zipFileName);
-            //File.Delete(csvFileName);
-            //try
-            //{
-            //    GetFile(webrequest, zipFileName);
-            //}
-            //catch( Exception exception)
-            //{
-            //    Console.WriteLine("download failed");
-            //    File.Delete(zipFileName);
-            //    File.Delete(csvFileName);
-            //    return false;
-            //}
-            //Reclamation.Core.ZipFileUtility.UnzipFile(zipFileName, csvFileName);
-            //Response = File.ReadAllText(csvFileName);
-            //Console.WriteLine("sucessfully downloaded to "+csvFileName);
-
-
-            //return true;
+           
 		}
 
         ///// <summary>
