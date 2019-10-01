@@ -15,14 +15,20 @@ namespace HEFS_Reader.Implementations
 			_times = times;
 		}
 
-		public DateTime[] getTimes()
+		public DateTime[] Times
 		{
-			return _times;
+			get
+			{
+				return _times;
+			}
 		}
 
-		public float[] getValues()
+		public float[] Values
 		{
-			return _values;
+			get
+			{
+				return _values;
+			}
 		}
 	}
 }

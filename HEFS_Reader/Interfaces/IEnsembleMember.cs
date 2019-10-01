@@ -6,7 +6,7 @@ namespace HEFS_Reader.Interfaces
 {
 	public interface IEnsembleMember
 	{
-		DateTime[] getTimes();
-		float[] getValues();
+		DateTime[] Times { get; }
+		float[] Values { get; }
 	}
 }

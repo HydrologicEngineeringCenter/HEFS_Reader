@@ -5,7 +5,7 @@ using HEFS_Reader.Interfaces;
 
 namespace HEFS_Reader.Implementations
 {
-	public class Ensemble : Interfaces.IEnsemble
+	public class Ensemble : IEnsemble
 	{
 		private DateTime _issuanceDate;
 		private DateTime _referenceDate;
@@ -25,28 +25,43 @@ namespace HEFS_Reader.Implementations
 			
 
 		}
-		public DateTime getIssueDate()
+		public DateTime IssueDate
 		{
-			return _issuanceDate;
+			get
+			{
+				return _issuanceDate;
+			}
 		}
 
-		public DateTime getRefereceDate()
+		public DateTime RefereceDate
 		{
-			return _referenceDate;
+			get
+			{
+				return _referenceDate;
+			}
 		}
-		public string getLocationName()
+		public string LocationName
 		{
-			return _locationName;
+			get
+			{
+				return _locationName;
+			}
 		}
 
-		public Enumerations.Timesteps getTimestep()
+		public Enumerations.Timesteps Timestep
 		{
-			return _timeStep;
+			get
+			{
+				return _timeStep;
+			}
 		}
 
-		public IList<IEnsembleMember> getMembers()
+		public IList<IEnsembleMember> Members
 		{
-			return _members;
+			get
+			{
+				return _members;
+			}
 		}
 	}
 }

@@ -5,10 +5,10 @@ namespace HEFS_Reader.Interfaces
 {
 	public interface IEnsemble
 	{
-		DateTime getRefereceDate();
-		DateTime getIssueDate();
-		string getLocationName();
-		Enumerations.Timesteps getTimestep();
-		IList<IEnsembleMember> getMembers();
+		DateTime RefereceDate { get; }
+		DateTime IssueDate { get; }
+		string LocationName { get; }
+		Enumerations.Timesteps Timestep { get; }
+		IList<IEnsembleMember> Members { get; }
 	}
 }

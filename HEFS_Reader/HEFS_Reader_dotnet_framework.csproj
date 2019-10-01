@@ -50,12 +50,17 @@
     <Compile Include="Implementations\EnsembleMember.cs" />
     <Compile Include="Implementations\HEFSRequestArgs.cs" />
     <Compile Include="Implementations\HEFS_DataServiceProvider.cs" />
-    <Compile Include="Implementations\HEFS_Reader.cs" />
-    <Compile Include="Implementations\TimeSeriesOfEnsembles.cs" />
+    <Compile Include="Implementations\HEFS_CSV_Parser.cs" />
+    <Compile Include="Implementations\Processor.cs" />
+    <Compile Include="Implementations\TimeSeriesOfEnsembleLocations.cs" />
+    <Compile Include="Implementations\Watershed.cs" />
     <Compile Include="Implementations\ZipFileUtility.cs" />
     <Compile Include="Interfaces\IEnsemble.cs" />
     <Compile Include="Interfaces\IEnsembleMember.cs" />
-    <Compile Include="Interfaces\IHEFS_DataServiceProvider.cs" />
+    <Compile Include="Interfaces\IEnsembleReader.cs" />
+    <Compile Include="Interfaces\IEnsembleWriter.cs" />
+    <Compile Include="Interfaces\ITimeSeriesOfEnsembleLocations.cs" />
+    <Compile Include="Interfaces\IWatershed.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />

@@ -4,9 +4,9 @@ using System.Text;
 
 namespace HEFS_Reader.Implementations
 {
-	class HEFS_Reader
+	class HEFS_CSV_Parser
 	{
-		public static IList<Interfaces.IEnsemble> readData(string data, DateTime issueDate)
+		public static Interfaces.IWatershed parseCSVData(string data, DateTime issueDate, Enumerations.Watersheds watershedName)
 		{
 			//is this zipped or not zipped?
 			//split based on new lines into rows for each element.
@@ -72,15 +72,26 @@ namespace HEFS_Reader.Implementations
 			}
 
 
-			return ensembles;
+			return new Watershed(ensembles,watershedName);
 		}
-		private static DateTime ParseDateTime(string dt)
+		public static DateTime ParseDateTime(string dt)
 		{
 			string[] dateTime = dt.Split(' ');
 			string[] yyyymmdd = dateTime[0].Split('-');
 			string[] hhmmss = dateTime[1].Split(':');
 			DateTime output = new DateTime(int.Parse(yyyymmdd[0]), int.Parse(yyyymmdd[1]), int.Parse(yyyymmdd[2]), int.Parse(hhmmss[0]), int.Parse(hhmmss[1]), int.Parse(hhmmss[2]));
 			return output;
+		}
+		public static string StringifyDateTime(DateTime input)
+		{
+			string output = "";
+			output = input.Year.ToString() + StringifyInt(input.Month) + StringifyInt(input.Day) + StringifyInt(input.Hour);
+			return output;
+		}
+		public static string StringifyInt(int input)
+		{
+			if (input < 10) return "0" + input.ToString();
+			return input.ToString();
 		}
 	}
 }

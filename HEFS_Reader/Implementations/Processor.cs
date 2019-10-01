@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace HEFS_Reader.Implementations
 {
-	public class TimeSeriesOfEnsembles
+	public class Processor
 	{
-		public IList<IList<Interfaces.IEnsemble>> getDataForWatershedAndTimeRange(Enumerations.Watersheds watershed, DateTime startTime, DateTime endTime, Interfaces.IHEFS_DataServiceProvider dataServiceProvider)
+		public static Interfaces.ITimeSeriesOfEnsembleLocations getDataForWatershedAndTimeRange(Enumerations.Watersheds watershed, DateTime startTime, DateTime endTime, Interfaces.IEnsembleReader dataServiceProvider)
 		{
 			if (startTime.Hour != 12) {
 				//start time must be 12 (actually i think it is supposed to be 10AM
@@ -25,24 +25,20 @@ namespace HEFS_Reader.Implementations
 			}
 			HEFSRequestArgs args = new HEFSRequestArgs();
 			args.location = watershed;
-			args.date = StringifyDateTime(startTime);
-			List<IList<Interfaces.IEnsemble>> output = new List<IList<Interfaces.IEnsemble>>();
-			//HEFS_DataServiceProvider dl = new HEFS_DataServiceProvider();
-
-			if (dataServiceProvider.FetchData(args))
+			args.date = HEFS_CSV_Parser.StringifyDateTime(startTime);
+			Interfaces.ITimeSeriesOfEnsembleLocations output = new TimeSeriesOfEnsembleLocations();
+			DateTime endTimePlus1 = endTime.AddDays(1.0);
+			System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+			while (!startTime.Equals(endTimePlus1))
 			{
-				output.Add(HEFS_Reader.readData(dataServiceProvider.Response, startTime));
-			}
-			
-			while (!startTime.Equals(endTime))
-			{
+				stopwatch.Start();
+				output.timeSeriesOfEnsembleLocations.Add(dataServiceProvider.Read(args));
+				stopwatch.Stop();
 				startTime = startTime.AddDays(1.0);
-				args.date = StringifyDateTime(startTime);
-				if (dataServiceProvider.FetchData(args))
-				{
-					output.Add(HEFS_Reader.readData(dataServiceProvider.Response, startTime));
-				}
+				args.date = HEFS_CSV_Parser.StringifyDateTime(startTime);
+				
 			}
+			Console.WriteLine("Reading took: " + stopwatch.Elapsed.ToString());
 			return output;
 		}
 		private string StringifyDateTime(DateTime input)
