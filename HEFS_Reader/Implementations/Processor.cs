@@ -32,7 +32,16 @@ namespace HEFS_Reader.Implementations
 			while (!startTime.Equals(endTimePlus1))
 			{
 				stopwatch.Start();
-				output.timeSeriesOfEnsembleLocations.Add(dataServiceProvider.Read(args));
+				Interfaces.IWatershed wtshd = dataServiceProvider.Read(args);
+				if (wtshd != null)
+				{
+					output.timeSeriesOfEnsembleLocations.Add(wtshd);
+				}
+				else
+				{
+					//dont add null data?
+				}
+				
 				stopwatch.Stop();
 				startTime = startTime.AddDays(1.0);
 				args.date = HEFS_CSV_Parser.StringifyDateTime(startTime);
