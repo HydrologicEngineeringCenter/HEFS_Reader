@@ -15,7 +15,7 @@ namespace HEFS_Reader.Implementations
 			{
 				string fileName = watershed.WatershedName.ToString() + "_" + HEFS_CSV_Parser.StringifyDateTime(watershed.Locations.First().IssueDate) + ".csv";
 				string fullPath = System.IO.Path.Combine(directoryPath, fileName);
-				System.IO.FileStream fs = new System.IO.FileStream(fullPath, System.IO.FileMode.CreateNew, System.IO.FileAccess.Write);
+				//System.IO.FileStream fs = new System.IO.FileStream(fullPath, System.IO.FileMode.CreateNew, System.IO.FileAccess.Write);
 				string line = "";//consider stringbuilder.
 				using (System.IO.StreamWriter sr = new System.IO.StreamWriter(fullPath))
 				{
