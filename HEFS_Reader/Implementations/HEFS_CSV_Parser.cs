@@ -6,7 +6,7 @@ namespace HEFS_Reader.Implementations
 {
 	class HEFS_CSV_Parser
 	{
-		public static Interfaces.IWatershed parseCSVData(string data, DateTime issueDate, Enumerations.Watersheds watershedName)
+		public static Interfaces.IWatershed ParseCSVData(string data, DateTime issueDate, Enumerations.Watersheds watershedName)
 		{
 			//is this zipped or not zipped?
 			//split based on new lines into rows for each element.

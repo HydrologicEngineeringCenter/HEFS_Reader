@@ -8,7 +8,7 @@ namespace HEFS_Reader.Implementations
 {
 	public class Processor
 	{
-		public static Interfaces.ITimeSeriesOfEnsembleLocations getDataForWatershedAndTimeRange(Enumerations.Watersheds watershed, DateTime startTime, DateTime endTime, Interfaces.IEnsembleReader dataServiceProvider)
+		public static Interfaces.ITimeSeriesOfEnsembleLocations GetDataForWatershedAndTimeRange(Enumerations.Watersheds watershed, DateTime startTime, DateTime endTime, Interfaces.IEnsembleReader dataServiceProvider)
 		{
 			if (startTime.Hour != 12) {
 				//start time must be 12 (actually i think it is supposed to be 10AM
@@ -25,7 +25,7 @@ namespace HEFS_Reader.Implementations
 			}
 			HEFSRequestArgs args = new HEFSRequestArgs();
 			args.location = watershed;
-			args.date = HEFS_CSV_Parser.StringifyDateTime(startTime);
+      args.date = startTime;
 			Interfaces.ITimeSeriesOfEnsembleLocations output = new TimeSeriesOfEnsembleLocations();
 			DateTime endTimePlus1 = endTime.AddDays(1.0);
 			System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
@@ -44,7 +44,7 @@ namespace HEFS_Reader.Implementations
 				
 				stopwatch.Stop();
 				startTime = startTime.AddDays(1.0);
-				args.date = HEFS_CSV_Parser.StringifyDateTime(startTime);
+        args.date = startTime;
 				
 			}
 			Console.WriteLine("Reading took: " + stopwatch.Elapsed.ToString());

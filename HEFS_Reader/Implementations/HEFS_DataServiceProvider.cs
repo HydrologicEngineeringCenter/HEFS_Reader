@@ -32,7 +32,7 @@ namespace HEFS_Reader.Implementations
             //string webrequest = _rootUrl;
 
 
-             string fileName  = args.date + "_";
+             string fileName  = args.date.ToString("yyyyMMddhh") + "_";
             fileName += args.location.ToString();
             fileName += "_hefs_csv_hourly";
             //webrequest += fileName+".zip";
@@ -43,7 +43,8 @@ namespace HEFS_Reader.Implementations
             if (File.Exists(csvFileName))
             {
                 Console.WriteLine("Found "+ csvFileName+" in cache.  Reading...");
-				return HEFS_CSV_Parser.parseCSVData(File.ReadAllText(csvFileName), HEFS_CSV_Parser.ParseDateTime(args.date), args.location);
+				return HEFS_CSV_Parser.ParseCSVData(File.ReadAllText(csvFileName), 
+           args.date, args.location);
             }
 
 			Console.WriteLine("Warning: "+csvFileName+" not found, skipping");
