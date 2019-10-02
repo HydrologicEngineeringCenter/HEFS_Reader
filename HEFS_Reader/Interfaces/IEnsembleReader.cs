@@ -8,6 +8,11 @@ namespace HEFS_Reader.Interfaces
 {
     public interface IEnsembleReader
     {
-        IWatershed Read(Implementations.HEFSRequestArgs args);
+        /// <summary>
+		/// This is where the magic happens for reading. We need to be able to access these ensemble datasets with lightning speed!
+		/// </summary>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		IWatershed Read(Implementations.HEFSRequestArgs args);
     }
 }
