@@ -9,6 +9,6 @@ namespace HEFS_Reader.Interfaces
 	public interface IEnsembleWriter
 	{
 		//bool Write(IEnsemble ensemble);
-		bool Write(ITimeSeriesOfEnsembleLocations timeSeriesOfEnsembleLocations);
+		bool Write(ITimeSeriesOfEnsembleLocations timeSeriesOfEnsembleLocations, string directoryName);
 	}
 }
