@@ -49,6 +49,7 @@
     <Compile Include="Implementations\Ensemble.cs" />
     <Compile Include="Implementations\EnsembleMember.cs" />
     <Compile Include="Implementations\HEFSRequestArgs.cs" />
+    <Compile Include="Implementations\HEFS_ZIP_Writer.cs" />
     <Compile Include="Implementations\HEFS_CSV_Writer.cs" />
     <Compile Include="Implementations\HEFS_DataServiceProvider.cs" />
     <Compile Include="Implementations\HEFS_CSV_Parser.cs" />
