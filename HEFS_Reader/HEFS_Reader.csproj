@@ -52,16 +52,16 @@
     <Compile Include="Implementations\HEFS_CSV_Writer.cs" />
     <Compile Include="Implementations\HEFS_DataServiceProvider.cs" />
     <Compile Include="Implementations\HEFS_CSV_Parser.cs" />
-    <Compile Include="Implementations\Processor.cs" />
+    <Compile Include="Implementations\ReadProcessor.cs" />
     <Compile Include="Implementations\TimeSeriesOfEnsembleLocations.cs" />
-    <Compile Include="Implementations\Watershed.cs" />
-    <Compile Include="Implementations\ZipFileUtility.cs" />
+    <Compile Include="Implementations\WatershedForecast.cs" />
     <Compile Include="Interfaces\IEnsemble.cs" />
     <Compile Include="Interfaces\IEnsembleMember.cs" />
     <Compile Include="Interfaces\IEnsembleReader.cs" />
     <Compile Include="Interfaces\IEnsembleWriter.cs" />
+    <Compile Include="Interfaces\IHEFSReadArgs.cs" />
     <Compile Include="Interfaces\ITimeSeriesOfEnsembleLocations.cs" />
-    <Compile Include="Interfaces\IWatershed.cs" />
+    <Compile Include="Interfaces\IWatershedForecast.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />

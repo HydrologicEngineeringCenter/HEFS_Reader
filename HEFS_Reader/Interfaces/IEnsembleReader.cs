@@ -13,6 +13,7 @@ namespace HEFS_Reader.Interfaces
 		/// </summary>
 		/// <param name="args"></param>
 		/// <returns></returns>
-		IWatershed Read(Implementations.HEFSRequestArgs args);
+		IWatershedForecast Read(Interfaces.IHEFSReadArgs args);
+    Interfaces.ITimeSeriesOfEnsembleLocations ReadDataset(Enumerations.Watersheds watershed, DateTime start, DateTime end, String Path);
     }
 }
