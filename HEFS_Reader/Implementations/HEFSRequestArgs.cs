@@ -2,9 +2,10 @@
 
 namespace HEFS_Reader.Implementations
 {
-	public class HEFSRequestArgs
+	public class HEFSRequestArgs: Interfaces.IHEFSReadArgs
 	{
-		public DateTime date { get; set; }
-		public Enumerations.Watersheds location { get; set; }
+		public DateTime ForecastDate { get; set; }
+		public Enumerations.Watersheds WatershedLocation { get; set; }
+    public string Path { get; set; }
 	}
 }

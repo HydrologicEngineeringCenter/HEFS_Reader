@@ -9,8 +9,8 @@ namespace HEFS_Reader.Implementations
 {
 	public class TimeSeriesOfEnsembleLocations : Interfaces.ITimeSeriesOfEnsembleLocations
 	{
-		private IList<IWatershed> _timeSeriesofEnsembleLocations;
-		public IList<IWatershed> timeSeriesOfEnsembleLocations
+		private IList<IWatershedForecast> _timeSeriesofEnsembleLocations;
+		public IList<IWatershedForecast> timeSeriesOfEnsembleLocations
 		{
 			get
 			{
@@ -19,7 +19,7 @@ namespace HEFS_Reader.Implementations
 		}
 		public TimeSeriesOfEnsembleLocations()
 		{
-			_timeSeriesofEnsembleLocations = new List<IWatershed>();
+			_timeSeriesofEnsembleLocations = new List<IWatershedForecast>();
 		}
 	}
 }

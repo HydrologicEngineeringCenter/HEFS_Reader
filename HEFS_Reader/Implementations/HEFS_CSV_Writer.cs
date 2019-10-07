@@ -7,11 +7,13 @@ using HEFS_Reader.Interfaces;
 
 namespace HEFS_Reader.Implementations
 {
-	class HEFS_CSV_Writer : Interfaces.IEnsembleWriter
+	public class HEFS_CSV_Writer : Interfaces.IEnsembleWriter
 	{
-		public bool Write(ITimeSeriesOfEnsembleLocations timeSeriesOfEnsembleLocations, string directoryPath)
+		public TimeSpan Write(ITimeSeriesOfEnsembleLocations timeSeriesOfEnsembleLocations, string directoryPath)
 		{
-			foreach (IWatershed watershed in timeSeriesOfEnsembleLocations.timeSeriesOfEnsembleLocations)//this could be parallel.
+      System.Diagnostics.Stopwatch st = new System.Diagnostics.Stopwatch();
+      st.Start();
+			foreach (IWatershedForecast watershed in timeSeriesOfEnsembleLocations.timeSeriesOfEnsembleLocations)//this could be parallel.
 			{
 				string fileName = watershed.WatershedName.ToString() + "_" + HEFS_CSV_Parser.StringifyDateTime(watershed.Locations.First().IssueDate) + ".csv";
 				string fullPath = System.IO.Path.Combine(directoryPath, fileName);
@@ -45,7 +47,8 @@ namespace HEFS_Reader.Implementations
 					}
 				}
 			}
-			return true;
+      st.Stop();
+			return st.Elapsed;
 		}
 	}
 }
