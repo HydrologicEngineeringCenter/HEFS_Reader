@@ -12,7 +12,7 @@ namespace HEFS_Reader.Implementations
 	{
 		//private const string _rootUrl = "https://www.cnrfc.noaa.gov/csv/";
     private long _watershedReadTime = 0;
-       // public string Response { get; set; }
+    public long ReadTimeInMilliSeconds { get { return _watershedReadTime; } }
 
 
     public HEFS_DataServiceProvider()
@@ -30,17 +30,17 @@ namespace HEFS_Reader.Implementations
             fileName += "_hefs_csv_hourly";
       //webrequest += fileName+".zip";
 
-      System.Diagnostics.Stopwatch st = new System.Diagnostics.Stopwatch();
+      //System.Diagnostics.Stopwatch st = new System.Diagnostics.Stopwatch();
             //string zipFileName = Path.Combine(CacheDirectory, fileName+".zip");
             string csvFileName = Path.Combine(args.Path, fileName + ".csv");
             if (File.Exists(csvFileName))
             {
                 Console.WriteLine("Found "+ csvFileName+" in cache.  Reading...");
-        st.Start();
+        //st.Start();
         Interfaces.IWatershedForecast w = HEFS_CSV_Parser.ParseCSVData(File.ReadAllText(csvFileName), 
            args.ForecastDate, args.WatershedLocation);
-        st.Stop();
-        _watershedReadTime = st.ElapsedMilliseconds;
+        //st.Stop();
+        //_watershedReadTime = st.ElapsedMilliseconds;
         return w;
             }
 
@@ -51,6 +51,8 @@ namespace HEFS_Reader.Implementations
 
     public Interfaces.ITimeSeriesOfEnsembleLocations ReadDataset(Watersheds watershed, DateTime start, DateTime end, string Path)
     {
+			System.Diagnostics.Stopwatch st = new System.Diagnostics.Stopwatch();
+			st.Start();
       if (start.Hour != 12)
       {
         //start time must be 12 (actually i think it is supposed to be 10AM
@@ -72,10 +74,8 @@ namespace HEFS_Reader.Implementations
       args.Path = Path;
       Interfaces.ITimeSeriesOfEnsembleLocations output = new TimeSeriesOfEnsembleLocations();
       DateTime endTimePlus1 = end.AddDays(1.0);
-      System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
       while (!start.Equals(endTimePlus1))
       {
-        stopwatch.Start();
         Interfaces.IWatershedForecast wtshd = Read(args);
         if (wtshd != null)
         {
@@ -85,13 +85,12 @@ namespace HEFS_Reader.Implementations
         {
           //dont add null data?
         }
-
-        stopwatch.Stop();
         start = start.AddDays(1.0);
         args.ForecastDate = start;
 
       }
-      //LogInfo("Reading took: " + stopwatch.Elapsed.ToString(), logFilePath);
+			st.Stop();
+			_watershedReadTime = st.ElapsedMilliseconds;
       return output;
     }
     private static void LogInfo(string textToappend, string logFile)

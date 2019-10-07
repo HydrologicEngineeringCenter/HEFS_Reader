@@ -12,6 +12,8 @@ namespace HEFSConverter
 {
 	class DssEnsembleReader : HEFS_Reader.Interfaces.IEnsembleReader
 	{
+		private long _readTimeInMilliSeconds = 0;
+		public long ReadTimeInMilliSeconds { get { return _readTimeInMilliSeconds; } }
 
 
 		/// <summary>
@@ -38,9 +40,8 @@ namespace HEFSConverter
 
 		public ITimeSeriesOfEnsembleLocations ReadDataset(Watersheds watershed, DateTime start, DateTime end, string dssPath)
 		{
-			//create catalog here,
-			// loop through start times until end time and call read appropriately.
-
+			System.Diagnostics.Stopwatch st = new Stopwatch();
+			st.Start();
 			List<HEFS_Reader.Interfaces.IEnsemble> ensembles = new List<HEFS_Reader.Interfaces.IEnsemble>();
 			WatershedForecast watershedForecast = new WatershedForecast(ensembles, watershed);
 			TimeSeriesOfEnsembleLocations rval = new TimeSeriesOfEnsembleLocations();
@@ -98,6 +99,8 @@ namespace HEFSConverter
 
 			}
 			watershedForecasts.Add(watershedForecast);
+			st.Stop();
+			_readTimeInMilliSeconds = st.ElapsedMilliseconds;
 			return rval;
 		}
 	}
