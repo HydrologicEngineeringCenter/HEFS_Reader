@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using HEFS_Reader.Enumerations;
+using HEFS_Reader.Interfaces;
 
 namespace HEFS_Reader.Implementations
 {
-	class HEFS_CSV_Parser
+	public class HEFS_CSV_Parser
 	{
 		public static Interfaces.IWatershedForecast ParseCSVData(string data, DateTime issueDate, Enumerations.Watersheds watershedName)
 		{
@@ -74,7 +76,13 @@ namespace HEFS_Reader.Implementations
 
 			return new WatershedForecast(ensembles,watershedName);
 		}
-		public static DateTime ParseDateTime(string dt)
+
+        public IWatershedForecast ParseCSVData(string v, DateTime forecastDate, Watersheds watershedLocation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static DateTime ParseDateTime(string dt)
 		{
 			string[] dateTime = dt.Split(' ');
 			string[] yyyymmdd = dateTime[0].Split('-');
