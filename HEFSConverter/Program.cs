@@ -51,9 +51,9 @@ namespace HEFSConverter
 
 
 				var fn = "ensemble_V7" + numEnsembles + ".dss";
-				DssEnsembleReader dssReader = new DssEnsembleReader();
+				HEFS_Reader.Interfaces.IEnsembleReader dssReader = new DssEnsembleReader();
 				var watershed = dssReader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
-				LogInfo(fn, numEnsembles, dssReader.ReadTimeInMilliSeconds/1000);
+				LogInfo(fn, numEnsembles, ((HEFS_Reader.Interfaces.ITimeable)dssReader).ReadTimeInMilliSeconds/1000);//potentially unsafe action.
 
 
 				numEnsembles *= 10;

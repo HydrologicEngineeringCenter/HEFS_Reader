@@ -15,6 +15,6 @@ namespace HEFS_Reader.Interfaces
 		/// <returns></returns>
 		//IWatershedForecast Read(Interfaces.IHEFSReadArgs args);
 		Interfaces.ITimeSeriesOfEnsembleLocations ReadDataset(Enumerations.Watersheds watershed, DateTime start, DateTime end, String Path);
-		long ReadTimeInMilliSeconds { get; }
+
     }
 }

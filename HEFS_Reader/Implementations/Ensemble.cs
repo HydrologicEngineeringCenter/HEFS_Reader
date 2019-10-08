@@ -72,43 +72,35 @@ namespace HEFS_Reader.Implementations
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        public bool HasSameData(IEnsemble e, float tolerance = 0.000001f)
+        public override bool Equals(object other)
         {
-
-            if (e.Members.Count != Members.Count)
+			IEnsemble o = other as IEnsemble;
+			if (o == null) return false;
+			float tolerance = 0.000001f;
+            if (o.Members.Count != this.Members.Count)
             {
                 Console.WriteLine("Different number of members");
                 return false;
             }
 
-            var diff = Members.Zip(e.Members, (first, second) => first.Values.Length == second.Values.Length);
-            if( diff.Any(x => x=false))
-            {
-                Console.WriteLine("different length of member values ");
-                return false;
-            }
-
-         //   var diff2 = Members.Zip(e.Members, (first, second) =>
-           //                    first.Values.Zip(second.Values, (a, b) => Math.Abs(a - b) > tolerance));
-
             for (int memberIndex = 0; memberIndex < Members.Count; memberIndex++)
             {
-                var a = Members[memberIndex].Values;
-                var b = e.Members[memberIndex].Values;
-                for (int i = 0; i < a.Length; i++)
-                {
-                    if( Math.Abs( a[i] - b[i]) > tolerance)
-                    {
-                        Console.WriteLine("difference exceeds tolerance");
-                        Console.WriteLine(this.LocationName+" member index = "+memberIndex+" "+this._times[i]);
-                      
-                        return false;
-                    }
-                }
+				this.Members[memberIndex].ComparisonTolerance = tolerance;
+				if (!this.Members[memberIndex].Equals(o.Members[memberIndex])) return false;
             }
              
             return true;
         }
 
-    }
+		public override int GetHashCode()
+		{
+			var hashCode = 1925819071;
+			hashCode = hashCode * -1521134295 + IssueDate.GetHashCode();
+			hashCode = hashCode * -1521134295 + RefereceDate.GetHashCode();
+			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(LocationName);
+			hashCode = hashCode * -1521134295 + Timestep.GetHashCode();
+			hashCode = hashCode * -1521134295 + EqualityComparer<IList<IEnsembleMember>>.Default.GetHashCode(Members);
+			return hashCode;
+		}
+	}
 }

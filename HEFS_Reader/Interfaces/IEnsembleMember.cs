@@ -14,5 +14,6 @@ namespace HEFS_Reader.Interfaces
 		/// The values for each timestep in the ensemble member.
 		/// </summary>
 		float[] Values { get; }
+		float ComparisonTolerance{ get; set; }
 	}
 }
