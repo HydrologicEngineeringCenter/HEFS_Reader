@@ -8,14 +8,14 @@ using HEFS_Reader.Interfaces;
 
 namespace HEFS_Reader.Implementations
 {
-	public class HEFS_DataServiceProvider : Interfaces.IEnsembleReader
+	public class HEFS_CSV_Reader : Interfaces.IEnsembleReader
 	{
 		//private const string _rootUrl = "https://www.cnrfc.noaa.gov/csv/";
     private long _watershedReadTime = 0;
     public long ReadTimeInMilliSeconds { get { return _watershedReadTime; } }
 
 
-    public HEFS_DataServiceProvider()
+    public HEFS_CSV_Reader()
         {
              //_cacheDirectory = Path.GetTempPath();
         }
@@ -93,59 +93,6 @@ namespace HEFS_Reader.Implementations
 			_watershedReadTime = st.ElapsedMilliseconds;
       return output;
     }
-    private static void LogInfo(string textToappend, string logFile)
-    {
-      System.IO.File.AppendAllText(logFile, textToappend);
-    }
-    private string StringifyDateTime(DateTime input)
-    {
-      string output = "";
-      output = input.Year.ToString() + StringifyInt(input.Month) + StringifyInt(input.Day) + StringifyInt(input.Hour);
-      return output;
-    }
-    private string StringifyInt(int input)
-    {
-      if (input < 10) return "0" + input.ToString();
-      return input.ToString();
-    }
   }
 }
 
-    ///// <summary>
-    ///// from https://stackoverflow.com/questions/137285/what-is-the-best-way-to-read-getresponsestream
-    ///// </summary>
-    // static void GetFile(string url, string outputFilename)
-    //{
-    //    HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(url);
-    //    httpRequest.Method = "GET";
-
-    //    // if the URI doesn't exist, an exception will be thrown here...
-    //    using (HttpWebResponse httpResponse = (HttpWebResponse)httpRequest.GetResponse())
-    //    {
-    //        using (Stream responseStream = httpResponse.GetResponseStream())
-    //        {
-    //            using (FileStream localFileStream =
-    //                new FileStream(outputFilename, FileMode.Create))
-    //            {
-    //                var buffer = new byte[4096];
-    //                long totalBytesRead = 0;
-    //                int bytesRead;
-
-    //                while ((bytesRead = responseStream.Read(buffer, 0, buffer.Length)) > 0)
-    //                {
-    //                    totalBytesRead += bytesRead;
-    //                    localFileStream.Write(buffer, 0, bytesRead);
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
-
-  //}
-
-
-//}
-//https://www.cnrfc.noaa.gov/ensembleHourlyProductCSV.php 
-//var filetoget = '/csv/'+yyyy+monnum+daynew+hh+'_'+theprod+'_hefs_csv_hourly.zip'
-//var printfiletoget = yyyy + monnum + daynew + hh + '_' + theprod + '_hefs_csv_hourly.zip
-//https://www.cnrfc.noaa.gov/csv/2019092312_RussianNapa_hefs_csv_hourly.zip
