@@ -77,10 +77,6 @@ namespace HEFS_Reader.Implementations
 			return new WatershedForecast(ensembles,watershedName);
 		}
 
-        public IWatershedForecast ParseCSVData(string v, DateTime forecastDate, Watersheds watershedLocation)
-        {
-            throw new NotImplementedException();
-        }
 
         public static DateTime ParseDateTime(string dt)
 		{
