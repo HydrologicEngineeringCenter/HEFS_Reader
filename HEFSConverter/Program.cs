@@ -37,48 +37,38 @@ namespace HEFSConverter
 			File.AppendAllText(logFile, "\n\n------" + DateTime.Now.ToString() + "-------\n\n");
 			File.AppendAllText(logFile, "filename, numEnsembles,seconds, filesize\n");
 
-			while (numEnsembles <= 10000)
-            {
-                DateTime startTime = new DateTime(2013, 11, 1, 12, 0, 0);
-                DateTime endTime = GetEndTime(numEnsembles);
+      while (numEnsembles <= 10000)
+      {
+        DateTime startTime = new DateTime(2013, 11, 1, 12, 0, 0);
+        DateTime endTime = GetEndTime(numEnsembles);
 
-                // READ CSV 
-                var provider = new HEFS_Reader.Implementations.HEFS_CSV_Reader();
-                HEFS_Reader.Interfaces.ITimeSeriesOfEnsembleLocations baseWaterShedData =
-                provider.ReadDataset(Watersheds.RussianNapa, startTime, endTime, cacheDir);
+        // READ CSV 
+        var provider = new HEFS_Reader.Implementations.HEFS_CSV_Reader();
+        HEFS_Reader.Interfaces.ITimeSeriesOfEnsembleLocations baseWaterShedData =
+        provider.ReadDataset(Watersheds.RussianNapa, startTime, endTime, cacheDir);
 
 
-                // WRITE
+        // WRITE
 
-                WriteToMultipleFormats(baseWaterShedData, numEnsembles, startTime);
+        WriteToMultipleFormats(baseWaterShedData, numEnsembles, startTime);
 
-                // READ
+        // READ
 
-                var fn = "ensemble_V7" + numEnsembles + ".dss";
-                HEFS_Reader.Interfaces.IEnsembleReader dssReader = new DssEnsembleReader();
-                var watershed = dssReader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
-                LogInfo(fn, numEnsembles, ((HEFS_Reader.Interfaces.ITimeable)dssReader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
+        var fn = "ensemble_V7" + numEnsembles + ".dss";
+        HEFS_Reader.Interfaces.IEnsembleReader dssReader = new DssEnsembleReader();
+        var watershed = dssReader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
+        LogInfo(fn, numEnsembles, ((HEFS_Reader.Interfaces.ITimeable)dssReader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
 
-                Compare(baseWaterShedData, watershed);
+        if (!baseWaterShedData.Equals(watershed))
+        {
+          Console.WriteLine("OOPs...");
+        }
 
                 numEnsembles *= 10;
             }
         }
 
-        private static void Compare(HEFS_Reader.Interfaces.ITimeSeriesOfEnsembleLocations baseWaterShedData, HEFS_Reader.Interfaces.ITimeSeriesOfEnsembleLocations watershed)
-        {
-            // compare to reference.
-            var locations = watershed.timeSeriesOfEnsembleLocations[0].Locations;
-            var refLocations = baseWaterShedData.timeSeriesOfEnsembleLocations[0].Locations;
-            for (int i = 0; i < locations.Count; i++)
-            {
-                if (!locations[i].Members.Equals(refLocations[i].Members))
-                {
-                    Console.WriteLine("Difference...");
-                }
-            }
-        }
-
+        
         private static void WriteToMultipleFormats(HEFS_Reader.Interfaces.ITimeSeriesOfEnsembleLocations waterShedData, int numEnsemblesToWrite, DateTime startTime)
 		{
 			TimeSpan ts;

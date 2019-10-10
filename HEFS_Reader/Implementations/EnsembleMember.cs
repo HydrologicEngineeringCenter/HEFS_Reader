@@ -45,7 +45,11 @@ namespace HEFS_Reader.Implementations
 				if (o.Times[0] != this.Times[0]) return false;//assumes fixed timestep.
 				for (int memberIdx = 0; memberIdx < Values.Length; memberIdx++)
 				{
-					if (Math.Abs(this.Values[memberIdx] - o.Values[memberIdx]) > ComparisonTolerance) return false;
+          if (Math.Abs(this.Values[memberIdx] - o.Values[memberIdx]) > ComparisonTolerance)
+          {
+            Console.WriteLine("exceeded tolerance, memberIdx = " + memberIdx);
+            return false;
+          }
 				}
 				return true;
 			}

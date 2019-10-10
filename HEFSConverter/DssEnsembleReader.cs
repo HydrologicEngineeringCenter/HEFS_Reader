@@ -5,12 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HEFSConverter
 {
-	class DssEnsembleReader : HEFS_Reader.Interfaces.IEnsembleReader, HEFS_Reader.Interfaces.ITimeable
+  class DssEnsembleReader : HEFS_Reader.Interfaces.IEnsembleReader, HEFS_Reader.Interfaces.ITimeable
 	{
 		private long _readTimeInMilliSeconds = 0;
 		public long ReadTimeInMilliSeconds { get { return _readTimeInMilliSeconds; } }

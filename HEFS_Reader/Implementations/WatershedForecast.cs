@@ -29,5 +29,23 @@ namespace HEFS_Reader.Implementations
 			_ensembles = ensembles;
 			_watershedName = watershedName;
 		}
-	}
+    public override bool Equals(object obj)
+    {
+      WatershedForecast o = (WatershedForecast) obj;
+      if( o == null)
+      {
+        return false;
+      }
+      if (this.Locations.Count != o.Locations.Count)
+        return false;
+      for (int i = 0; i < this.Locations.Count; i++)
+      {
+        if (!this.Locations[i].Equals(o.Locations[i]))
+          return false;
+      }
+      return true;
+    }
+
+    
+  }
 }
