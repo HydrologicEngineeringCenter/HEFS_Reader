@@ -55,27 +55,32 @@ namespace HEFSConverter
 
         // READ
 
-        var fn = "ensemble_sqlite_blob_compressed" + numEnsembles + ".db";
-        IEnsembleReader reader = new SqlBlobEnsembleReader();
-        var watershed = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
-        LogInfo(fn, numEnsembles, ((HEFS_Reader.Interfaces.ITimeable)reader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
-        ErrorCheck(fn,baseWaterShedData, watershed);
-
-        fn = "ensemble_sqlite_blob" + numEnsembles + ".db";
-        reader = new SqlBlobEnsembleReader();
-        watershed = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
-        LogInfo(fn, numEnsembles, ((HEFS_Reader.Interfaces.ITimeable)reader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
-        ErrorCheck(fn,baseWaterShedData, watershed);
-
-
-        fn = "ensemble_V7" + numEnsembles + ".dss";
-        reader = new DssEnsembleReader();
-        watershed = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
-        LogInfo(fn, numEnsembles, ((HEFS_Reader.Interfaces.ITimeable)reader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
-        ErrorCheck(fn,baseWaterShedData, watershed);
+        ReadFromMultipleFormats(numEnsembles, startTime, endTime, baseWaterShedData);
 
         numEnsembles *= 10;
       }
+    }
+
+    private static void ReadFromMultipleFormats(int numEnsembles, DateTime startTime, DateTime endTime, ITimeSeriesOfEnsembleLocations baseWaterShedData)
+    {
+      var fn = "ensemble_sqlite_blob_compressed" + numEnsembles + ".db";
+      IEnsembleReader reader = new SqlBlobEnsembleReader();
+      var watershed = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
+      LogInfo(fn, numEnsembles, ((HEFS_Reader.Interfaces.ITimeable)reader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
+      ErrorCheck(fn, baseWaterShedData, watershed);
+
+      fn = "ensemble_sqlite_blob" + numEnsembles + ".db";
+      reader = new SqlBlobEnsembleReader();
+      watershed = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
+      LogInfo(fn, numEnsembles, ((HEFS_Reader.Interfaces.ITimeable)reader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
+      ErrorCheck(fn, baseWaterShedData, watershed);
+
+
+      fn = "ensemble_V7" + numEnsembles + ".dss";
+      reader = new DssEnsembleReader();
+      watershed = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
+      LogInfo(fn, numEnsembles, ((HEFS_Reader.Interfaces.ITimeable)reader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
+      ErrorCheck(fn, baseWaterShedData, watershed);
     }
 
     private static void ErrorCheck(string fn, ITimeSeriesOfEnsembleLocations baseWaterShedData, ITimeSeriesOfEnsembleLocations watershed)
