@@ -18,7 +18,7 @@ namespace HEFSConverter
     /// each ensemble member is written to a blob
     /// with optional compressions
     /// </summary>
-    class SqlBlobEnsemble
+    class SqlBlobEnsembleWriter
     {
 
         static string tableName = "timeseries_hourly";
@@ -46,13 +46,15 @@ namespace HEFSConverter
             row["watershed"] = watershed.WatershedName;
             row["location_name"] = e.LocationName;
             row["timeseries_start_date"] = e.Members[0].Times[0];
-            row["timeseries_time_length"] = e.Members[0].Times.Length;
-            row["binary_values"] = ConvertToBytes(e.Members, compress);
+            row["member_length"] = e.Members[0].Values.Length;
+            row["member_count"] = e.Members.Count;
+            row["compressed"] = compress ?1 :0;
+            row["byte_value_array"] = ConvertToBytes(e.Members, compress);
 
-          lock (newRowLock)
-          {
+         // lock (newRowLock)
+          //{
             timeSeriesTable.Rows.Add(row); // create rows in separate loop first
-          }
+         // }
         }
       }
       server.SaveTable(timeSeriesTable);
@@ -79,13 +81,15 @@ namespace HEFSConverter
       //Console.WriteLine("uncompressed: "+uncompressed.Length+"  compressed "+compressed.Length+ " "+pct);
       return compressed;
     }
-  
-    private static byte[] Compress(byte[] bytes)
+
+
+    public static byte[] Compress(byte[] bytes)
     {
       using (var msi = new MemoryStream(bytes))
       using (var mso = new MemoryStream())
       {
-        using (var gs = new GZipStream(mso, CompressionMode.Compress))
+        var mode = CompressionMode.Compress;
+        using (var gs = new GZipStream(mso,  mode))
         {
           //msi.CopyTo(gs);
           CopyTo(msi, gs);
@@ -106,73 +110,6 @@ namespace HEFSConverter
       }
     }
 
-    /// <summary>
-    /// Reads a set of ensembles based on criteria
-    /// </summary>
-    /// <param name="server"></param>
-    /// <param name="issueStartTime"></param>
-    /// <param name="issueEndTime"></param>
-    /// <param name="watershedFilter"></param>
-    /// <param name="locations">list of locations ('NVRC1','LAMC1',...) </param>
-    /// <returns></returns>
-    internal static IList<IList<HEFS_Reader.Interfaces.IEnsemble>> Read(Reclamation.Core.BasicDBServer server,
-            DateTime issueStartTime, DateTime issueEndTime, string[] locations, string watershedFilter = "RussianNapa")
-    {
-      string sql = "Select * from " + tableName;
-      sql += " WHERE issue_date >= " + server.PortableDateString(issueStartTime, DateTimeFormat)
-       + " AND "
-      + " issue_date <= " + server.PortableDateString(issueEndTime, DateTimeFormat);
-
-      if (locations.Length > 0)
-        sql += " AND location_name in '" + String.Join("','", locations) + "'";
-
-      sql += " order by watershed,issue_date,location_name";
-
-      var hourly_table = server.Table(tableName, sql);
-      TimeSeriesOfEnsembleLocations tsoe = new TimeSeriesOfEnsembleLocations();
-
-      List<IList<HEFS_Reader.Interfaces.IEnsemble>> output = new List<IList<HEFS_Reader.Interfaces.IEnsemble>>();
-
-      foreach (DataRow row in hourly_table.Rows)
-      {
-      
-        List<DateTime> times = GetTimes(row);
-        List<List<float>> values = GetValues(row);
-
-        Ensemble ensemeble = new Ensemble(row["location_name"].ToString(),
-                                           (DateTime)row["issue_date"],
-                                           values,
-                                           times);
-      }
-
-      return output;
-    }
-
-    private static List<DateTime> GetTimes(DataRow row)
-    {
-      throw new NotImplementedException();
-    }
-
-    private static List<List<float>> GetValues(DataRow row)
-    {
-      var rval = new List<List<float>>();
-      int size = Convert.ToInt32(row["timeseries_time_length"]);
-      var numBytesPerMember = size * sizeof(float);
-
-      byte[] binary_values = (byte[])row["binary_values"];
-      int numMembers = binary_values.Length / numBytesPerMember;
-
-      for (int i = 0; i < numMembers; i++)
-      {
-        var floatValues = new float[size];
-        Buffer.BlockCopy(binary_values, i * numBytesPerMember, floatValues,0,numBytesPerMember );
-          var values = new List<float>();
-        values.AddRange(floatValues);
-        rval.Add(values);
-      }
-      
-      return rval;
-    }
      
 
         /// <summary>
@@ -192,8 +129,10 @@ namespace HEFSConverter
                 + "   watershed NVARCHAR(100) ,"
                 + "   location_name NVARCHAR(100) ,"
                 + "   timeseries_start_date datetime ," 
-                + "   timeseries_time_length integer    ,"
-                + "  binary_values BLOB NULL )";
+                + "   member_length integer    ,"
+                + "   member_count integer    ,"
+                + "   compressed integer    ,"
+                + "  byte_value_array BLOB NULL )";
                 server.RunSqlCommand(sql);
 
             }

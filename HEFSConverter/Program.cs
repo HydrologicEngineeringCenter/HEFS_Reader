@@ -8,6 +8,7 @@ using System.IO;
 using DSSIO;
 using HEFS_Reader.Implementations;
 using HEFS_Reader.Enumerations;
+using HEFS_Reader.Interfaces;
 
 namespace HEFSConverter
 {
@@ -54,10 +55,18 @@ namespace HEFSConverter
 
         // READ
 
-        var fn = "ensemble_V7" + numEnsembles + ".dss";
-        HEFS_Reader.Interfaces.IEnsembleReader dssReader = new DssEnsembleReader();
-        var watershed = dssReader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
-        LogInfo(fn, numEnsembles, ((HEFS_Reader.Interfaces.ITimeable)dssReader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
+        var fn = "ensemble_sqlite_blob_compressed" + numEnsembles + ".db";
+
+        IEnsembleReader reader = new SqlBlobEnsembleReader();
+        var watershed = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
+        LogInfo(fn, numEnsembles, ((HEFS_Reader.Interfaces.ITimeable)reader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
+
+
+
+        fn = "ensemble_V7" + numEnsembles + ".dss";
+        reader = new DssEnsembleReader();
+        watershed = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
+        LogInfo(fn, numEnsembles, ((HEFS_Reader.Interfaces.ITimeable)reader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
 
         if (!baseWaterShedData.Equals(watershed))
         {
@@ -112,7 +121,7 @@ namespace HEFSConverter
 			connectionString = "Data Source=" + fn + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
 			server = new Reclamation.Core.SQLiteServer(connectionString);
 			server.CloseAllConnections();
-			ts = SqlBlobEnsemble.Write(server, waterShedData, false);
+			ts = SqlBlobEnsembleWriter.Write(server, waterShedData, false);
 			LogInfo(fn, numEnsemblesToWrite, ts.TotalSeconds);
 
 			fn = "ensemble_sqlite_blob_compressed" + numEnsemblesToWrite + ".db";
@@ -120,7 +129,7 @@ namespace HEFSConverter
 			connectionString = "Data Source=" + fn + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
 			server = new Reclamation.Core.SQLiteServer(connectionString);
 			server.CloseAllConnections();
-			ts = SqlBlobEnsemble.Write(server, waterShedData, true);
+			ts = SqlBlobEnsembleWriter.Write(server, waterShedData, true);
 			LogInfo(fn, numEnsemblesToWrite, ts.TotalSeconds);
 
 			//  CreateSqLiteBlobDatabaseOfEnsembles("sqlite_blob_ensemble_float.pdb", startTime, endTime);

@@ -63,7 +63,8 @@
     <Compile Include="HEFSDSSReadArgs.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqlBlobEnsemble.cs" />
+    <Compile Include="SqlBlobEnsembleReader.cs" />
+    <Compile Include="SqlBlobEnsembleWriter.cs" />
     <Compile Include="SqlEnsembleWriter.cs" />
   </ItemGroup>
   <ItemGroup>
