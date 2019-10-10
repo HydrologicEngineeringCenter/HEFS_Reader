@@ -1,4 +1,5 @@
-﻿using HEFS_Reader.Enumerations;
+﻿using DSSIO;
+using HEFS_Reader.Enumerations;
 using HEFS_Reader.Implementations;
 using HEFS_Reader.Interfaces;
 using System;
@@ -82,6 +83,7 @@ namespace HEFSConverter
 					  && path.Apart.ToLower() == watershed.ToString().ToLower())
 					{
 						var ts = dss.GetTimeSeries(path.FullPath);
+                        TrimLeadingBaggage(ts);
 						List<float> memberValues = new List<float>();
 						memberValues.AddRange(Array.ConvertAll(ts.Values, item => (float)item));
 						ensembleValues.Add(memberValues);
@@ -101,5 +103,49 @@ namespace HEFSConverter
 			_readTimeInMilliSeconds = st.ElapsedMilliseconds;
 			return rval;
 		}
-	}
+
+        /// <summary>
+        /// Trim leading missing data, can be caused by DSS Block alignment with data
+        /// (move to DSSIO ?)
+        /// </summary>
+        /// <param name="ts"></param>
+        private void TrimLeadingBaggage(DSSTimeSeries ts)
+        {
+            var vals = ts.Values;
+            int idxFirstGood = 0;
+            int idxLastGood = vals.Length - 1;
+            if (vals.Length == 0)
+                return;
+            for (int i = 0; i < vals.Length; i++)
+            {
+                if (Hec.Dss.DSS.ZIsMissingFloat(vals[i]) != 1)
+                {
+                    idxFirstGood = i;
+                    break;
+                }
+            }
+
+            for (int i = vals.Length - 1; i >= 0; i--)
+            {
+                if (Hec.Dss.DSS.ZIsMissingFloat(vals[i]) != 1)
+                {
+                    idxLastGood = i;
+                    break;
+                }
+            }
+            if (idxFirstGood != 0 || idxLastGood != vals.Length - 1)
+            { // 
+                int len = idxLastGood - idxFirstGood + 1;
+                var f = new double[len];
+                DateTime[] t = new DateTime[len];
+                Array.Copy(vals, idxFirstGood, f, 0, len);
+                Array.Copy(ts.Times, idxFirstGood, t, 0, len);
+                ts.Values = f;
+                ts.Times = t;
+
+            }
+
+
+        }
+    }
 }
