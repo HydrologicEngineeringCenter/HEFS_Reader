@@ -71,7 +71,7 @@ namespace HEFSConverter
        
         ensembles.Add(ensemeble);  // one location.
       }
-      
+      watershedForecasts.Add(watershedForecast);
       st.Stop();
       _readTimeInMilliSeconds = st.ElapsedMilliseconds;
 

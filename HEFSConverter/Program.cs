@@ -56,32 +56,42 @@ namespace HEFSConverter
         // READ
 
         var fn = "ensemble_sqlite_blob_compressed" + numEnsembles + ".db";
-
         IEnsembleReader reader = new SqlBlobEnsembleReader();
         var watershed = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
         LogInfo(fn, numEnsembles, ((HEFS_Reader.Interfaces.ITimeable)reader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
+        ErrorCheck(fn,baseWaterShedData, watershed);
 
+        fn = "ensemble_sqlite_blob" + numEnsembles + ".db";
+        reader = new SqlBlobEnsembleReader();
+        watershed = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
+        LogInfo(fn, numEnsembles, ((HEFS_Reader.Interfaces.ITimeable)reader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
+        ErrorCheck(fn,baseWaterShedData, watershed);
 
 
         fn = "ensemble_V7" + numEnsembles + ".dss";
         reader = new DssEnsembleReader();
         watershed = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
         LogInfo(fn, numEnsembles, ((HEFS_Reader.Interfaces.ITimeable)reader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
+        ErrorCheck(fn,baseWaterShedData, watershed);
 
-        if (!baseWaterShedData.Equals(watershed))
-        {
-          Console.WriteLine("OOPs...");
-        }
+        numEnsembles *= 10;
+      }
+    }
 
-                numEnsembles *= 10;
-            }
-        }
+    private static void ErrorCheck(string fn, ITimeSeriesOfEnsembleLocations baseWaterShedData, ITimeSeriesOfEnsembleLocations watershed)
+    {
+      if (!baseWaterShedData.Equals(watershed))
+      {
+        string msg = "ERROR comparing read from write ";
+        LogInfo(fn, 0, 0);
+        Console.WriteLine(msg);
+      }
+    }
 
-        
-        private static void WriteToMultipleFormats(HEFS_Reader.Interfaces.ITimeSeriesOfEnsembleLocations waterShedData, int numEnsemblesToWrite, DateTime startTime)
+    private static void WriteToMultipleFormats(HEFS_Reader.Interfaces.ITimeSeriesOfEnsembleLocations waterShedData, int numEnsembles, DateTime startTime)
 		{
 			TimeSpan ts;
-			DateTime endTime = GetEndTime(numEnsemblesToWrite);
+			DateTime endTime = GetEndTime(numEnsembles);
 			//  startTime = new DateTime(2016, 11, 1, 12, 0, 0);
 			// endTime = new DateTime(2017, 2, 28, 12, 0, 0);
 
@@ -91,51 +101,51 @@ namespace HEFSConverter
 			File.AppendAllText(logFile, startTime.ToString() + " -->  " + endTime.ToString() + "\n");
 
 			HEFS_Reader.Implementations.HEFS_CSV_Writer w = new HEFS_CSV_Writer();
-			var dir = Path.Combine(Directory.GetCurrentDirectory(), "csv_out_" + numEnsemblesToWrite);
+			var dir = Path.Combine(Directory.GetCurrentDirectory(), "csv_out_" + numEnsembles);
 			if (Directory.Exists(dir))
 				Directory.Delete(dir, true);
 			Directory.CreateDirectory(dir);
 			ts = w.Write(waterShedData, dir);
-			LogInfo(dir, numEnsemblesToWrite, ts.TotalSeconds, true);
+			LogInfo(dir, numEnsembles, ts.TotalSeconds, true);
 
-			var fn = "ensemble_V7" + numEnsemblesToWrite + ".dss";
+			var fn = "ensemble_V7" + numEnsembles + ".dss";
 			ts = DssEnsembleWriter.Write(fn, waterShedData, true, 7);
-			LogInfo(fn, numEnsemblesToWrite, ts.TotalSeconds);
+			LogInfo(fn, numEnsembles, ts.TotalSeconds);
 
-			fn = "ensemble_V6" + numEnsemblesToWrite + ".dss";
+			fn = "ensemble_V6" + numEnsembles + ".dss";
 			ts = DssEnsembleWriter.Write(fn, waterShedData, true, 6);
-			LogInfo(fn, numEnsemblesToWrite, ts.TotalSeconds);
+			LogInfo(fn, numEnsembles, ts.TotalSeconds);
 
 
-			fn = "ensemble_sqlite" + numEnsemblesToWrite + ".db";
+			fn = "ensemble_sqlite" + numEnsembles + ".db";
 			File.Delete(fn);
 			var connectionString = "Data Source=" + fn + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
 			Reclamation.Core.SQLiteServer server = new Reclamation.Core.SQLiteServer(connectionString);
 			//ts = SqlEnsembleWriter.WriteToDatabase(server, startTime, endTime, true, cacheDir);
 			ts = SqlEnsembleWriter.Write(server, waterShedData);
 			server.CloseAllConnections();
-			LogInfo(fn, numEnsemblesToWrite, ts.TotalSeconds);
+			LogInfo(fn, numEnsembles, ts.TotalSeconds);
 
-			fn = "ensemble_sqlite_blob" + numEnsemblesToWrite + ".db";
+			fn = "ensemble_sqlite_blob" + numEnsembles + ".db";
 			File.Delete(fn);
 			connectionString = "Data Source=" + fn + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
 			server = new Reclamation.Core.SQLiteServer(connectionString);
 			server.CloseAllConnections();
 			ts = SqlBlobEnsembleWriter.Write(server, waterShedData, false);
-			LogInfo(fn, numEnsemblesToWrite, ts.TotalSeconds);
+			LogInfo(fn, numEnsembles, ts.TotalSeconds);
 
-			fn = "ensemble_sqlite_blob_compressed" + numEnsemblesToWrite + ".db";
+			fn = "ensemble_sqlite_blob_compressed" + numEnsembles + ".db";
 			File.Delete(fn);
 			connectionString = "Data Source=" + fn + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
 			server = new Reclamation.Core.SQLiteServer(connectionString);
 			server.CloseAllConnections();
 			ts = SqlBlobEnsembleWriter.Write(server, waterShedData, true);
-			LogInfo(fn, numEnsemblesToWrite, ts.TotalSeconds);
+			LogInfo(fn, numEnsembles, ts.TotalSeconds);
 
 			//  CreateSqLiteBlobDatabaseOfEnsembles("sqlite_blob_ensemble_float.pdb", startTime, endTime);
 		}
 
-		static void LogInfo(string path, int numEnsemblesToWrite, double seconds, bool isDir = false)
+		static void LogInfo(string path, int numEnsemblesToWrite, double seconds, bool isDir = false, string msg="")
 		{
 			long size = 0;
 			if (isDir)
@@ -152,7 +162,8 @@ namespace HEFSConverter
 			double mb = size / 1024.0 / 1024.0;
 			double mbs = mb / seconds;
 
-			string rval = path + ", " + numEnsemblesToWrite + ", " + seconds.ToString("F2") + " s ," + BytesToString(size) + ", " + mbs.ToString("F2") + " mb/seconds\n";
+			string rval = path + ", " + numEnsemblesToWrite + ", " 
+        + seconds.ToString("F2") + " s ," + BytesToString(size) + ", " + mbs.ToString("F2") + " mb/seconds"+msg+"\n";
 			File.AppendAllText(logFile, rval);
 		}
 		static long GetDirectorySize(string p)
