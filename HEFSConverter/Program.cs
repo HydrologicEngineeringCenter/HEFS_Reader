@@ -122,19 +122,19 @@ namespace HEFSConverter
 			LogInfo(fn, numEnsembles, ts.TotalSeconds);
 
 
-			fn = "ensemble_sqlite" + numEnsembles + ".db";
-			File.Delete(fn);
-			var connectionString = "Data Source=" + fn + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
-			Reclamation.Core.SQLiteServer server = new Reclamation.Core.SQLiteServer(connectionString);
-			//ts = SqlEnsembleWriter.WriteToDatabase(server, startTime, endTime, true, cacheDir);
-			ts = SqlEnsembleWriter.Write(server, waterShedData);
-			server.CloseAllConnections();
-			LogInfo(fn, numEnsembles, ts.TotalSeconds);
+			//fn = "ensemble_sqlite" + numEnsembles + ".db";
+			//File.Delete(fn);
+			//var connectionString = "Data Source=" + fn + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
+			//Reclamation.Core.SQLiteServer server = new Reclamation.Core.SQLiteServer(connectionString);
+			////ts = SqlEnsembleWriter.WriteToDatabase(server, startTime, endTime, true, cacheDir);
+			//ts = SqlEnsembleWriter.Write(server, waterShedData);
+			//server.CloseAllConnections();
+			//LogInfo(fn, numEnsembles, ts.TotalSeconds);
 
 			fn = "ensemble_sqlite_blob" + numEnsembles + ".db";
 			File.Delete(fn);
-			connectionString = "Data Source=" + fn + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
-			server = new Reclamation.Core.SQLiteServer(connectionString);
+			var connectionString = "Data Source=" + fn + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
+			var server = new Reclamation.Core.SQLiteServer(connectionString);
 			server.CloseAllConnections();
 			ts = SqlBlobEnsembleWriter.Write(server, waterShedData, false);
 			LogInfo(fn, numEnsembles, ts.TotalSeconds);
