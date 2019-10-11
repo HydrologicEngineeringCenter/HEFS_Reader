@@ -56,7 +56,7 @@ namespace HEFSConverter
                 var tokens = x.Fpart.Split('|');
                 if (tokens.Length != 2)
                     return x.PathWithoutDate;
-                rval += tokens[1].Split(':')[1] + tokens[0].Split(':')[0];
+                rval += tokens[1].Split(':')[1] + tokens[0].Split(':')[1];
                 return rval;
             }
         }
