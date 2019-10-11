@@ -22,11 +22,15 @@ namespace HEFSConverter
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		private static DateTime ParseIssueDate(string fPart)
+		private static DateTime ParseIssueDate(string input, bool tPart = false)
 		{
-			string[] tokens = fPart.Split('|')[1].Split(':');
-			int year = Convert.ToInt32(tokens[1].Substring(3));
-			string sday = tokens[1].Substring(0, 3);
+            if (!tPart)
+            {
+                input = input.Split('|')[1].Split(':')[1];
+            }
+            
+			int year = Convert.ToInt32(input.Substring(3));
+			string sday = input.Substring(0, 3);
 			int day = Convert.ToInt32(sday);
 			DateTime issueDate = new DateTime(year, 1, 1).AddDays(day - 1).AddHours(12);
 			return issueDate;
@@ -89,56 +93,82 @@ namespace HEFSConverter
 				string previousLoc = dssPaths[0].Bpart;
 				// /RUSSIANNAPA/APCC1/FLOW/01SEP2019/1HOUR/C:000002|T:0212019/
 				List<List<float>> ensembleValues = new List<List<float>>();
-				
 
+                
 				for (int i = 0; i < size; i++)
 				{
 					DSSIO.DSSPath path = dssPaths[i];
 					string currentLoc = path.Bpart;
 					string currentT = path.Fpart.Split('|').Last().Split(':').Last();//probably slowish operation
 					DateTime issueDate = ParseIssueDate(path.Fpart);
-					if (!previousT.Equals(currentT))//relying on sorted T and B
-					{
-						//issue time has changed, we need a new Watershed Forecast, or to identify an existing one.
-						
-						int idx = rval.IndexOfIssueDate(issueDate);
-						if (idx == -1)
-						{
-							//this is a new csv
-							ensembles = new List<IEnsemble>();
-							watershedForecast = new WatershedForecast(ensembles, watershed, issueDate);
 
-						}
-						else
-						{
-							//add the completed one!
-							rval.timeSeriesOfEnsembleLocations.Add(watershedForecast);
-							//fetch the old one!
-							watershedForecast = rval.timeSeriesOfEnsembleLocations[idx];
-							ensembles = watershedForecast.Locations;
-						}
-						
-						previousT = currentT;
-						previousLoc = currentLoc;
-					}
+                    if (issueDate >= start && issueDate <= end
+                      && path.Apart.ToLower() == watershed.ToString().ToLower())
+                    {
+                        var ts = dss.GetTimeSeries(path.FullPath);
+                        TrimLeadingBaggage(ts);
 
-					
-					if (issueDate >= start && issueDate <= end
-					  && path.Apart.ToLower() == watershed.ToString().ToLower())
-					{
-						var ts = dss.GetTimeSeries(path.FullPath);
-                         TrimLeadingBaggage(ts);
-						List<float> memberValues = new List<float>();
-						memberValues.AddRange(Array.ConvertAll(ts.Values, item => (float)item));
-						ensembleValues.Add(memberValues);
-						if (i == size - 1 || dssPaths[i + 1].Bpart != currentLoc)
-						{// package this ensemble
-							Ensemble e = new Ensemble(currentLoc, issueDate, ensembleValues, ts.Times.ToList());
-							ensembles.Add(e);
-							// start building next ensemble
-							ensembleValues = new List<List<float>>();
-						}
-					}
+                      //  bigguy.Add( ensemble, watershed,  issueDate)
+
+                        List<float> memberValues = new List<float>();
+
+                        memberValues.AddRange(Array.ConvertAll(ts.Values, item => (float)item));
+                        ensembleValues.Add(memberValues);
+
+
+
+                        if (!previousT.Equals(currentT) || i == 0)//relying on sorted T and B
+                        {
+                            //issue time has changed, we need a new Watershed Forecast, or to identify an existing one.
+
+                            int idx = rval.IndexOfIssueDate(issueDate);
+                            int prevIdx = rval.IndexOfIssueDate(ParseIssueDate(previousT, true));
+                            if (i != 0 && prevIdx == -1)
+                            {
+                                rval.timeSeriesOfEnsembleLocations.Add(watershedForecast);//add the completed one!
+                            }
+
+                            if (idx == -1)
+                            {
+                                //this is a new csv
+                                ensembles = new List<IEnsemble>();
+                                watershedForecast = new WatershedForecast(ensembles, watershed, issueDate);
+                            }
+                            else
+                            {
+                                //fetch the old one!
+                                watershedForecast = rval.timeSeriesOfEnsembleLocations[idx];
+                                ensembles = watershedForecast.Locations;
+                            }
+                            previousT = currentT;
+                            previousLoc = currentLoc;
+                        }
+                        bool contains = false;
+                        Ensemble e = null;
+                        foreach(Ensemble ens in ensembles)
+                        {
+                            if(ens.LocationName== currentLoc)
+                            {
+                                //why?
+                                contains = true;
+                                e = ens;
+                                break;
+                            }
+
+                        }
+                        if (!contains)
+                        {
+                           e = new Ensemble(currentLoc, issueDate, ensembleValues, ts.Times.ToList());
+                           ensembles.Add(e);
+                        }
+                        else
+                        {
+                            e.Members.Add(new EnsembleMember(memberValues.ToArray(), ts.Times));
+                            //throw new Exception("found data at " + currentLoc + " for time " + issueDate.ToString() + " but we think it already exists.")
+                        }
+
+                    }
+
 				}
 
 			}
