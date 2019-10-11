@@ -1,8 +1,5 @@
-﻿using System;
+﻿using HEFS_Reader.Interfaces;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HEFS_Reader.Implementations
 {
@@ -52,6 +49,14 @@ namespace HEFS_Reader.Implementations
 				}
 			}
 			return true;
+		}
+
+		public override int GetHashCode()
+		{
+			var hashCode = -1316565584;
+			hashCode = hashCode * -1521134295 + EqualityComparer<IList<IEnsemble>>.Default.GetHashCode(Locations);
+			hashCode = hashCode * -1521134295 + WatershedName.GetHashCode();
+			return hashCode;
 		}
 	}
 }
