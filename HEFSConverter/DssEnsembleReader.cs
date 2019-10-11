@@ -45,7 +45,7 @@ namespace HEFSConverter
 			List<HEFS_Reader.Interfaces.IEnsemble> ensembles = new List<HEFS_Reader.Interfaces.IEnsemble>();
 			WatershedForecast watershedForecast = new WatershedForecast(ensembles, watershed);
 			TimeSeriesOfEnsembleLocations rval = new TimeSeriesOfEnsembleLocations();
-			IList<IWatershedForecast> watershedForecasts = rval.timeSeriesOfEnsembleLocations;
+			IList<IWatershedForecast> watershedForecasts = rval.Forecasts;
 
 
 			using (DSSIO.DSSReader dss = new DSSIO.DSSReader(dssPath))

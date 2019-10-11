@@ -11,14 +11,14 @@ using Reclamation.Core;
 
 namespace HEFSConverter
 {
-    /// <summary>
-    /// Writes HEFS data to SQL tables,
-    /// table is named based on watershed_location_forecast
-    /// columns for each ensemble member
-    /// first column is date time
-    /// </summary>
-    class SqlEnsembleWriter
-    {
+  /// <summary>
+  /// Writes HEFS data to SQL tables,
+  /// table is named based on watershed_location_forecast
+  /// columns for each ensemble member
+  /// first column is date time
+  /// </summary>
+  class SqlEnsembleWriter
+  {
 
     internal static TimeSpan Write(BasicDBServer server, ITimeSeriesOfEnsembleLocations waterShedData)
     {
@@ -31,19 +31,19 @@ namespace HEFSConverter
       }
 
       sw.Stop();
-      return sw.Elapsed ;
+      return sw.Elapsed;
     }
     private static IEnumerable<DataTable> GetTableEnumerator(ITimeSeriesOfEnsembleLocations watersheds)
     {
-      foreach (IWatershedForecast watershed in watersheds.timeSeriesOfEnsembleLocations)
+      foreach (IWatershedForecast watershed in watersheds.Forecasts)
       {
         foreach (IEnsemble e in watershed.Locations)
         {
-          
+
           var t = e.IssueDate;
           DataTable tbl = new DataTable(watershed.WatershedName + "_" + e.LocationName + "_day_" + t.DayOfYear.ToString() + "_" + t.Year);
           tbl.Columns.Add("DateTime", typeof(DateTime));
-           
+
           for (int ensembleMember = 1; ensembleMember <= e.Members.Count; ensembleMember++)
           {
             tbl.Columns.Add("member_" + ensembleMember.ToString(), typeof(double));
@@ -74,6 +74,6 @@ namespace HEFSConverter
 
 
 
-   
+
   }
 }

@@ -8,7 +8,7 @@ namespace HEFS_Reader.Implementations
 {
 	public class HEFS_CSV_Parser
 	{
-		public static Interfaces.IWatershedForecast ParseCSVData(string data, DateTime issueDate, Enumerations.Watersheds watershedName)
+		public static IWatershedForecast ParseCSVData(string data, DateTime issueDate, Enumerations.Watersheds watershedName)
 		{
 			//is this zipped or not zipped?
 			//split based on new lines into rows for each element.
@@ -17,12 +17,13 @@ namespace HEFS_Reader.Implementations
 			
 			//split based on comma
 			string[] header = rows[0].Split(',');
-			List<int> locStarts = new List<int>();
 			string currHeader = "";
-			List<string> headers = new List<string>();
-			List <Interfaces.IEnsemble> ensembles = new List<Interfaces.IEnsemble>();
+			var locStarts = new List<int>();
+			var headers = new List<string>();
+			var ensembles = new List<IEnsemble>();
 
-			for (int i = 1; i < header.Length; i++)//first data element in header is timezone.
+      //first data element in header is timezone.
+      for (int i = 1; i < header.Length; i++)
 			{
 				if (!currHeader.Equals(header[i])){
 					currHeader = header[i];
@@ -30,8 +31,8 @@ namespace HEFS_Reader.Implementations
 					locStarts.Add(i);
 				}
 			}
-			//second line is Blank,QINE,...QINE
-			//
+			
+      //second line is Blank,QINE,...QINE
 			bool isFirstPass = true;
 			List<List<List<float>>> FullTable = new List<List<List<float>>>();//location, Ensemble member, values - because 64bit allows me to be careless
 			List<DateTime> times = new List<DateTime>();
@@ -67,12 +68,12 @@ namespace HEFS_Reader.Implementations
 				}
 				isFirstPass = false;
 			}
+
 			//push into ensembles.
 			for (int i = 0; i < FullTable.Count; i++)
 			{
 				ensembles.Add(new Ensemble(headers[i], issueDate, FullTable[i], times));
 			}
-
 
 			return new WatershedForecast(ensembles,watershedName);
 		}

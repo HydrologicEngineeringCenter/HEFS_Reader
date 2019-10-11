@@ -7,7 +7,7 @@ using HEFS_Reader.Interfaces;
 
 namespace HEFS_Reader.Implementations
 {
-	class HEFS_ZIP_Writer : Interfaces.IEnsembleWriter
+	class HEFS_ZIP_Writer : IEnsembleWriter
 	{
 		public bool Write(ITimeSeriesOfEnsembleLocations timeSeriesOfEnsembleLocations, string directoryPath)
 		{

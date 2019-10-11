@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using HEFS_Reader.Interfaces;
 
@@ -11,9 +12,9 @@ namespace HEFS_Reader.Implementations
 	{
 		public TimeSpan Write(ITimeSeriesOfEnsembleLocations timeSeriesOfEnsembleLocations, string directoryPath)
 		{
-      System.Diagnostics.Stopwatch st = new System.Diagnostics.Stopwatch();
-      st.Start();
-			foreach (IWatershedForecast watershed in timeSeriesOfEnsembleLocations.timeSeriesOfEnsembleLocations)//this could be parallel.
+      var st = Stopwatch.StartNew();
+
+			foreach (IWatershedForecast watershed in timeSeriesOfEnsembleLocations.Forecasts)//this could be parallel.
 			{
 				string fileName = watershed.WatershedName.ToString() + "_" + HEFS_CSV_Parser.StringifyDateTime(watershed.Locations.First().IssueDate) + ".csv";
 				string fullPath = System.IO.Path.Combine(directoryPath, fileName);
@@ -31,7 +32,8 @@ namespace HEFS_Reader.Implementations
 					}
 					sr.WriteLine(line.ToString());
 					line = new StringBuilder();
-					Int32 counter = 0;
+
+					int counter = 0;
 					foreach (DateTime t in watershed.Locations.First().Members.First().Times)
 					{
 						line = new StringBuilder(t.ToString());

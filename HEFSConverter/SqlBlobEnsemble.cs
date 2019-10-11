@@ -13,20 +13,20 @@ using Reclamation.Core;
 
 namespace HEFSConverter
 {
-    /// <summary>
-    /// Writes HEFS data to SQL tables
-    /// each ensemble member is written to a blob
-    /// with optional compressions
-    /// </summary>
-    class SqlBlobEnsemble
-    {
+  /// <summary>
+  /// Writes HEFS data to SQL tables
+  /// each ensemble member is written to a blob
+  /// with optional compressions
+  /// </summary>
+  class SqlBlobEnsemble
+  {
 
-        static string tableName = "timeseries_hourly";
-        public static string DateTimeFormat = "yyyy-MM-dd HH:mm:ss.fff";
+    static string tableName = "timeseries_hourly";
+    public static string DateTimeFormat = "yyyy-MM-dd HH:mm:ss.fff";
 
 
     internal static TimeSpan Write(SQLiteServer server, ITimeSeriesOfEnsembleLocations watersheds,
-      bool compress =false)
+      bool compress = false)
     {
       Stopwatch sw = Stopwatch.StartNew();
       int index = 0;
@@ -34,20 +34,20 @@ namespace HEFSConverter
 
       var newRowLock = new object();
 
-      foreach (IWatershedForecast watershed in watersheds.timeSeriesOfEnsembleLocations)
+      foreach (IWatershedForecast watershed in watersheds.Forecasts)
       {
         foreach (IEnsemble e in watershed.Locations)
         {
-            var t = e.IssueDate;
-            index++;
-            var row = timeSeriesTable.NewRow();// create rows in separate loop first
-            row["id"] = index;
-            row["issue_date"] = e.IssueDate;
-            row["watershed"] = watershed.WatershedName;
-            row["location_name"] = e.LocationName;
-            row["timeseries_start_date"] = e.Members[0].Times[0];
-            row["timeseries_time_length"] = e.Members[0].Times.Length;
-            row["binary_values"] = ConvertToBytes(e.Members, compress);
+          var t = e.IssueDate;
+          index++;
+          var row = timeSeriesTable.NewRow();// create rows in separate loop first
+          row["id"] = index;
+          row["issue_date"] = e.IssueDate;
+          row["watershed"] = watershed.WatershedName;
+          row["location_name"] = e.LocationName;
+          row["timeseries_start_date"] = e.Members[0].Times[0];
+          row["timeseries_time_length"] = e.Members[0].Times.Length;
+          row["binary_values"] = ConvertToBytes(e.Members, compress);
 
           lock (newRowLock)
           {
@@ -64,22 +64,22 @@ namespace HEFSConverter
     {//https://stackoverflow.com/questions/6952923/conversion-double-array-to-byte-array
       float[] values = ensembleMembers[0].Values;
       var numBytesPerMember = values.Length * sizeof(float);
-      var uncompressed = new byte[numBytesPerMember * ensembleMembers.Count  ];
+      var uncompressed = new byte[numBytesPerMember * ensembleMembers.Count];
 
       for (int i = 0; i < ensembleMembers.Count; i++)
       {
         values = ensembleMembers[i].Values;
-        Buffer.BlockCopy(values, 0, uncompressed, i*numBytesPerMember, numBytesPerMember);
+        Buffer.BlockCopy(values, 0, uncompressed, i * numBytesPerMember, numBytesPerMember);
       }
 
       if (!compress)
         return uncompressed;
-      var compressed =  Compress(uncompressed);
+      var compressed = Compress(uncompressed);
       //double pct = (double)uncompressed.Length / (double)compressed.Length * 100;
       //Console.WriteLine("uncompressed: "+uncompressed.Length+"  compressed "+compressed.Length+ " "+pct);
       return compressed;
     }
-  
+
     private static byte[] Compress(byte[] bytes)
     {
       using (var msi = new MemoryStream(bytes))
@@ -135,7 +135,7 @@ namespace HEFSConverter
 
       foreach (DataRow row in hourly_table.Rows)
       {
-      
+
         List<DateTime> times = GetTimes(row);
         List<List<float>> values = GetValues(row);
 
@@ -165,46 +165,46 @@ namespace HEFSConverter
       for (int i = 0; i < numMembers; i++)
       {
         var floatValues = new float[size];
-        Buffer.BlockCopy(binary_values, i * numBytesPerMember, floatValues,0,numBytesPerMember );
-          var values = new List<float>();
+        Buffer.BlockCopy(binary_values, i * numBytesPerMember, floatValues, 0, numBytesPerMember);
+        var values = new List<float>();
         values.AddRange(floatValues);
         rval.Add(values);
       }
-      
+
       return rval;
     }
-     
-
-        /// <summary>
-        /// Returns and empty timeseries_hourly table for storing blobs
-        /// </summary>
-        /// <param name="server"></param>
-        /// <returns></returns>
-        static DataTable GetHourlyBlobTable(Reclamation.Core.BasicDBServer server)
-        {
-          
-
-            if (!server.TableExists(tableName))
-            {
-                string sql = "CREATE TABLE " + tableName
-                + " ( id integer not null primary key,"
-                +"    issue_date datetime, "
-                + "   watershed NVARCHAR(100) ,"
-                + "   location_name NVARCHAR(100) ,"
-                + "   timeseries_start_date datetime ," 
-                + "   timeseries_time_length integer    ,"
-                + "  binary_values BLOB NULL )";
-                server.RunSqlCommand(sql);
-
-            }
-            server.RunSqlCommand("DELETE from " + tableName);
-            return server.Table(tableName, "select * from " + tableName + " where 1=0");
 
 
-        }
+    /// <summary>
+    /// Returns and empty timeseries_hourly table for storing blobs
+    /// </summary>
+    /// <param name="server"></param>
+    /// <returns></returns>
+    static DataTable GetHourlyBlobTable(Reclamation.Core.BasicDBServer server)
+    {
 
-         
-       
+
+      if (!server.TableExists(tableName))
+      {
+        string sql = "CREATE TABLE " + tableName
+        + " ( id integer not null primary key,"
+        + "    issue_date datetime, "
+        + "   watershed NVARCHAR(100) ,"
+        + "   location_name NVARCHAR(100) ,"
+        + "   timeseries_start_date datetime ,"
+        + "   timeseries_time_length integer    ,"
+        + "  binary_values BLOB NULL )";
+        server.RunSqlCommand(sql);
+
+      }
+      server.RunSqlCommand("DELETE from " + tableName);
+      return server.Table(tableName, "select * from " + tableName + " where 1=0");
+
 
     }
+
+
+
+
+  }
 }

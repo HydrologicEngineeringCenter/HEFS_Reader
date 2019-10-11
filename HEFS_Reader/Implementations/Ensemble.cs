@@ -34,7 +34,7 @@ namespace HEFS_Reader.Implementations
 			}
 		}
 
-		public DateTime RefereceDate
+		public DateTime ReferenceDate
 		{
 			get
 			{
@@ -96,7 +96,7 @@ namespace HEFS_Reader.Implementations
 		{
 			var hashCode = 1925819071;
 			hashCode = hashCode * -1521134295 + IssueDate.GetHashCode();
-			hashCode = hashCode * -1521134295 + RefereceDate.GetHashCode();
+			hashCode = hashCode * -1521134295 + ReferenceDate.GetHashCode();
 			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(LocationName);
 			hashCode = hashCode * -1521134295 + Timestep.GetHashCode();
 			hashCode = hashCode * -1521134295 + EqualityComparer<IList<IEnsembleMember>>.Default.GetHashCode(Members);

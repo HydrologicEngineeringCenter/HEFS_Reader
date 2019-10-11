@@ -21,9 +21,11 @@ namespace HEFSConverter
       Hec.Dss.DSS.ZSet("DSSV", "", version);
 
       int count = 0;
-      using (var w = new DSSWriter(dssFileName))
+     
+      // Because "critical" is too verbose...
+      using (var w = new DSSWriter(dssFileName, DSSReader.MethodID.MESS_METHOD_GENERAL_ID, DSSReader.LevelID.MESS_LEVEL_NONE))
       {
-        foreach (IWatershedForecast watershed in watersheds.timeSeriesOfEnsembleLocations)
+        foreach (IWatershedForecast watershed in watersheds.Forecasts)
         {
           foreach (IEnsemble e in watershed.Locations)
           {
@@ -47,7 +49,9 @@ namespace HEFSConverter
                 Path = path,
                 StartDateTime = m.Times[0]
               };
-              Console.WriteLine("saving: " + path);
+
+              // Console writes are slow..
+              // Console.WriteLine("saving: " + path);
               w.Write(timeseries, saveAsFloat);
               count++;
               //                            int status = w.StoreTimeSeriesRegular(path, d, 0, DateTime.Now.Date, "cfs", "INST-VAL");
