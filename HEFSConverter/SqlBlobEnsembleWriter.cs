@@ -46,7 +46,7 @@ namespace HEFSConverter
             row["watershed"] = watershed.WatershedName;
             row["location_name"] = e.LocationName;
             row["timeseries_start_date"] = e.Members[0].Times[0];
-            row["member_length"] = e.Members[0].Values.Length;
+            row["member_length"] = e.Members[0].Values.Count;
             row["member_count"] = e.Members.Count;
             row["compressed"] = compress ?1 :0;
             row["byte_value_array"] = ConvertToBytes(e.Members, compress);
@@ -64,13 +64,13 @@ namespace HEFSConverter
 
     private static byte[] ConvertToBytes(IList<IEnsembleMember> ensembleMembers, bool compress)
     {//https://stackoverflow.com/questions/6952923/conversion-double-array-to-byte-array
-      float[] values = ensembleMembers[0].Values;
+            float[] values = ensembleMembers[0].Values.ToArray();
       var numBytesPerMember = values.Length * sizeof(float);
       var uncompressed = new byte[numBytesPerMember * ensembleMembers.Count  ];
 
       for (int i = 0; i < ensembleMembers.Count; i++)
       {
-        values = ensembleMembers[i].Values;
+                values = ensembleMembers[i].Values.ToArray();
         Buffer.BlockCopy(values, 0, uncompressed, i*numBytesPerMember, numBytesPerMember);
       }
 

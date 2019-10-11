@@ -22,10 +22,10 @@ namespace HEFS_Reader.Implementations
 		{
 			_timeSeriesofEnsembleLocations = new List<IWatershedForecast>();
 		}
-		public void AddEnsembleMember(EnsembleMember em, int ensembleMemberIndex, DateTime issueDate, string location, Enumerations.Watersheds watershedName)
-		{
+		//public void AddEnsembleMember(EnsembleMember em, int ensembleMemberIndex, DateTime issueDate, string location, Enumerations.Watersheds watershedName)
+		//{
 
-		}
+		//}
 		private int IndexOfIssueDate(DateTime dt)
 		{
 			

@@ -41,7 +41,7 @@ namespace HEFSConverter
               var path = "/" + watershed.WatershedName + "/" + e.LocationName + "/Flow//1Hour/" + F + "/";
               DSSTimeSeries timeseries = new DSSTimeSeries
               {
-                Values = Array.ConvertAll(m.Values, item => (double)item),
+                Values = Array.ConvertAll(m.Values.ToArray(), item => (double)item),
                 Units = "",
                 DataType = "INST-VAL",
                 Path = path,

@@ -53,13 +53,13 @@ namespace HEFSConverter
           {
             var m = e.Members[ensembleMember];
             var vals = m.Values;
-            for (int i = 0; i < vals.Length; i++)
+            for (int i = 0; i < vals.Count; i++)
             {
               if (ensembleMember == 0)
               {
                 var row = tbl.NewRow();
                 tbl.Rows.Add(row);
-                DateTime[] times = m.Times;
+                DateTime[] times = m.Times.ToArray();
                 row[0] = times[i];
               }
               tbl.Rows[i][ensembleMember + 1] = vals[i];
