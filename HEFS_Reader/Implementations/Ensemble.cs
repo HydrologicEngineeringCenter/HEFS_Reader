@@ -12,14 +12,14 @@ namespace HEFS_Reader.Implementations
 		private DateTime _referenceDate;
 		private Enumerations.Timesteps _timeStep;
 		private string _locationName;
-		private DateTime[] _times;//same times for all members.
+		private IList<DateTime> _times;//same times for all members.
 		private IList<IEnsembleMember> _members;
-		public Ensemble(string name, DateTime issueDate, List<List<float>> values, List<DateTime> times)
+		public Ensemble(string name, DateTime issueDate, List<List<float>> values, IList<DateTime> times)
 		{
 			_locationName = name;
 			_issuanceDate = issueDate;
 			_members = new List<IEnsembleMember>();
-			_times = times.ToArray();
+			_times = times;
 			foreach(List<float> em in values) {
 				_members.Add(new EnsembleMember(em.ToArray(), _times));
 			}
@@ -65,14 +65,26 @@ namespace HEFS_Reader.Implementations
 			}
 		}
 
-        /// <summary>
-        /// Returns true if the ensemble members, have the same 
-        /// float values as this instance.  Assumes the ensemble members are in a 
-        /// consistent order.
-        /// </summary>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        public override bool Equals(object other)
+		public void AddEnsembleMember(IEnsembleMember em, int ensembleMemberIndex)
+		{
+			//throw new NotImplementedException();
+			if (_members.Count < ensembleMemberIndex)
+			{
+				while (_members.Count < ensembleMemberIndex) {
+					_members.Add(new EnsembleMember());
+				}
+			}
+			_members[ensembleMemberIndex] = em;
+		}
+
+		/// <summary>
+		/// Returns true if the ensemble members, have the same 
+		/// float values as this instance.  Assumes the ensemble members are in a 
+		/// consistent order.
+		/// </summary>
+		/// <param name="e"></param>
+		/// <returns></returns>
+		public override bool Equals(object other)
         {
 			IEnsemble o = other as IEnsemble;
 			if (o == null) return false;

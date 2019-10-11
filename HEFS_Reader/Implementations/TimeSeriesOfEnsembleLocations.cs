@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HEFS_Reader.Enumerations;
 using HEFS_Reader.Interfaces;
 
 namespace HEFS_Reader.Implementations
@@ -21,7 +22,11 @@ namespace HEFS_Reader.Implementations
 		{
 			_timeSeriesofEnsembleLocations = new List<IWatershedForecast>();
 		}
-		public int IndexOfIssueDate(DateTime dt)
+		public void AddEnsembleMember(EnsembleMember em, int ensembleMemberIndex, DateTime issueDate, string location, Enumerations.Watersheds watershedName)
+		{
+
+		}
+		private int IndexOfIssueDate(DateTime dt)
 		{
 			
 			if (_timeSeriesofEnsembleLocations.Count == 0) return -1;
@@ -48,6 +53,23 @@ namespace HEFS_Reader.Implementations
 		public override int GetHashCode()
 		{
 			return 1866927581 + EqualityComparer<IList<IWatershedForecast>>.Default.GetHashCode(timeSeriesOfEnsembleLocations);
+		}
+
+		public void AddEnsembleMember(IEnsembleMember em, int emidx, DateTime issueDate, string locationName, Watersheds watershedName)
+		{
+			int idx = IndexOfIssueDate(issueDate);
+			if (idx == -1)
+			{
+				//need to sort based on issueDate
+				_timeSeriesofEnsembleLocations.Add(new WatershedForecast(new List<IEnsemble>(), watershedName, issueDate));
+				idx = IndexOfIssueDate(issueDate);
+
+			}
+			_timeSeriesofEnsembleLocations[idx].AddEnsembleMember(em, emidx, locationName);
+		}
+		public void SortByIssuanceDate()
+		{
+			//please implement me!
 		}
 	}
 }

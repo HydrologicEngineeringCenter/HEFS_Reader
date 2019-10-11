@@ -12,6 +12,6 @@ namespace HEFS_Reader.Interfaces
 		/// This is a list of watershed objects, a watershed represents an entire watershed set of ensembles (one for each location in the watershed), each watershed in the list represents an ensemble forecast time.
 		/// </summary>
 		IList<IWatershedForecast> timeSeriesOfEnsembleLocations { get; }
-		
+		void AddEnsembleMember(IEnsembleMember em, int emidx, DateTime issueDate, string locationName, Enumerations.Watersheds watershedName);
 	}
 }

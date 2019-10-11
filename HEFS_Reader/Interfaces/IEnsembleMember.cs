@@ -9,11 +9,11 @@ namespace HEFS_Reader.Interfaces
 		/// <summary>
 		/// The times for each value in the ensemble member
 		/// </summary>
-		DateTime[] Times { get; }
+		IList<DateTime> Times { get; }
 		/// <summary>
 		/// The values for each timestep in the ensemble member.
 		/// </summary>
-		float[] Values { get; }
+		IList<float> Values { get; }
 		float ComparisonTolerance{ get; set; }
 	}
 }

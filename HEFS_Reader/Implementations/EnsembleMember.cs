@@ -7,17 +7,21 @@ namespace HEFS_Reader.Implementations
 {
 	public class EnsembleMember : Interfaces.IEnsembleMember
 	{
-		private DateTime[] _times;
-		private float[] _values;
+		private IList<DateTime> _times;
+		private IList<float> _values;
 		private float _comparisonTolerance;
-
-		public EnsembleMember(float[] em, DateTime[] times)
+		public EnsembleMember()
+		{
+			_times = new List<DateTime>();
+			_values = new List<float>();
+		}
+		public EnsembleMember(IList<float> em, IList<DateTime> times)
 		{
 			_values = em;
 			_times = times;
 		}
 
-		public DateTime[] Times
+		public IList<DateTime> Times
 		{
 			get
 			{
@@ -25,7 +29,7 @@ namespace HEFS_Reader.Implementations
 			}
 		}
 
-		public float[] Values
+		public IList<float> Values
 		{
 			get
 			{
@@ -40,10 +44,10 @@ namespace HEFS_Reader.Implementations
 			IEnsembleMember o = other as IEnsembleMember;
 			if (o != null)
 			{
-				if (o.Times.Length != this.Times.Length) return false;
-				if (o.Values.Length != this.Values.Length) return false;
+				if (o.Times.Count != this.Times.Count) return false;
+				if (o.Values.Count != this.Values.Count) return false;
 				if (o.Times[0] != this.Times[0]) return false;//assumes fixed timestep.
-				for (int memberIdx = 0; memberIdx < Values.Length; memberIdx++)
+				for (int memberIdx = 0; memberIdx < Values.Count; memberIdx++)
 				{
           if (Math.Abs(this.Values[memberIdx] - o.Values[memberIdx]) > ComparisonTolerance)
           {
@@ -59,8 +63,8 @@ namespace HEFS_Reader.Implementations
 		public override int GetHashCode()
 		{
 			var hashCode = -2055526408;
-			hashCode = hashCode * -1521134295 + EqualityComparer<DateTime[]>.Default.GetHashCode(Times);
-			hashCode = hashCode * -1521134295 + EqualityComparer<float[]>.Default.GetHashCode(Values);
+			hashCode = hashCode * -1521134295 + EqualityComparer<IList<DateTime>>.Default.GetHashCode(Times);
+			hashCode = hashCode * -1521134295 + EqualityComparer<IList<float>>.Default.GetHashCode(Values);
 			return hashCode;
 		}
 	}
