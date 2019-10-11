@@ -8,7 +8,7 @@ using HEFS_Reader.Implementations;
 
 namespace HEFS_Reader.Interfaces
 {
-	public interface IWatershedForecast
+	public interface IWatershedForecast : IComparable<IWatershedForecast>
 	{
 		/// <summary>
 		/// Within a watershed there is an ensemble for each location in the watershed. Each ensemble is made up of ensemble members, the order (and count) of the ensemble members should be consisent across all locations. The ith ensemble member represents one estimated forecasted state

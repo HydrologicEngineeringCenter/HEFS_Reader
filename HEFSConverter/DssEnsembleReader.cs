@@ -119,10 +119,10 @@ namespace HEFSConverter
 
                         if (!previousT.Equals(currentT) || i == 0)//relying on sorted T and B
                         {
-                            //issue time has changed, we need a new Watershed Forecast, or to identify an existing one.
+							//issue time has changed, we need a new Watershed Forecast, or to identify an existing one.
 
-                            int idx = rval.IndexOfIssueDate(issueDate);
-                            int prevIdx = rval.IndexOfIssueDate(ParseIssueDate(previousT, true));
+							int idx = 0;//rval.IndexOfIssueDate(issueDate);
+							int prevIdx = 0;//rval.IndexOfIssueDate(ParseIssueDate(previousT, true));
                             if (i != 0 && prevIdx == -1)
                             {
                                 rval.timeSeriesOfEnsembleLocations.Add(watershedForecast);//add the completed one!

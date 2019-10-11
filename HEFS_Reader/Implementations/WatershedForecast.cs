@@ -91,5 +91,10 @@ namespace HEFS_Reader.Implementations
 			}
 				//throw new NotImplementedException();
 		}
+
+		public int CompareTo(IWatershedForecast other)
+		{
+			return this.IssueDate.CompareTo(other.IssueDate);
+		}
 	}
 }

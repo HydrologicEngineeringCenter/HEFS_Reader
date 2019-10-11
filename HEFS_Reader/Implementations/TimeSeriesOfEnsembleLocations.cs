@@ -8,9 +8,9 @@ using HEFS_Reader.Interfaces;
 
 namespace HEFS_Reader.Implementations
 {
-	public class TimeSeriesOfEnsembleLocations : Interfaces.ITimeSeriesOfEnsembleLocations
+	public class TimeSeriesOfEnsembleLocations : Interfaces.ITimeSeriesOfEnsembleLocations 
 	{
-		private IList<IWatershedForecast> _timeSeriesofEnsembleLocations;
+		private List<IWatershedForecast> _timeSeriesofEnsembleLocations;
 		public IList<IWatershedForecast> timeSeriesOfEnsembleLocations
 		{
 			get
@@ -69,6 +69,7 @@ namespace HEFS_Reader.Implementations
 		}
 		public void SortByIssuanceDate()
 		{
+			_timeSeriesofEnsembleLocations.Sort();
 			//please implement me!
 		}
 	}
