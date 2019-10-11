@@ -1,4 +1,5 @@
 ﻿using HEFS_Reader.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace HEFS_Reader.Implementations
@@ -7,6 +8,7 @@ namespace HEFS_Reader.Implementations
 	{
 		private IList<Interfaces.IEnsemble> _ensembles;
 		private Enumerations.Watersheds _watershedName;
+		private DateTime _issueDate;
 		public IList<Interfaces.IEnsemble> Locations
 		{
 			get
@@ -21,10 +23,25 @@ namespace HEFS_Reader.Implementations
 				return _watershedName;
 			}
 		}
-		public WatershedForecast(IList<Interfaces.IEnsemble> ensembles, Enumerations.Watersheds watershedName)
+
+		public DateTime IssueDate
+		{
+			get
+			{
+				return _issueDate;
+			}
+		}
+
+		//public WatershedForecast(IList<Interfaces.IEnsemble> ensembles, Enumerations.Watersheds watershedName)
+		//{
+		//	_ensembles = ensembles;
+		//	_watershedName = watershedName;
+		//}
+		public WatershedForecast(IList<Interfaces.IEnsemble> ensembles, Enumerations.Watersheds watershedName,DateTime issueDate)
 		{
 			_ensembles = ensembles;
 			_watershedName = watershedName;
+			_issueDate = issueDate;
 		}
 		public override bool Equals(object obj)
 		{

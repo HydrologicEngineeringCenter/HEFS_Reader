@@ -16,5 +16,6 @@ namespace HEFS_Reader.Interfaces
 		/// the name of the watershed as defined by the cnrfc website (it is their spelling and capitalization, not mine.)
 		/// </summary>
 		Enumerations.Watersheds WatershedName { get; }
+		DateTime IssueDate { get; }
 	}
 }

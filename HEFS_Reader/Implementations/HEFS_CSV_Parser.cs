@@ -74,7 +74,7 @@ namespace HEFS_Reader.Implementations
 			}
 
 
-			return new WatershedForecast(ensembles,watershedName);
+			return new WatershedForecast(ensembles,watershedName, issueDate);
 		}
 
 

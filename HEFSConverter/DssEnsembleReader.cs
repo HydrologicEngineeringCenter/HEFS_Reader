@@ -65,10 +65,10 @@ namespace HEFSConverter
 		{
 			System.Diagnostics.Stopwatch st = new Stopwatch();
 			st.Start();
-			List<HEFS_Reader.Interfaces.IEnsemble> ensembles = new List<HEFS_Reader.Interfaces.IEnsemble>();
-			WatershedForecast watershedForecast = new WatershedForecast(ensembles, watershed);
+			IList<HEFS_Reader.Interfaces.IEnsemble> ensembles = new List<HEFS_Reader.Interfaces.IEnsemble>();
+			IWatershedForecast watershedForecast = null;
 			TimeSeriesOfEnsembleLocations rval = new TimeSeriesOfEnsembleLocations();
-			IList<IWatershedForecast> watershedForecasts = rval.timeSeriesOfEnsembleLocations;
+			//IList<IWatershedForecast> watershedForecasts = rval.timeSeriesOfEnsembleLocations;
 
 
 			using (DSSIO.DSSReader dss = new DSSIO.DSSReader(dssPath))
@@ -96,17 +96,33 @@ namespace HEFSConverter
 					DSSIO.DSSPath path = dssPaths[i];
 					string currentLoc = path.Bpart;
 					string currentT = path.Fpart.Split('|').Last().Split(':').Last();//probably slowish operation
+					DateTime issueDate = ParseIssueDate(path.Fpart);
 					if (!previousT.Equals(currentT))//relying on sorted T and B
 					{
-						//issue time has changed, we have read a whole csv.
-						watershedForecasts.Add(watershedForecast);
-						ensembles = new List<HEFS_Reader.Interfaces.IEnsemble>();
-						watershedForecast = new WatershedForecast(ensembles, watershed);
+						//issue time has changed, we need a new Watershed Forecast, or to identify an existing one.
+						
+						int idx = rval.IndexOfIssueDate(issueDate);
+						if (idx == -1)
+						{
+							//this is a new csv
+							ensembles = new List<IEnsemble>();
+							watershedForecast = new WatershedForecast(ensembles, watershed, issueDate);
+
+						}
+						else
+						{
+							//add the completed one!
+							rval.timeSeriesOfEnsembleLocations.Add(watershedForecast);
+							//fetch the old one!
+							watershedForecast = rval.timeSeriesOfEnsembleLocations[idx];
+							ensembles = watershedForecast.Locations;
+						}
+						
 						previousT = currentT;
 						previousLoc = currentLoc;
 					}
 
-					DateTime issueDate = ParseIssueDate(path.Fpart);
+					
 					if (issueDate >= start && issueDate <= end
 					  && path.Apart.ToLower() == watershed.ToString().ToLower())
 					{
@@ -126,7 +142,7 @@ namespace HEFSConverter
 				}
 
 			}
-			watershedForecasts.Add(watershedForecast);
+			rval.timeSeriesOfEnsembleLocations.Add(watershedForecast);
 			st.Stop();
 			_readTimeInMilliSeconds = st.ElapsedMilliseconds;
 			return rval;

@@ -21,6 +21,18 @@ namespace HEFS_Reader.Implementations
 		{
 			_timeSeriesofEnsembleLocations = new List<IWatershedForecast>();
 		}
+		public int IndexOfIssueDate(DateTime dt)
+		{
+			
+			if (_timeSeriesofEnsembleLocations.Count == 0) return -1;
+			int idx = 0;
+			foreach (IWatershedForecast w in _timeSeriesofEnsembleLocations)
+			{
+				if (w.IssueDate.Equals(dt)) return idx;
+				idx++;
+			}
+			return -1;
+		}
 		public override bool Equals(object obj)
 		{
 			ITimeSeriesOfEnsembleLocations o = obj as ITimeSeriesOfEnsembleLocations;
