@@ -37,7 +37,31 @@ namespace HEFSConverter
 			throw new NotImplementedException();
 		}
 
-		public ITimeSeriesOfEnsembleLocations ReadDataset(Watersheds watershed, DateTime start, DateTime end, string dssPath)
+        class PathComparer : IComparer<DSSPath>
+        {
+            public int Compare(DSSPath x, DSSPath y)
+            {
+
+                return string.Compare(CollectionSortable(x),CollectionSortable(y));
+            }
+
+//            string previousT = dssPaths[0].Fpart.Split('|').Last().Split(':').Last();
+  //          string previousLoc = dssPaths[0].Bpart;
+            // /RUSSIANNAPA/APCC1/FLOW/01SEP2019/1HOUR/C:000002|T:0212019 
+
+            private string CollectionSortable(DSSPath x)
+            {
+                string rval = x.Apart + x.Bpart + x.Cpart + x.SortableDPart + x.Epart;
+                     
+                var tokens = x.Fpart.Split('|');
+                if (tokens.Length != 2)
+                    return x.PathWithoutDate;
+                rval += tokens[1].Split(':')[1] + tokens[0].Split(':')[0];
+                return rval;
+            }
+        }
+
+        public ITimeSeriesOfEnsembleLocations ReadDataset(Watersheds watershed, DateTime start, DateTime end, string dssPath)
 		{
 			System.Diagnostics.Stopwatch st = new Stopwatch();
 			st.Start();
@@ -49,8 +73,12 @@ namespace HEFSConverter
 
 			using (DSSIO.DSSReader dss = new DSSIO.DSSReader(dssPath))
 			{
-				DSSIO.DSSPathCollection dssPaths = dss.GetCondensedPathNames(); // sorted
-				if (dssPaths.Count == 0)
+				DSSIO.DSSPathCollection rawDssPaths = dss.GetCondensedPathNames(); // sorted
+                var dssPaths = rawDssPaths.OrderBy(a => a, new PathComparer()).ToArray(); // sorted
+
+
+                int size = dssPaths.Length;
+                if (size == 0)
 				{
 					throw new Exception("Empty DSS catalog");
 				}
@@ -61,7 +89,7 @@ namespace HEFSConverter
 				string previousLoc = dssPaths[0].Bpart;
 				// /RUSSIANNAPA/APCC1/FLOW/01SEP2019/1HOUR/C:000002|T:0212019/
 				List<List<float>> ensembleValues = new List<List<float>>();
-				int size = dssPaths.Count;
+				
 
 				for (int i = 0; i < size; i++)
 				{
@@ -83,7 +111,7 @@ namespace HEFSConverter
 					  && path.Apart.ToLower() == watershed.ToString().ToLower())
 					{
 						var ts = dss.GetTimeSeries(path.FullPath);
-                        TrimLeadingBaggage(ts);
+                         TrimLeadingBaggage(ts);
 						List<float> memberValues = new List<float>();
 						memberValues.AddRange(Array.ConvertAll(ts.Values, item => (float)item));
 						ensembleValues.Add(memberValues);
