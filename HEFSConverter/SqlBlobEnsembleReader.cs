@@ -47,7 +47,7 @@ namespace HEFSConverter
       }
       DateTime prevIssueDate = Convert.ToDateTime(table.Rows[0]["issue_date"]);
       DateTime currentDate = Convert.ToDateTime(table.Rows[0]["issue_date"]);
-      WatershedForecast watershedForecast = new WatershedForecast(ensembles, watershed); // one csv
+      WatershedForecast watershedForecast = new WatershedForecast(ensembles, watershed,currentDate); // one csv
       foreach (DataRow row in table.Rows)
       {
         currentDate = Convert.ToDateTime(row["issue_date"]);
@@ -57,7 +57,7 @@ namespace HEFSConverter
           watershedForecasts.Add(watershedForecast); // one csv.. (forecast group)
 
           ensembles = new List<IEnsemble>();
-          watershedForecast = new WatershedForecast(ensembles, watershed);
+          watershedForecast = new WatershedForecast(ensembles, watershed,currentDate);
           prevIssueDate = currentDate;
         }
         List<DateTime> times = GetTimes(row);
