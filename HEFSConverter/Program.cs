@@ -83,9 +83,9 @@ namespace HEFSConverter
 
         /*
         var fn = "ensemble_V7" + numEnsembles + ".dss";
-        HEFS_Reader.Interfaces.IEnsembleReader dssReader = new DssEnsembleReader();
+        IEnsembleReader dssReader = new DssEnsembleReader();
         var watershed = dssReader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
-        LogInfo(fn, numEnsembles, ((HEFS_Reader.Interfaces.ITimeable)dssReader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
+        LogInfo(fn, numEnsembles, ((ITimeable)dssReader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
 
         Compare(baseWaterShedData, watershed);
         */
