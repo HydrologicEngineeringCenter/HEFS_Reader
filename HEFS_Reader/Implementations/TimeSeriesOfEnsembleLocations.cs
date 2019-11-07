@@ -41,6 +41,10 @@ namespace HEFS_Reader.Implementations
     {
       _forecasts = Forecasts.OrderBy(ws => ws.Locations.FirstOrDefault().IssueDate).ToList();
     }
+    public void AddEnsembleMember(IEnsembleMember em, int ensembleMemberIndex, DateTime issueDate, string location, Enumerations.Watersheds watershedName)
+    {
+      // Copied from master to get it to compile
+    }
 
     public override bool Equals(object obj)
     {
@@ -54,6 +58,11 @@ namespace HEFS_Reader.Implementations
       return true;
     }
 
+    public void SortByIssuanceDate()
+    {
+      // copied from master
+      _forecasts.Sort();
+    }
     public override int GetHashCode()
     {
       return 1866927581 + EqualityComparer<IList<IWatershedForecast>>.Default.GetHashCode(Forecasts);

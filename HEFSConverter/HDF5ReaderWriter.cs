@@ -214,7 +214,9 @@ namespace HEFSConverter
 
         // Because for some reason this is an enum here
         List<IEnsemble> ensembles = new List<IEnsemble>();
-        WatershedForecast watershedForecast = new WatershedForecast(ensembles, HEFS_Reader.Enumerations.Watersheds.RussianNapa);
+
+        // Issue date added afterwards - TODO
+        WatershedForecast watershedForecast = new WatershedForecast(ensembles, HEFS_Reader.Enumerations.Watersheds.RussianNapa, DateTime.MinValue);
         
         // For each location in this watershed
         string fullWshedPath = root + H5Reader.PathSeparator + group;

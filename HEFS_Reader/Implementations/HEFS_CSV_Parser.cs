@@ -75,7 +75,8 @@ namespace HEFS_Reader.Implementations
 				ensembles.Add(new Ensemble(headers[i], issueDate, FullTable[i], times));
 			}
 
-			return new WatershedForecast(ensembles,watershedName);
+      // Issue date added after the fact.
+			return new WatershedForecast(ensembles,watershedName, issueDate);
 		}
 
 

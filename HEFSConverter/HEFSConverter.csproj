@@ -23,6 +23,7 @@
     <Reference Include="Reclamation.TimeSeries">
       <HintPath>..\References\Reclamation.TimeSeries.dll</HintPath>
     </Reference>
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data.SQLite">
       <HintPath>..\References\System.Data.SQLite.dll</HintPath>
     </Reference>

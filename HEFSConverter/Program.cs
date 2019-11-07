@@ -57,7 +57,6 @@ namespace HEFSConverter
       // I'd like to warmup more, but it's SO FREAKING SLOW
       int warmupEnsembleCount = 1;
       var warmupWatershed = baseWaterShedData.CloneSubset(warmupEnsembleCount);
-      //var confirmed = provider.ReadDataset(Watersheds.RussianNapa, StartTime, new DateTime(2013, 11, 1, 12, 0, 0), cacheDir);
       for (int i = 0; i < 3; i++)
       {
         WriteAllFormats(warmupWatershed, warmupEnsembleCount, StartTime);
@@ -67,7 +66,10 @@ namespace HEFSConverter
 
 
       int totalCt = baseWaterShedData.Forecasts.Count;
-      int steps = (int)Math.Ceiling(Math.Log(totalCt, 10));
+
+      // Changing this to do the last log-integer count (1000 for our current test) 
+      // rather than going to the full ~1800 ensembles
+      int steps = (int)Math.Floor(Math.Log(totalCt, 10));
 
       for (int i = 0; i <= steps; i++)
       {
@@ -80,18 +82,7 @@ namespace HEFSConverter
         WriteAllFormats(watershedSubset, numEnsembles, StartTime);
 
         ReadAllFormats(numEnsembles, StartTime, watershedSubset);
-        // READ
-
-        /*
-        var fn = "ensemble_V7" + numEnsembles + ".dss";
-        IEnsembleReader dssReader = new DssEnsembleReader();
-        var watershed = dssReader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
-        LogInfo(fn, numEnsembles, ((ITimeable)dssReader).ReadTimeInMilliSeconds / 1000);//potentially unsafe action.
-
-        Compare(baseWaterShedData, watershed);
-        */
-      }
-      
+      }      
 
       Console.WriteLine("Test complete, log-file written to " + logFile);
     }
@@ -103,7 +94,7 @@ namespace HEFSConverter
       string fn, dir;
 
       // CSV
-      /*
+      
       if (false)
       {
         dir = Path.Combine(Directory.GetCurrentDirectory(), "csv_out_" + ensembleCount);
@@ -119,13 +110,16 @@ namespace HEFSConverter
       }
 
       // DSS 6/7
-      if (!(SKIP_SLOW_TESTS && ensembleCount >= 1000))
+      if (!(SKIP_SLOW_TESTS && ensembleCount >= 100))
       {
         fn = "ensemble_V6" + ensembleCount + ".dss";
         WriteTimed(fn, ensembleCount, () => DssEnsembleWriter.Write(fn, waterShedData, true, 6));
 
         fn = "ensemble_V7" + ensembleCount + ".dss";
         WriteTimed(fn, ensembleCount, () => DssEnsembleWriter.Write(fn, waterShedData, true, 7));
+
+        fn = "ensemble_V7_profiles" + ensembleCount + ".dss";
+        WriteTimed(fn, ensembleCount, () => DssEnsembleWriter.WriteToTimeSeriesProfiles(fn, waterShedData, true, 7));
       }
       else
       {
@@ -133,7 +127,7 @@ namespace HEFSConverter
       }
 
       // SQLITE
-      if (!(SKIP_SLOW_TESTS && ensembleCount >= 1000))
+      if (false)
       {
         fn = "ensemble_sqlite" + ensembleCount + ".db";
         WriteTimed(fn, ensembleCount, () =>
@@ -168,7 +162,7 @@ namespace HEFSConverter
         SqlBlobEnsemble.Write(server, waterShedData, true);
       });
 
-  */
+
       // Serial HDF5
       fn = "ensemble_serial_1RowPerChunk.h5";
       WriteTimed(fn, ensembleCount, () =>
@@ -179,7 +173,7 @@ namespace HEFSConverter
 
 
       // Parallel HDF5
-      foreach (int c in new[] { 1, 5, 10, -1 })
+      foreach (int c in new[] { 1, 10, -1 })
       {
         fn = "ensemble_parallel_" + c.ToString() + "RowsPerChunk.h5";
         WriteTimed(fn, ensembleCount, () =>
@@ -192,6 +186,8 @@ namespace HEFSConverter
 
     private static void ReadAllFormats(int ensembleCount, DateTime startTime, ITimeSeriesOfEnsembleLocations validateWatershedDataB)
     {
+      // TODO - compare validateWatershed data with computed
+
       File.AppendAllText(logFile, NL);
       File.AppendAllText(logFile, startTime.ToString() + ", Count = " + ensembleCount.ToString() + NL);
       string fn;
@@ -208,7 +204,7 @@ namespace HEFSConverter
 
 
       // Parallel HDF5
-      foreach (int c in new[] { 1, 5, 10, -1 })
+      foreach (int c in new[] { 1, 10, -1 })
       {
         fn = "ensemble_parallel_" + c.ToString() + "RowsPerChunk.h5";
         ReadTimed(fn, ensembleCount, () =>
@@ -217,6 +213,7 @@ namespace HEFSConverter
             wshedData = HDF5ReaderWriter.Read(hr);
         });
       }
+
     }
 
 
