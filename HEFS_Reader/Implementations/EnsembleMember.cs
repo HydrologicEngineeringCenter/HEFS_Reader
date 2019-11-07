@@ -17,21 +17,8 @@ namespace HEFS_Reader.Implementations
 			_times = times;
 		}
 
-		public DateTime[] Times
-		{
-			get
-			{
-				return _times;
-			}
-		}
-
-		public float[] Values
-		{
-			get
-			{
-				return _values;
-			}
-		}
+    public DateTime[] Times => _times;
+    public float[] Values => _values;
 
 		public float ComparisonTolerance { get { return _comparisonTolerance; } set { _comparisonTolerance = value; } }
 

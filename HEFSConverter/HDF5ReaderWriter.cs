@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
 using HEFS_Reader.Interfaces;
+using HEFS_Reader.Implementations;
 using H5Assist;
 
 namespace HEFSConverter
@@ -175,7 +176,7 @@ namespace HEFSConverter
                 relativeRow = 0;
                 chunks[0] += 1;
               }
-              else if(ensembleMember == e.Members.Count - 1)
+              else if (ensembleMember == e.Members.Count - 1)
               {
                 // We have some number of rows to write at the end... wipe the rest of the buffer 
                 // so it compresses better and gets unzipped as zeroes?
@@ -191,6 +192,80 @@ namespace HEFSConverter
 
       }
     }
+
+
+
+
+    public static ITimeSeriesOfEnsembleLocations Read(H5Reader h5r)
+    {
+      string root = H5Reader.Root + "Watersheds";
+
+      long[] dtTicks = null;
+      float[,] data = null;
+
+      TimeSeriesOfEnsembleLocations retn = new TimeSeriesOfEnsembleLocations();
+
+      // For each [outer] watershed
+      var shedGroups = h5r.GetGroupNames(root);
+      foreach (var group in shedGroups)
+      {
+        // "RussianNapa"
+        string wshedName = group;
+
+        // Because for some reason this is an enum here
+        List<IEnsemble> ensembles = new List<IEnsemble>();
+        WatershedForecast watershedForecast = new WatershedForecast(ensembles, HEFS_Reader.Enumerations.Watersheds.RussianNapa);
+        
+        // For each location in this watershed
+        string fullWshedPath = root + H5Reader.PathSeparator + group;
+        var locGroups = h5r.GetGroupNames(fullWshedPath);
+
+        foreach (var location in locGroups)
+        {
+          // location: "APCC1"
+          // FullLocation: "/Watersheds/RussianNapa/APCC1"
+          string fullLocation = fullWshedPath + H5Reader.PathSeparator + location;
+
+          // Each location has a bunch of 1-day folders
+          var dayGroups = h5r.GetGroupNames(fullLocation);
+
+          foreach (var yrDay in dayGroups)
+          {
+            // yrDay: "2013_305"
+            string fullDay = fullLocation + H5Reader.PathSeparator + yrDay;
+
+            // Parse out the time
+            string[] split = yrDay.Split('_');
+            if(split.Length != 2)
+            {
+              Console.WriteLine("ERROR IN HDF5 PATH: " + fullDay);
+              continue;
+            }
+
+            int yr = int.Parse(split[0]);
+            int day = int.Parse(split[1]);
+
+
+            string valuePath = fullDay + H5Reader.PathSeparator + "Values";
+            string timePath = fullDay + H5Reader.PathSeparator + "Times";
+
+            h5r.ReadDataset(timePath, ref dtTicks);
+            h5r.ReadDataset(valuePath, ref data);
+
+            DateTime issueDate = new DateTime(yr, 1, 1);
+            issueDate.AddDays(day - 1);
+
+            Ensemble e = new Ensemble(location, issueDate, data, dtTicks);
+            ensembles.Add(e);
+          }
+        }
+
+        retn.Forecasts.Add(watershedForecast);
+      }
+
+      return retn;
+    }
+
 
   }
 }

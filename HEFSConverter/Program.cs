@@ -79,6 +79,7 @@ namespace HEFSConverter
         var watershedSubset = baseWaterShedData.CloneSubset(numEnsembles);
         WriteAllFormats(watershedSubset, numEnsembles, StartTime);
 
+        ReadAllFormats(numEnsembles, StartTime, watershedSubset);
         // READ
 
         /*
@@ -102,7 +103,7 @@ namespace HEFSConverter
       string fn, dir;
 
       // CSV
-
+      /*
       if (false)
       {
         dir = Path.Combine(Directory.GetCurrentDirectory(), "csv_out_" + ensembleCount);
@@ -167,7 +168,7 @@ namespace HEFSConverter
         SqlBlobEnsemble.Write(server, waterShedData, true);
       });
 
-
+  */
       // Serial HDF5
       fn = "ensemble_serial_1RowPerChunk.h5";
       WriteTimed(fn, ensembleCount, () =>
@@ -189,6 +190,35 @@ namespace HEFSConverter
       }
     }
 
+    private static void ReadAllFormats(int ensembleCount, DateTime startTime, ITimeSeriesOfEnsembleLocations validateWatershedDataB)
+    {
+      File.AppendAllText(logFile, NL);
+      File.AppendAllText(logFile, startTime.ToString() + ", Count = " + ensembleCount.ToString() + NL);
+      string fn;
+
+      ITimeSeriesOfEnsembleLocations wshedData;
+
+      // Serial HDF5
+      fn = "ensemble_serial_1RowPerChunk.h5";
+      ReadTimed(fn, ensembleCount, () =>
+      {
+        using (var hr = new H5Reader(fn))
+          wshedData = HDF5ReaderWriter.Read(hr);
+      });
+
+
+      // Parallel HDF5
+      foreach (int c in new[] { 1, 5, 10, -1 })
+      {
+        fn = "ensemble_parallel_" + c.ToString() + "RowsPerChunk.h5";
+        ReadTimed(fn, ensembleCount, () =>
+        {
+          using (var hr = new H5Reader(fn))
+            wshedData = HDF5ReaderWriter.Read(hr);
+        });
+      }
+    }
+
 
     // Writer helpers
     private static void WriteTimed(string filename, int ensembleCount, Action CreateFile)
@@ -203,7 +233,7 @@ namespace HEFSConverter
         CreateFile();
 
         sw.Stop();
-        LogResult(filename, ensembleCount, sw.Elapsed);
+        LogWriteResult(filename, ensembleCount, sw.Elapsed);
       }
       catch (Exception ex)
       {
@@ -226,7 +256,24 @@ namespace HEFSConverter
         CreateFile();
 
         sw.Stop();
-        LogResult(dirName, ensembleCount, sw.Elapsed);
+        LogWriteResult(dirName, ensembleCount, sw.Elapsed);
+      }
+      catch (Exception ex)
+      {
+        LogWarning(ex.Message);
+      }
+    }
+    private static void ReadTimed(string filename, int ensembleCount, Action ReadFile)
+    {
+      try
+      {
+        // Record the amount of time from start->end, including flushing to disk.
+        var sw = Stopwatch.StartNew();
+
+        ReadFile();
+
+        sw.Stop();
+        LogReadResult(filename, ensembleCount, sw.Elapsed);
       }
       catch (Exception ex)
       {
@@ -289,7 +336,7 @@ namespace HEFSConverter
       lock (logFile)
         File.AppendAllText(logFile, "WARNING: " + msg);
     }
-    static void LogResult(string path, int numEnsemblesToWrite, TimeSpan ts)
+    static void LogWriteResult(string path, int numEnsemblesToWrite, TimeSpan ts)
     {
       if (DisableTestReporting)
         return;
@@ -313,15 +360,26 @@ namespace HEFSConverter
       }
 
       double mb = size / 1024.0 / 1024.0;
-      double mbs = mb / ts.TotalSeconds;
-
       Log(path.PadRight(FileNameColSize) + Separator +
           numEnsemblesToWrite.ToString().PadRight(NumEnsColSize) + Separator +
           ts.TotalSeconds.ToString("F2").PadRight(TimeColSize) + Separator +
           BytesToString(size).PadRight(FileSzColSize) + NL);
+    }
+    static void LogReadResult(string path, int numEnsemblesToWrite, TimeSpan ts)
+    {
+      if (DisableTestReporting)
+        return;
 
-      //mbs.ToString("F2") + " MB/sec" + NL;
+      if (!File.Exists(path))
+      {
+        LogWarning("File " + path + " was not found!");
+        return;
+      }
 
+      Log(path.PadRight(FileNameColSize) + Separator +
+          numEnsemblesToWrite.ToString().PadRight(NumEnsColSize) + Separator +
+          ts.TotalSeconds.ToString("F2").PadRight(TimeColSize) + Separator +
+          "(Reading)".PadRight(FileSzColSize) + NL);
     }
 
     // Other helpers
