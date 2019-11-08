@@ -21,23 +21,23 @@ namespace HEFSConverter
     public ITimeSeriesOfEnsembleLocations ReadDataset(Watersheds watershed, DateTime start, DateTime end, string Path)
     {
       var st = System.Diagnostics.Stopwatch.StartNew();
-      var  connectionString = "Data Source=" + Path + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
-            var DateTimeFormat = SqlBlobEnsembleWriter.DateTimeFormat;
-            var tableName = SqlBlobEnsembleWriter.tableName;
+      var connectionString = "Data Source=" + Path + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
+      var DateTimeFormat = SqlBlobEnsembleWriter.DateTimeFormat;
+      var tableName = SqlBlobEnsembleWriter.TableName;
 
       SQLiteServer server = new SQLiteServer(connectionString);
       var ensembles = new List<IEnsemble>();
       TimeSeriesOfEnsembleLocations rval = new TimeSeriesOfEnsembleLocations();
       IList<IWatershedForecast> watershedForecasts = rval.Forecasts;
-     
+
       var sql = "select * from " + tableName +
         " WHERE issue_date >= '" + start.ToString(DateTimeFormat) + "' "
         + " AND issue_date <= '" + end.ToString(DateTimeFormat) + "' "
         + " AND watershed = '" + watershed.ToString() + "' ";
-        sql += " order by watershed,issue_date,location_name";
+      sql += " order by watershed,issue_date,location_name";
 
       var table = server.Table(tableName, sql);
-      if( table.Rows.Count == 0)
+      if (table.Rows.Count == 0)
       {
         throw new Exception("no data");
       }
@@ -47,13 +47,13 @@ namespace HEFSConverter
       foreach (DataRow row in table.Rows)
       {
         currentDate = Convert.ToDateTime(row["issue_date"]);
-         
-        if( currentDate != prevIssueDate )// new issue_date
+
+        if (currentDate != prevIssueDate)// new issue_date
         {
           watershedForecasts.Add(watershedForecast); // one csv.. (forecast group)
 
           ensembles = new List<IEnsemble>();
-          watershedForecast = new WatershedForecast(ensembles, watershed,currentDate);
+          watershedForecast = new WatershedForecast(ensembles, watershed, currentDate);
           prevIssueDate = currentDate;
         }
         List<DateTime> times = GetTimes(row);
@@ -64,7 +64,7 @@ namespace HEFSConverter
                                              values,
                                              times);
 
-       
+
         ensembles.Add(ensemeble);  // one location.
       }
       watershedForecasts.Add(watershedForecast);
@@ -106,12 +106,12 @@ namespace HEFSConverter
       int member_length = Convert.ToInt32(row["member_length"]);
 
       byte[] byte_values = (byte[])row["byte_value_array"];
-      
+
       if (compressed != 0)
       {
         byte_values = Decompress(byte_values);
       }
-    
+
       var numBytesPerMember = byte_values.Length / member_count;
 
       for (int i = 0; i < member_count; i++)
@@ -125,6 +125,6 @@ namespace HEFSConverter
 
       return rval;
     }
-     
+
   }
 }

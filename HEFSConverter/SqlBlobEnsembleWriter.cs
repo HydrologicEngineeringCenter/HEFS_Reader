@@ -18,20 +18,17 @@ namespace HEFSConverter
   /// each ensemble member is written to a blob
   /// with optional compressions
   /// </summary>
-  class SqlBlobEnsembleWriter
+  public class SqlBlobEnsembleWriter
   {
-
-    public static string tableName = "timeseries_blob";
+    public static string TableName = "timeseries_blob";
     public static string DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-
-    internal static TimeSpan Write(SQLiteServer server, ITimeSeriesOfEnsembleLocations watersheds,
-      bool compress = false, bool createPiscesDB = false)
+    internal static TimeSpan Write(SQLiteServer server, ITimeSeriesOfEnsembleLocations watersheds, bool compress = false, bool createPiscesDB = false)
     {
       Stopwatch sw = Stopwatch.StartNew();
       int index = 0;
 
-      Reclamation.TimeSeries.TimeSeriesDatabase db = null;
+      Reclamation.TimeSeries.TimeSeriesDatabase db;
       int folderIndex = 1;
       int scIndex = 0;
       Reclamation.TimeSeries.TimeSeriesDatabaseDataSet.SeriesCatalogDataTable sc = null;
@@ -43,6 +40,7 @@ namespace HEFSConverter
         folderIndex = 1;
         scIndex = sc.NextID();
       }
+
       var timeSeriesTable = CreateAndGetBlobTable(server);
 
       //var newRowLock = new object();
@@ -72,7 +70,7 @@ namespace HEFSConverter
 
           if (createPiscesDB)
           {
-           int folderID= sc.GetOrCreateFolder(watershed.WatershedName.ToString(),e.LocationName, e.IssueDate.ToString("yyyy-MM-dd"));
+            int folderID = sc.GetOrCreateFolder(watershed.WatershedName.ToString(), e.LocationName, e.IssueDate.ToString("yyyy-MM-dd"));
             scIndex += 3;// increment enough for folders
             for (int i = 0; i < e.Members.Count; i++)
             {
@@ -103,6 +101,7 @@ namespace HEFSConverter
       }
       if (createPiscesDB)
         server.SaveTable(sc);
+
       server.SaveTable(timeSeriesTable);
       sw.Stop();
       return sw.Elapsed;
@@ -165,11 +164,9 @@ namespace HEFSConverter
     /// <returns></returns>
     static DataTable CreateAndGetBlobTable(Reclamation.Core.BasicDBServer server)
     {
-
-
-      if (!server.TableExists(tableName))
+      if (!server.TableExists(TableName))
       {
-        string sql = "CREATE TABLE " + tableName
+        string sql = "CREATE TABLE " + TableName
         + " ( id integer not null primary key,"
         + "    issue_date datetime, "
         + "   watershed NVARCHAR(100) ,"
@@ -180,12 +177,10 @@ namespace HEFSConverter
         + "   compressed integer    ,"
         + "  byte_value_array BLOB NULL )";
         server.RunSqlCommand(sql);
-
       }
-      server.RunSqlCommand("DELETE from " + tableName);
-      return server.Table(tableName, "select * from " + tableName + " where 1=0");
 
-
+      server.RunSqlCommand("DELETE from " + TableName);
+      return server.Table(TableName, "select * from " + TableName + " where 1=0");
     }
 
 

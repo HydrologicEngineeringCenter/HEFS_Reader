@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace HEFSConverter
 {
-  class DssEnsembleReader : HEFS_Reader.Interfaces.IEnsembleReader, HEFS_Reader.Interfaces.ITimeable
+  public class DssEnsembleReader : IEnsembleReader, ITimeable
   {
     private long _readTimeInMilliSeconds = 0;
     public long ReadTimeInMilliSeconds { get { return _readTimeInMilliSeconds; } }
@@ -42,42 +42,14 @@ namespace HEFSConverter
       throw new NotImplementedException();
     }
 
-    class PathComparer : IComparer<DSSPath>
-    {
-      public int Compare(DSSPath x, DSSPath y)
-      {
-
-        return string.Compare(CollectionSortable(x), CollectionSortable(y));
-      }
-
-      //            string previousT = dssPaths[0].Fpart.Split('|').Last().Split(':').Last();
-      //          string previousLoc = dssPaths[0].Bpart;
-      // /RUSSIANNAPA/APCC1/FLOW/01SEP2019/1HOUR/C:000002|T:0212019 
-
-      private string CollectionSortable(DSSPath x)
-      {
-        string rval = x.Apart + x.Bpart + x.Cpart + x.SortableDPart + x.Epart;
-
-        if (!x.Fpart.StartsWith("C:"))
-          return rval;
-
-        var tokens = x.Fpart.Split('|');
-        if (tokens.Length != 2)
-          return x.PathWithoutDate;
-        rval += tokens[1].Split(':')[1] + tokens[0].Split(':')[1];
-        return rval;
-      }
-    }
-
     public ITimeSeriesOfEnsembleLocations ReadDataset(Watersheds watershed, DateTime start, DateTime end, string dssPath)
     {
-      var st = Stopwatch.StartNew();
       TimeSeriesOfEnsembleLocations rval = new TimeSeriesOfEnsembleLocations();
 
       using (DSSReader dss = new DSSReader(dssPath, DSSReader.MethodID.MESS_METHOD_GENERAL_ID, DSSReader.LevelID.MESS_LEVEL_NONE))
       {
-        Console.WriteLine("Reading" + dssPath);
-        DSSIO.DSSPathCollection rawDssPaths = dss.GetCatalog(); // sorted
+        Console.WriteLine("Reading " + dssPath);
+        DSSPathCollection rawDssPaths = dss.GetCatalog(); // sorted
         var dssPaths = rawDssPaths.OrderBy(a => a, new PathComparer()).ToArray(); // sorted
         int size = dssPaths.Length;
         if (size == 0)
@@ -105,16 +77,13 @@ namespace HEFSConverter
             // rval.Forecasts.Insert(memberidx - 1, )
             rval.AddEnsembleMember(em, memberidx - 1, issueDate, location, watershed);
           }
-        }
+         }
       }
+
       rval.SortByIssuanceDate();
-      st.Stop();
-      Console.WriteLine();
-      _readTimeInMilliSeconds = st.ElapsedMilliseconds;
       return rval;
     }
-
-
+    
     public ITimeSeriesOfEnsembleLocations ReadDatasetFromProfiles(Watersheds watershed, DateTime start, DateTime end, string dssPath)
     {
       var st = Stopwatch.StartNew();
@@ -172,6 +141,7 @@ namespace HEFSConverter
       _readTimeInMilliSeconds = st.ElapsedMilliseconds;
       return rval;
     }
+    
     private static List<DateTime> GetTimes(DateTime t, int count)
     {
       var rval = new List<DateTime>(count);
@@ -183,6 +153,33 @@ namespace HEFSConverter
       return rval;
     }
 
+
+    class PathComparer : IComparer<DSSPath>
+    {
+      public int Compare(DSSPath x, DSSPath y)
+      {
+
+        return string.Compare(CollectionSortable(x), CollectionSortable(y));
+      }
+
+      //            string previousT = dssPaths[0].Fpart.Split('|').Last().Split(':').Last();
+      //          string previousLoc = dssPaths[0].Bpart;
+      // /RUSSIANNAPA/APCC1/FLOW/01SEP2019/1HOUR/C:000002|T:0212019 
+
+      private string CollectionSortable(DSSPath x)
+      {
+        string rval = x.Apart + x.Bpart + x.Cpart + x.SortableDPart + x.Epart;
+
+        if (!x.Fpart.StartsWith("C:"))
+          return rval;
+
+        var tokens = x.Fpart.Split('|');
+        if (tokens.Length != 2)
+          return x.PathWithoutDate;
+        rval += tokens[1].Split(':')[1] + tokens[0].Split(':')[1];
+        return rval;
+      }
+    }
 
   }
 }

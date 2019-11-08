@@ -16,7 +16,7 @@ namespace HEFSConverter
   class Program
   {
     // So I can test this reliably at work....
-    const bool SKIP_SLOW_TESTS = false;
+    const bool SPEEDRUN = true;
 
     static string cacheDir = @"C:\Temp\hefs_cache";
     static string logFile = "Ensemble_testing.log";
@@ -42,11 +42,15 @@ namespace HEFSConverter
           "Seconds".PadRight(TimeColSize) + Separator +
           "File Size".PadRight(FileSzColSize) + NL);
 
+      if (SPEEDRUN)
+      { EndTime = StartTime.AddYears(1);
+        Console.WriteLine("SPEED RUN!");
+      }
+
       var provider = new HEFS_CSV_Reader();
 
-      //ITimeSeriesOfEnsembleLocations baseWaterShedData = provider.ReadDataset(Watersheds.RussianNapa, StartTime, EndTime, cacheDir);
-
       Console.WriteLine("Reading CSV Directory (Parallel)...");
+      
       ITimeSeriesOfEnsembleLocations baseWaterShedData = provider.ReadParallel(Watersheds.RussianNapa, StartTime, EndTime, cacheDir);
       Console.WriteLine("Finished reading in " + Math.Round(provider.ReadTime.TotalSeconds) + " seconds.");
 
@@ -59,7 +63,7 @@ namespace HEFSConverter
       var warmupWatershed = baseWaterShedData.CloneSubset(warmupEnsembleCount);
       for (int i = 0; i < 3; i++)
       {
-        WriteAllFormats(warmupWatershed, warmupEnsembleCount, StartTime);
+        WriteAllFormats(warmupWatershed, warmupEnsembleCount);
       }
       DisableTestReporting = false;
       Console.WriteLine("Finished Warmup.");
@@ -79,22 +83,22 @@ namespace HEFSConverter
         Console.WriteLine("Starting test: " + numEnsembles.ToString() + " Ensembles.");
 
         var watershedSubset = baseWaterShedData.CloneSubset(numEnsembles);
-        WriteAllFormats(watershedSubset, numEnsembles, StartTime);
+        WriteAllFormats(watershedSubset, numEnsembles);
 
-        ReadAllFormats(numEnsembles, StartTime, watershedSubset);
-      }      
+        ReadAllFormats(numEnsembles, watershedSubset);
+      }
 
       Console.WriteLine("Test complete, log-file written to " + logFile);
     }
 
-    private static void WriteAllFormats(ITimeSeriesOfEnsembleLocations waterShedData, int ensembleCount, DateTime startTime)
+    private static void WriteAllFormats(ITimeSeriesOfEnsembleLocations waterShedData, int ensembleCount)
     {
       File.AppendAllText(logFile, NL);
-      File.AppendAllText(logFile, startTime.ToString() + ", Count = " + ensembleCount.ToString() + NL);
+      File.AppendAllText(logFile, "---------- Writing " + ensembleCount.ToString() + " Ensembles ----------" + NL);
       string fn, dir;
 
       // CSV
-      
+
       if (false)
       {
         dir = Path.Combine(Directory.GetCurrentDirectory(), "csv_out_" + ensembleCount);
@@ -106,60 +110,36 @@ namespace HEFSConverter
       }
       else
       {
-        Log("---CSV SKIPPED FOR TIME CONSTRAINTS---" + NL);
+        //Log("---CSV SKIPPED FOR TIME CONSTRAINTS---" + NL);
       }
 
       // DSS 6/7
-      if (!(SKIP_SLOW_TESTS && ensembleCount >= 100))
-      {
-        fn = "ensemble_V6" + ensembleCount + ".dss";
-        WriteTimed(fn, ensembleCount, () => DssEnsembleWriter.Write(fn, waterShedData, true, 6));
+      fn = "ensemble_V6_" + ensembleCount + ".dss";
+      WriteTimed(fn, ensembleCount, () => DssEnsembleWriter.Write(fn, waterShedData, true, 6));
 
-        fn = "ensemble_V7" + ensembleCount + ".dss";
-        WriteTimed(fn, ensembleCount, () => DssEnsembleWriter.Write(fn, waterShedData, true, 7));
+      fn = "ensemble_V7_" + ensembleCount + ".dss";
+      WriteTimed(fn, ensembleCount, () => DssEnsembleWriter.Write(fn, waterShedData, true, 7));
 
-        fn = "ensemble_V7_profiles" + ensembleCount + ".dss";
-        WriteTimed(fn, ensembleCount, () => DssEnsembleWriter.WriteToTimeSeriesProfiles(fn, waterShedData, true, 7));
-      }
-      else
-      {
-        Log("---DSS SKIPPED FOR TIME CONSTRAINTS---" + NL);
-      }
+      fn = "ensemble_V7_profiles_" + ensembleCount + ".dss";
+      WriteTimed(fn, ensembleCount, () => DssEnsembleWriter.WriteToTimeSeriesProfiles(fn, waterShedData, true, 7));
 
       // SQLITE
-      if (false)
-      {
-        fn = "ensemble_sqlite" + ensembleCount + ".db";
-        WriteTimed(fn, ensembleCount, () =>
-        {
-          string connectionString = "Data Source=" + fn + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
-          Reclamation.Core.SQLiteServer server = new Reclamation.Core.SQLiteServer(connectionString);
-          SqlEnsembleWriter.Write(server, waterShedData);
-          //ts = SqlEnsembleWriter.WriteToDatabase(server, startTime, endTime, true, cacheDir);
-          server.CloseAllConnections();
-        });
-      }
-      else
-      {
-        Log("---SQLITE S1 SKIPPED FOR TIME CONSTRAINTS---" + NL);
-      }
-
-      fn = "ensemble_sqlite_blob" + ensembleCount + ".db";
+      fn = "ensemble_sqlite_blob_" + ensembleCount + ".db";
       WriteTimed(fn, ensembleCount, () =>
       {
         string connectionString = "Data Source=" + fn + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
         var server = new Reclamation.Core.SQLiteServer(connectionString);
         server.CloseAllConnections();
-        SqlBlobEnsemble.Write(server, waterShedData, false);
+        SqlBlobEnsembleWriter.Write(server, waterShedData, false);
       });
 
-      fn = "ensemble_sqlite_blob_compressed" + ensembleCount + ".db";
+      fn = "ensemble_sqlite_blob_compressed_" + ensembleCount + ".db";
       WriteTimed(fn, ensembleCount, () =>
       {
         string connectionString = "Data Source=" + fn + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
         var server = new Reclamation.Core.SQLiteServer(connectionString);
         server.CloseAllConnections();
-        SqlBlobEnsemble.Write(server, waterShedData, true);
+        SqlBlobEnsembleWriter.Write(server, waterShedData, true);
       });
 
 
@@ -184,15 +164,54 @@ namespace HEFSConverter
       }
     }
 
-    private static void ReadAllFormats(int ensembleCount, DateTime startTime, ITimeSeriesOfEnsembleLocations validateWatershedDataB)
+    private static void ReadAllFormats(int ensembleCount, ITimeSeriesOfEnsembleLocations validateWatershedDataB)
     {
       // TODO - compare validateWatershed data with computed
 
       File.AppendAllText(logFile, NL);
-      File.AppendAllText(logFile, startTime.ToString() + ", Count = " + ensembleCount.ToString() + NL);
+      File.AppendAllText(logFile, "---------- Reading " + ensembleCount.ToString() + " Ensembles ----------" + NL);
       string fn;
 
       ITimeSeriesOfEnsembleLocations wshedData;
+      DateTime startTime = DateTime.MinValue;
+      DateTime endTime = DateTime.MaxValue;
+
+      // DSS
+      fn = "ensemble_V6_" + ensembleCount + ".dss";
+      ReadTimed(fn, ensembleCount, () =>
+      {
+        var reader = new DssEnsembleReader();
+        wshedData = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
+      });
+
+      fn = "ensemble_V7_" + ensembleCount + ".dss";
+      ReadTimed(fn, ensembleCount, () =>
+      {
+        var reader = new DssEnsembleReader();
+        wshedData = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
+      });
+
+      fn = "ensemble_V7_profiles_" + ensembleCount + ".dss";
+      ReadTimed(fn, ensembleCount, () =>
+      {
+        var reader = new DssEnsembleReader();
+        wshedData = reader.ReadDatasetFromProfiles(Watersheds.RussianNapa, startTime, endTime, fn);
+      });
+
+      // SQLITE
+      fn = "ensemble_sqlite_blob_" + ensembleCount + ".db";
+      ReadTimed(fn, ensembleCount, () =>
+      {
+        var reader = new SqlBlobEnsembleReader();
+        wshedData = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
+      });
+
+      fn = "ensemble_sqlite_blob_compressed_" + ensembleCount + ".db";
+      ReadTimed(fn, ensembleCount, () =>
+      {
+        var reader = new SqlBlobEnsembleReader();
+        wshedData = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
+      });
 
       // Serial HDF5
       fn = "ensemble_serial_1RowPerChunk.h5";
