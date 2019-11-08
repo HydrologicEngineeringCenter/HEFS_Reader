@@ -45,6 +45,7 @@ namespace HEFSConverter
     public ITimeSeriesOfEnsembleLocations ReadDataset(Watersheds watershed, DateTime start, DateTime end, string dssPath)
     {
       TimeSeriesOfEnsembleLocations rval = new TimeSeriesOfEnsembleLocations();
+      DSSReader.UseTrainingWheels = false;
 
       using (DSSReader dss = new DSSReader(dssPath, DSSReader.MethodID.MESS_METHOD_GENERAL_ID, DSSReader.LevelID.MESS_LEVEL_NONE))
       {
@@ -72,8 +73,8 @@ namespace HEFSConverter
 
           if (issueDate >= start && issueDate <= end && string.Equals(path.Apart, shedStr, StringComparison.OrdinalIgnoreCase))
           {
-            // Full path is important, path without date triggers a heinous case in the dss low-level code
-            var ts = dss.GetTimeSeries(path.FullPath);
+            // Passing in 'path' (not the dateless string) is important, path without date triggers a heinous case in the dss low-level code
+            var ts = dss.GetTimeSeries(path);
 
             var em = new EnsembleMember(ts.Values.Select(d => (float)d).ToArray(), ts.Times);
             rval.AddEnsembleMember(em, memberidx - 1, issueDate, location, watershed);
@@ -82,6 +83,7 @@ namespace HEFSConverter
       }
 
       rval.SortByIssuanceDate();
+      Console.WriteLine();
       return rval;
     }
     

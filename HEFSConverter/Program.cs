@@ -16,7 +16,7 @@ namespace HEFSConverter
   class Program
   {
     // So I can test this reliably at work....
-    const bool SPEEDRUN = true;
+    const bool SPEEDRUN = false;
 
     static string cacheDir = @"C:\Temp\hefs_cache";
     static string logFile = "Ensemble_testing.log";
@@ -36,24 +36,13 @@ namespace HEFSConverter
 
     static void Main(string[] args)
     {
+      //string testfn = @"C:\Temp\SampleDSSFiles\ensemble_V6_100.dss";
+
+      //var en = new DssEnsembleReader();
+      //en.ReadDataset(Watersheds.RussianNapa, DateTime.MinValue, DateTime.MaxValue, testfn);
 
 
-      string testfn = @"C:\Temp\SampleDSSFiles\ensemble_V6_100.dss";
-
-
-      var en = new DssEnsembleReader();
-      en.ReadDataset(Watersheds.RussianNapa, DateTime.MinValue, DateTime.MaxValue, testfn);
-
-
-
-
-
-
-
-
-
-
-      return;
+      //return;
 
       Log(NL + NL + "------" + DateTime.Now.ToString() + "-------" + NL + NL);
       Log("Filename".PadRight(FileNameColSize) + Separator +
