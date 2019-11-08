@@ -36,6 +36,25 @@ namespace HEFSConverter
 
     static void Main(string[] args)
     {
+
+
+      string testfn = @"C:\Temp\SampleDSSFiles\ensemble_V6_100.dss";
+
+
+      var en = new DssEnsembleReader();
+      en.ReadDataset(Watersheds.RussianNapa, DateTime.MinValue, DateTime.MaxValue, testfn);
+
+
+
+
+
+
+
+
+
+
+      return;
+
       Log(NL + NL + "------" + DateTime.Now.ToString() + "-------" + NL + NL);
       Log("Filename".PadRight(FileNameColSize) + Separator +
           "#Ensembles".PadRight(NumEnsColSize) + Separator +
@@ -43,7 +62,8 @@ namespace HEFSConverter
           "File Size".PadRight(FileSzColSize) + NL);
 
       if (SPEEDRUN)
-      { EndTime = StartTime.AddYears(1);
+      { 
+        EndTime = StartTime.AddYears(1);
         Console.WriteLine("SPEED RUN!");
       }
 

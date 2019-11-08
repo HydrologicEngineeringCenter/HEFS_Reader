@@ -43,8 +43,12 @@ namespace HEFS_Reader.Implementations
     }
     public void AddEnsembleMember(IEnsembleMember em, int ensembleMemberIndex, DateTime issueDate, string location, Enumerations.Watersheds watershedName)
     {
-      // Copied from master to get it to compile
+      // Copied from master to get it to compile.
+      // It doesn't have an implementation in master, so just add it to a list to make sure it's working
+      _randomEnsembles.Add(em);
     }
+
+    private List<IEnsembleMember> _randomEnsembles = new List<IEnsembleMember>();
 
     public override bool Equals(object obj)
     {

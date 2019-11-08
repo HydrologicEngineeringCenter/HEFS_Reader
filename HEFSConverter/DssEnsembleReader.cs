@@ -49,13 +49,14 @@ namespace HEFSConverter
       using (DSSReader dss = new DSSReader(dssPath, DSSReader.MethodID.MESS_METHOD_GENERAL_ID, DSSReader.LevelID.MESS_LEVEL_NONE))
       {
         Console.WriteLine("Reading " + dssPath);
-        DSSPathCollection rawDssPaths = dss.GetCatalog(); // sorted
-        var dssPaths = rawDssPaths.OrderBy(a => a, new PathComparer()).ToArray(); // sorted
-        int size = dssPaths.Length;
+        DSSPathCollection dssPaths = dss.GetCatalog(); // sorted
+        int size = dssPaths.Count;
         if (size == 0)
         {
           throw new Exception("Empty DSS catalog");
         }
+
+        string shedStr = watershed.ToString();
 
         // /RUSSIANNAPA/APCC1/FLOW/01SEP2019/1HOUR/C:000002|T:0212019/
         for (int i = 0; i < size; i++)
@@ -69,12 +70,12 @@ namespace HEFSConverter
 
           DateTime issueDate = ParseIssueDate(path.Fpart);
 
-          if (issueDate >= start && issueDate <= end && path.Apart.ToLower() == watershed.ToString().ToLower())
+          if (issueDate >= start && issueDate <= end && string.Equals(path.Apart, shedStr, StringComparison.OrdinalIgnoreCase))
           {
-            var ts = dss.GetTimeSeries(path.PathWithoutDate);
+            // Full path is important, path without date triggers a heinous case in the dss low-level code
+            var ts = dss.GetTimeSeries(path.FullPath);
 
             var em = new EnsembleMember(ts.Values.Select(d => (float)d).ToArray(), ts.Times);
-            // rval.Forecasts.Insert(memberidx - 1, )
             rval.AddEnsembleMember(em, memberidx - 1, issueDate, location, watershed);
           }
          }
