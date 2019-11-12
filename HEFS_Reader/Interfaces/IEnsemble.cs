@@ -26,5 +26,7 @@ namespace HEFS_Reader.Interfaces
 		/// The individual traces that make up an ensemble.
 		/// </summary>
 		IList<IEnsembleMember> Members { get; }
-	}
+
+    void AddEnsembleMember(IEnsembleMember em, int ensembleMemberIndex);
+  }
 }

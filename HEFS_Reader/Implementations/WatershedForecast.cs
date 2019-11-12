@@ -17,5 +17,26 @@ namespace HEFS_Reader.Implementations
       WatershedName = watershedName;
       IssueDate = issueDate;
     }
+
+    void IWatershedForecast.AddEnsembleMember(IEnsembleMember em, int ensembleMemberIndex, string location)
+    {
+      IEnsemble ensembleAtLocation = null;
+      foreach (IEnsemble e in Locations)
+      {
+        if (e.LocationName.Equals(location))
+        {
+          ensembleAtLocation = e;
+          break;
+        }
+      }
+
+      if (ensembleAtLocation == null)
+      {
+        ensembleAtLocation = new Ensemble(location, IssueDate, new List<List<float>>(), em.Times);
+        Locations.Add(ensembleAtLocation);
+      }
+
+      ensembleAtLocation.AddEnsembleMember(em, ensembleMemberIndex);
+    }
   }
 }

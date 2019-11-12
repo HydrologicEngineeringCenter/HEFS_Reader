@@ -15,16 +15,15 @@ namespace HEFS_Reader.Implementations
     private DateTime[] _times;//same times for all members.
     private IList<IEnsembleMember> _members;
 
-    public Ensemble(string name, DateTime issueDate, List<List<float>> values, List<DateTime> times)
+    public Ensemble(string name, DateTime issueDate, List<List<float>> values, DateTime[] times)
     {
       _locationName = name;
       _issuanceDate = issueDate;
       _members = new List<IEnsembleMember>();
-      _times = times.ToArray();
 
       foreach (List<float> em in values)
       {
-        _members.Add(new EnsembleMember(em.ToArray(), _times));
+        _members.Add(new EnsembleMember(em.ToArray(), times));
       }
     }
     public Ensemble(string name, DateTime issueDate, float[,] values, IList<long> ticks)
@@ -49,6 +48,15 @@ namespace HEFS_Reader.Implementations
     public string LocationName => _locationName;
     public Enumerations.Timesteps Timestep => _timeStep;
     public IList<IEnsembleMember> Members => _members;
+
+    public void AddEnsembleMember(IEnsembleMember em, int ensembleMemberIndex)
+    {
+      while (ensembleMemberIndex > _members.Count - 1)
+      {
+        _members.Add(new EnsembleMember());
+      }
+      _members[ensembleMemberIndex] = em;
+    }
 
     /// <summary>
     /// Returns true if the ensemble members, have the same 

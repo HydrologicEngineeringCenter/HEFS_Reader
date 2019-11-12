@@ -83,7 +83,6 @@ namespace HEFSConverter
       }
 
       rval.SortByIssuanceDate();
-      Console.WriteLine();
       return rval;
     }
     

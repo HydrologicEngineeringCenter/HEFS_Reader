@@ -11,7 +11,11 @@ namespace HEFS_Reader.Implementations
 		private float[] _values;
 		private float _comparisonTolerance;
 
-		public EnsembleMember(float[] em, DateTime[] times)
+    public EnsembleMember()
+    {
+    }
+
+    public EnsembleMember(float[] em, DateTime[] times)
 		{
 			_values = em;
 			_times = times;

@@ -16,7 +16,7 @@ namespace HEFSConverter
   class Program
   {
     // So I can test this reliably at work....
-    const bool SPEEDRUN = false;
+    const bool SPEEDRUN = true;
 
     static string cacheDir = @"C:\Temp\hefs_cache";
     static string logFile = "Ensemble_testing.log";
@@ -41,7 +41,7 @@ namespace HEFSConverter
       //var en = new DssEnsembleReader();
       //en.ReadDataset(Watersheds.RussianNapa, DateTime.MinValue, DateTime.MaxValue, testfn);
 
-
+      DSSIO.DSSReader.UseTrainingWheels = false;
       //return;
 
       Log(NL + NL + "------" + DateTime.Now.ToString() + "-------" + NL + NL);
@@ -181,7 +181,7 @@ namespace HEFSConverter
       File.AppendAllText(logFile, "---------- Reading " + ensembleCount.ToString() + " Ensembles ----------" + NL);
       string fn;
 
-      ITimeSeriesOfEnsembleLocations wshedData;
+      ITimeSeriesOfEnsembleLocations wshedData=null;
       DateTime startTime = DateTime.MinValue;
       DateTime endTime = DateTime.MaxValue;
 
@@ -192,6 +192,10 @@ namespace HEFSConverter
         var reader = new DssEnsembleReader();
         wshedData = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
       });
+
+      if( wshedData == null)
+        Console.WriteLine();
+      Compare(validateWatershedDataB, wshedData);
 
       fn = "ensemble_V7_" + ensembleCount + ".dss";
       ReadTimed(fn, ensembleCount, () =>

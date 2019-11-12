@@ -35,7 +35,7 @@ namespace HEFS_Reader.Implementations
       //second line is Blank,QINE,...QINE
 			bool isFirstPass = true;
 			List<List<List<float>>> FullTable = new List<List<List<float>>>();//location, Ensemble member, values - because 64bit allows me to be careless
-			List<DateTime> times = new List<DateTime>();
+			List<DateTime> times = new List<DateTime>(rows.Length);
 			for (int j = 2; j < rows.Length; j++) {
                 if (rows[j].Trim() == "")
                     continue;
@@ -72,7 +72,7 @@ namespace HEFS_Reader.Implementations
 			//push into ensembles.
 			for (int i = 0; i < FullTable.Count; i++)
 			{
-				ensembles.Add(new Ensemble(headers[i], issueDate, FullTable[i], times));
+				ensembles.Add(new Ensemble(headers[i], issueDate, FullTable[i], times.ToArray()));
 			}
 
       // Issue date added after the fact.

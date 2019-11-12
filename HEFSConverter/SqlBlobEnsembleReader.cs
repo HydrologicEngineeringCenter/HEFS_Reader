@@ -56,7 +56,7 @@ namespace HEFSConverter
           watershedForecast = new WatershedForecast(ensembles, watershed, currentDate);
           prevIssueDate = currentDate;
         }
-        List<DateTime> times = GetTimes(row);
+        var times = GetTimes(row);
         List<List<float>> values = GetValues(row);
 
         Ensemble ensemeble = new Ensemble(row["location_name"].ToString(),
@@ -73,14 +73,14 @@ namespace HEFSConverter
 
       return rval;
     }
-    private static List<DateTime> GetTimes(DataRow row)
+    private static DateTime[] GetTimes(DataRow row)
     {
       DateTime t = Convert.ToDateTime(row["timeseries_start_date"]);
       int count = Convert.ToInt32(row["member_length"]);
-      var rval = new List<DateTime>(count);
+      var rval = new DateTime[count];
       for (int i = 0; i < count; i++)
       {
-        rval.Add(t);
+        rval[i] = t;
         t = t.AddHours(1); // hardcode hourly
       }
       return rval;
