@@ -62,11 +62,6 @@ namespace HEFS_Reader.Implementations
       }
       return true;
     }
-    public void SortByIssuanceDate()
-    {
-      // copied from master
-      _forecasts.Sort();
-    }
     public override int GetHashCode()
     {
       return 1866927581 + EqualityComparer<IList<IWatershedForecast>>.Default.GetHashCode(Forecasts);

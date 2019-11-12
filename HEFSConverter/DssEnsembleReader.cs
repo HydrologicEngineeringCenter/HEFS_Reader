@@ -82,7 +82,7 @@ namespace HEFSConverter
          }
       }
 
-      rval.SortByIssuanceDate();
+      rval.SortWatersheds();
       return rval;
     }
     
@@ -137,7 +137,7 @@ namespace HEFSConverter
         }
       }
 
-      rval.SortByIssuanceDate();
+      rval.SortWatersheds();
       st.Stop();
       Console.WriteLine();
       _readTimeInMilliSeconds = st.ElapsedMilliseconds;
