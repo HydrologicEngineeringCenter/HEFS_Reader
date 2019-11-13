@@ -10,8 +10,6 @@ namespace HEFS_Reader.Implementations
 {
   public class HEFS_CSV_Reader : IEnsembleReader
   {
-    public TimeSpan ReadTime { get; private set; }
-
     // Allegedly threadsafe
     // https://docs.microsoft.com/en-us/dotnet/api/system.console?redirectedfrom=MSDN&view=netframework-4.8
     static bool DebugMode = false;
@@ -97,14 +95,12 @@ namespace HEFS_Reader.Implementations
       }
 
       st.Stop();
-      ReadTime = st.Elapsed;
       return output;
     }
 
 
     public TimeSeriesOfEnsembleLocations ReadParallel(Watersheds watershed, DateTime start, DateTime end, string Path)
     {
-      var st = Stopwatch.StartNew();
       if (start.Hour != 12)
       {
         //start time must be 12 (actually i think it is supposed to be 10AM
@@ -153,8 +149,6 @@ namespace HEFS_Reader.Implementations
       // Issue-date seems like it should be one level higher?
       output.SortWatersheds();
 
-      st.Stop();
-      ReadTime = st.Elapsed;
       return output;
     }
   }

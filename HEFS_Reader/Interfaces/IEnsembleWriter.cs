@@ -16,6 +16,6 @@ namespace HEFS_Reader.Interfaces
 		/// <param name="timeSeriesOfEnsembleLocations">An in memory representation of all ensembles across a time range for all locations in a watershed.</param>
 		/// <param name="directoryName">the output directory (define your own file name)</param>
 		/// <returns>The time it took to write!</returns>
-		TimeSpan Write(TimeSeriesOfEnsembleLocations timeSeriesOfEnsembleLocations, string directoryName);
+		void Write(TimeSeriesOfEnsembleLocations timeSeriesOfEnsembleLocations, string directoryName);
 	}
 }

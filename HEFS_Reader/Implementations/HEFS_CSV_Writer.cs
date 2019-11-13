@@ -10,9 +10,8 @@ namespace HEFS_Reader.Implementations
 {
 	public class HEFS_CSV_Writer : Interfaces.IEnsembleWriter
 	{
-		public TimeSpan Write(TimeSeriesOfEnsembleLocations timeSeriesOfEnsembleLocations, string directoryPath)
+		public void Write(TimeSeriesOfEnsembleLocations timeSeriesOfEnsembleLocations, string directoryPath)
 		{
-      var st = Stopwatch.StartNew();
 
 			foreach (WatershedForecast watershed in timeSeriesOfEnsembleLocations.Forecasts)//this could be parallel.
 			{
@@ -49,8 +48,6 @@ namespace HEFS_Reader.Implementations
 					}
 				}
 			}
-      st.Stop();
-			return st.Elapsed;
 		}
 	}
 }

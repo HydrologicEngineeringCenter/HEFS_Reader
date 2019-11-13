@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using HEFS_Reader.Enumerations;
 using HEFS_Reader.Interfaces;
+using HEFS_Reader.Implementations;
 
 namespace HEFS_Reader.Implementations
 {
@@ -20,7 +21,7 @@ namespace HEFS_Reader.Implementations
         {
             _cacheDirectory = Path.GetTempPath();
         }
-        public Interfaces.IWatershedForecast Read(Interfaces.IHEFSReadArgs args)
+        public WatershedForecast Read(HEFSRequestArgs args)
         {
             //https://www.cnrfc.noaa.gov/csv/2019092312_RussianNapa_hefs_csv_hourly.zip
             string webrequest = _rootUrl;
@@ -36,7 +37,7 @@ namespace HEFS_Reader.Implementations
             if (File.Exists(csvFileName))
             {
                 Console.WriteLine("Found " + csvFileName + " in cache.  skipping...");
-                Interfaces.IWatershedForecast w = HEFS_CSV_Parser.ParseCSVData(File.ReadAllText(csvFileName),
+                WatershedForecast w = HEFS_CSV_Parser.ParseCSVData(File.ReadAllText(csvFileName),
                    args.ForecastDate, args.WatershedLocation);
                 return w;
             }
@@ -53,14 +54,14 @@ namespace HEFS_Reader.Implementations
                     return null;
                 }
                 Reclamation.Core.ZipFileUtility.UnzipFile(zipFileName, csvFileName);
-                Interfaces.IWatershedForecast w = HEFS_CSV_Parser.ParseCSVData(File.ReadAllText(csvFileName),
+                WatershedForecast w = HEFS_CSV_Parser.ParseCSVData(File.ReadAllText(csvFileName),
                    args.ForecastDate, args.WatershedLocation);
                 return w;
             }
         }
 
 
-        public Interfaces.ITimeSeriesOfEnsembleLocations ReadDataset(Watersheds watershed, DateTime start, DateTime end, string Path)
+        public TimeSeriesOfEnsembleLocations ReadDataset(Watersheds watershed, DateTime start, DateTime end, string Path)
         {
             System.Diagnostics.Stopwatch st = new System.Diagnostics.Stopwatch();
             st.Start();
@@ -83,14 +84,14 @@ namespace HEFS_Reader.Implementations
             args.WatershedLocation = watershed;
             args.ForecastDate = start;
             args.Path = Path;
-            Interfaces.ITimeSeriesOfEnsembleLocations output = new TimeSeriesOfEnsembleLocations();
+            TimeSeriesOfEnsembleLocations output = new TimeSeriesOfEnsembleLocations();
             DateTime endTimePlus1 = end.AddDays(1.0);
             while (!start.Equals(endTimePlus1))
             {
-                Interfaces.IWatershedForecast wtshd = Read(args);
+                WatershedForecast wtshd = Read(args);
                 if (wtshd != null)
                 {
-                    output.timeSeriesOfEnsembleLocations.Add(wtshd);
+                    output.Forecasts.Add(wtshd);
                 }
                 else
                 {

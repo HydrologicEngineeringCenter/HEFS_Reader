@@ -59,9 +59,10 @@ namespace HEFSConverter
       var provider = new HEFS_CSV_Reader();
 
       Console.WriteLine("Reading CSV Directory (Parallel)...");
-      
+      var rt = Stopwatch.StartNew();
       TimeSeriesOfEnsembleLocations baseWaterShedData = provider.ReadParallel(Watersheds.RussianNapa, StartTime, EndTime, cacheDir);
-      Console.WriteLine("Finished reading in " + Math.Round(provider.ReadTime.TotalSeconds) + " seconds.");
+      rt.Stop();
+      Console.WriteLine("Finished reading in " + Math.Round(rt.Elapsed.TotalSeconds) + " seconds.");
 
       // Let the JITTER settle down with the smallest case
       Console.WriteLine("Warmup time period, results will not be logged.");
