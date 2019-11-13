@@ -13,12 +13,12 @@ using Reclamation.Core;
 
 namespace HEFSConverter
 {
-  public class SqlBlobEnsembleReader : IEnsembleReader, ITimeable
+  public class SqlBlobEnsembleReader : IEnsembleReader
   {
     private long _readTimeInMilliSeconds = 0;
     public long ReadTimeInMilliSeconds { get { return _readTimeInMilliSeconds; } }
 
-    public ITimeSeriesOfEnsembleLocations ReadDataset(Watersheds watershed, DateTime start, DateTime end, string Path)
+    public TimeSeriesOfEnsembleLocations ReadDataset(Watersheds watershed, DateTime start, DateTime end, string Path)
     {
       var st = System.Diagnostics.Stopwatch.StartNew();
       var connectionString = "Data Source=" + Path + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
@@ -26,9 +26,9 @@ namespace HEFSConverter
       var tableName = SqlBlobEnsembleWriter.TableName;
 
       SQLiteServer server = new SQLiteServer(connectionString);
-      var ensembles = new List<IEnsemble>();
+      var ensembles = new List<Ensemble>();
       TimeSeriesOfEnsembleLocations rval = new TimeSeriesOfEnsembleLocations();
-      IList<IWatershedForecast> watershedForecasts = rval.Forecasts;
+      List<WatershedForecast> watershedForecasts = rval.Forecasts;
 
       var sql = "select * from " + tableName +
         " WHERE issue_date >= '" + start.ToString(DateTimeFormat) + "' "
@@ -52,7 +52,7 @@ namespace HEFSConverter
         {
           watershedForecasts.Add(watershedForecast); // one csv.. (forecast group)
 
-          ensembles = new List<IEnsemble>();
+          ensembles = new List<Ensemble>();
           watershedForecast = new WatershedForecast(ensembles, watershed, currentDate);
           prevIssueDate = currentDate;
         }

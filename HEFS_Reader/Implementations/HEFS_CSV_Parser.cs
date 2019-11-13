@@ -8,7 +8,7 @@ namespace HEFS_Reader.Implementations
 {
 	public class HEFS_CSV_Parser
 	{
-		public static IWatershedForecast ParseCSVData(string data, DateTime issueDate, Enumerations.Watersheds watershedName)
+		public static WatershedForecast ParseCSVData(string data, DateTime issueDate, Enumerations.Watersheds watershedName)
 		{
 			//is this zipped or not zipped?
 			//split based on new lines into rows for each element.
@@ -20,7 +20,7 @@ namespace HEFS_Reader.Implementations
 			string currHeader = "";
 			var locStarts = new List<int>();
 			var headers = new List<string>();
-			var ensembles = new List<IEnsemble>();
+			var ensembles = new List<Ensemble>();
 
       //first data element in header is timezone.
       for (int i = 1; i < header.Length; i++)

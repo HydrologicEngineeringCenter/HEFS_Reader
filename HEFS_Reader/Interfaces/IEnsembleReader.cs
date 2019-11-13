@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HEFS_Reader.Implementations;
 
 namespace HEFS_Reader.Interfaces
 {
@@ -13,7 +14,7 @@ namespace HEFS_Reader.Interfaces
     /// </summary>
     /// <param name="args"></param>
     /// <returns></returns>
-    ITimeSeriesOfEnsembleLocations ReadDataset(Enumerations.Watersheds watershed, DateTime start, DateTime end, String Path);
+    TimeSeriesOfEnsembleLocations ReadDataset(Enumerations.Watersheds watershed, DateTime start, DateTime end, String Path);
 
   }
 }

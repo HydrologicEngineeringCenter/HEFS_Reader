@@ -1,4 +1,5 @@
 ﻿using DSSIO;
+using HEFS_Reader.Implementations;
 using HEFS_Reader.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace HEFSConverter
 {
   public class DssEnsembleWriter
   {
-    public static TimeSpan Write(string dssFileName, ITimeSeriesOfEnsembleLocations watersheds, bool saveAsFloat, int version)
+    public static TimeSpan Write(string dssFileName, TimeSeriesOfEnsembleLocations watersheds, bool saveAsFloat, int version)
     {
       var sw = Stopwatch.StartNew();
 
@@ -23,14 +24,14 @@ namespace HEFSConverter
       int count = 0;
       using (var w = new DSSWriter(dssFileName,DSSReader.MethodID.MESS_METHOD_GLOBAL_ID,DSSReader.LevelID.MESS_LEVEL_NONE))
       {
-        foreach (IWatershedForecast watershed in watersheds.Forecasts)
+        foreach (WatershedForecast watershed in watersheds.Forecasts)
         {
-          foreach (IEnsemble e in watershed.Locations)
+          foreach (Ensemble e in watershed.Locations)
           {
            if( count %100 == 0)
               Console.Write(".");
             int memberCounter = 0;
-            foreach (IEnsembleMember m in e.Members)
+            foreach (EnsembleMember m in e.Members)
             {
               memberCounter++;
               ///   A/B/FLOW//1 Hour/<FPART></FPART>
@@ -72,7 +73,7 @@ namespace HEFSConverter
     /// <param name="saveAsFloat"></param>
     /// <param name="version"></param>
     /// <returns></returns>
-    internal static TimeSpan WriteToTimeSeriesProfiles(string dssFileName, ITimeSeriesOfEnsembleLocations watersheds, bool saveAsFloat, int version)
+    internal static TimeSpan WriteToTimeSeriesProfiles(string dssFileName, TimeSeriesOfEnsembleLocations watersheds, bool saveAsFloat, int version)
     {
       var sw = Stopwatch.StartNew();
 
@@ -84,9 +85,9 @@ namespace HEFSConverter
       int count = 0;
       using (var w = new DSSWriter(dssFileName, DSSReader.MethodID.MESS_METHOD_GLOBAL_ID, DSSReader.LevelID.MESS_LEVEL_NONE))
       {
-        foreach (IWatershedForecast watershed in watersheds.Forecasts)
+        foreach (WatershedForecast watershed in watersheds.Forecasts)
         {
-          foreach (IEnsemble e in watershed.Locations)
+          foreach (Ensemble e in watershed.Locations)
           {
             if (count % 100 == 0)
               Console.Write(".");
@@ -117,7 +118,7 @@ namespace HEFSConverter
       return sw.Elapsed;
     }
 
-    private static double[][] ConvertEnsembleToArray(IEnsemble e, int numColumns, int numRows)
+    private static double[][] ConvertEnsembleToArray(Ensemble e, int numColumns, int numRows)
     {
       double[][] data = new double[numRows][];
       for (int r = 0; r < numRows; r++)

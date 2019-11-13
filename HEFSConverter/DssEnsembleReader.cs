@@ -9,12 +9,8 @@ using System.Linq;
 
 namespace HEFSConverter
 {
-  public class DssEnsembleReader : IEnsembleReader, ITimeable
+  public class DssEnsembleReader : IEnsembleReader
   {
-    private long _readTimeInMilliSeconds = 0;
-    public long ReadTimeInMilliSeconds { get { return _readTimeInMilliSeconds; } }
-
-
     /// <summary>
     /// parse issue date from part F:
     /// C:000002|T:0212019
@@ -37,12 +33,7 @@ namespace HEFSConverter
       return issueDate;
     }
 
-    public IWatershedForecast Read(IHEFSReadArgs args)
-    {
-      throw new NotImplementedException();
-    }
-
-    public ITimeSeriesOfEnsembleLocations ReadDataset(Watersheds watershed, DateTime start, DateTime end, string dssPath)
+    public TimeSeriesOfEnsembleLocations ReadDataset(Watersheds watershed, DateTime start, DateTime end, string dssPath)
     {
       TimeSeriesOfEnsembleLocations rval = new TimeSeriesOfEnsembleLocations();
       DSSReader.UseTrainingWheels = false;
@@ -86,9 +77,8 @@ namespace HEFSConverter
       return rval;
     }
     
-    public ITimeSeriesOfEnsembleLocations ReadDatasetFromProfiles(Watersheds watershed, DateTime start, DateTime end, string dssPath)
+    public TimeSeriesOfEnsembleLocations ReadDatasetFromProfiles(Watersheds watershed, DateTime start, DateTime end, string dssPath)
     {
-      var st = Stopwatch.StartNew();
       TimeSeriesOfEnsembleLocations rval = new TimeSeriesOfEnsembleLocations();
 
       using (DSSReader dss = new DSSReader(dssPath, DSSReader.MethodID.MESS_METHOD_GENERAL_ID, DSSReader.LevelID.MESS_LEVEL_NONE))
@@ -138,9 +128,6 @@ namespace HEFSConverter
       }
 
       rval.SortWatersheds();
-      st.Stop();
-      Console.WriteLine();
-      _readTimeInMilliSeconds = st.ElapsedMilliseconds;
       return rval;
     }
     

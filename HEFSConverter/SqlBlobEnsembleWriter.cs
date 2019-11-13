@@ -23,7 +23,7 @@ namespace HEFSConverter
     public static string TableName = "timeseries_blob";
     public static string DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-    internal static TimeSpan Write(SQLiteServer server, ITimeSeriesOfEnsembleLocations watersheds, bool compress = false, bool createPiscesDB = false)
+    internal static TimeSpan Write(SQLiteServer server, TimeSeriesOfEnsembleLocations watersheds, bool compress = false, bool createPiscesDB = false)
     {
       Stopwatch sw = Stopwatch.StartNew();
       int index = 0;
@@ -45,13 +45,13 @@ namespace HEFSConverter
 
       //var newRowLock = new object();
 
-      foreach (IWatershedForecast watershed in watersheds.Forecasts)
+      foreach (WatershedForecast watershed in watersheds.Forecasts)
       {
         if (createPiscesDB)
         {
           folderIndex = sc.AddFolder(watershed.WatershedName.ToString(), scIndex++, folderIndex);
         }
-        foreach (IEnsemble e in watershed.Locations)
+        foreach (Ensemble e in watershed.Locations)
         {
           var t = e.IssueDate;
           var timeseries_start_date = e.Members[0].Times[0];
@@ -107,7 +107,7 @@ namespace HEFSConverter
       return sw.Elapsed;
     }
 
-    private static byte[] ConvertToBytes(IList<IEnsembleMember> ensembleMembers, bool compress)
+    private static byte[] ConvertToBytes(IList<EnsembleMember> ensembleMembers, bool compress)
     {//https://stackoverflow.com/questions/6952923/conversion-double-array-to-byte-array
       float[] values = ensembleMembers[0].Values.ToArray();
       var numBytesPerMember = values.Length * sizeof(float);

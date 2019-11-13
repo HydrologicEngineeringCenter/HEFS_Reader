@@ -6,20 +6,20 @@ using HEFS_Reader.Interfaces;
 
 namespace HEFS_Reader.Implementations
 {
-  public class Ensemble : IEnsemble
+  public class Ensemble 
   {
     private DateTime _issuanceDate;
     private DateTime _referenceDate;
     private Enumerations.Timesteps _timeStep;
     private string _locationName;
     private DateTime[] _times;//same times for all members.
-    private IList<IEnsembleMember> _members;
+    private IList<EnsembleMember> _members;
 
     public Ensemble(string name, DateTime issueDate, List<List<float>> values, DateTime[] times)
     {
       _locationName = name;
       _issuanceDate = issueDate;
-      _members = new List<IEnsembleMember>();
+      _members = new List<EnsembleMember>();
 
       foreach (List<float> em in values)
       {
@@ -30,7 +30,7 @@ namespace HEFS_Reader.Implementations
     {
       _locationName = name;
       _issuanceDate = issueDate;
-      _members = new List<IEnsembleMember>();
+      _members = new List<EnsembleMember>();
       _times = ticks.Select(t => new DateTime(t)).ToArray();
 
       int sz = values.GetLength(1);
@@ -47,9 +47,9 @@ namespace HEFS_Reader.Implementations
     public DateTime ReferenceDate => _referenceDate;
     public string LocationName => _locationName;
     public Enumerations.Timesteps Timestep => _timeStep;
-    public IList<IEnsembleMember> Members => _members;
+    public IList<EnsembleMember> Members => _members;
 
-    public void AddEnsembleMember(IEnsembleMember em, int ensembleMemberIndex)
+    public void AddEnsembleMember(EnsembleMember em, int ensembleMemberIndex)
     {
       while (ensembleMemberIndex > _members.Count - 1)
       {
@@ -67,7 +67,7 @@ namespace HEFS_Reader.Implementations
     /// <returns></returns>
     public override bool Equals(object other)
     {
-      IEnsemble o = other as IEnsemble;
+      Ensemble o = other as Ensemble;
       if (o == null) return false;
       float tolerance = 0.000001f;
       if (o.Members.Count != this.Members.Count)
@@ -92,7 +92,7 @@ namespace HEFS_Reader.Implementations
       hashCode = hashCode * -1521134295 + ReferenceDate.GetHashCode();
       hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(LocationName);
       hashCode = hashCode * -1521134295 + Timestep.GetHashCode();
-      hashCode = hashCode * -1521134295 + EqualityComparer<IList<IEnsembleMember>>.Default.GetHashCode(Members);
+      hashCode = hashCode * -1521134295 + EqualityComparer<IList<EnsembleMember>>.Default.GetHashCode(Members);
       return hashCode;
     }
   }

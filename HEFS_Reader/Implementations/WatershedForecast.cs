@@ -5,23 +5,23 @@ using HEFS_Reader.Interfaces;
 
 namespace HEFS_Reader.Implementations
 {
-	public class WatershedForecast : IWatershedForecast
+	public class WatershedForecast
   {
     public Watersheds WatershedName { get; }
-    public IList<IEnsemble> Locations { get; }
+    public IList<Ensemble> Locations { get; }
     public DateTime IssueDate { get; }
 
-    public WatershedForecast(IList<IEnsemble> ensembles, Watersheds watershedName, DateTime issueDate)
+    public WatershedForecast(IList<Ensemble> ensembles, Watersheds watershedName, DateTime issueDate)
 		{
       Locations = ensembles;
       WatershedName = watershedName;
       IssueDate = issueDate;
     }
 
-    void IWatershedForecast.AddEnsembleMember(IEnsembleMember em, int ensembleMemberIndex, string location)
+    public void AddEnsembleMember(EnsembleMember em, int ensembleMemberIndex, string location)
     {
-      IEnsemble ensembleAtLocation = null;
-      foreach (IEnsemble e in Locations)
+      Ensemble ensembleAtLocation = null;
+      foreach (Ensemble e in Locations)
       {
         if (e.LocationName.Equals(location))
         {

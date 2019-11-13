@@ -6,22 +6,22 @@ using HEFS_Reader.Interfaces;
 
 namespace HEFS_Reader.Implementations
 {
-  public class TimeSeriesOfEnsembleLocations : ITimeSeriesOfEnsembleLocations
+  public class TimeSeriesOfEnsembleLocations 
   {
-    private List<IWatershedForecast> _forecasts;
-    public IList<IWatershedForecast> Forecasts { get => _forecasts; }
+    private List<WatershedForecast> _forecasts;
+    public List<WatershedForecast> Forecasts { get => _forecasts; }
 
     public TimeSeriesOfEnsembleLocations()
     {
-      _forecasts = new List<IWatershedForecast>();
+      _forecasts = new List<WatershedForecast>();
     }
 
-    public ITimeSeriesOfEnsembleLocations CloneSubset(int takeCount)
+    public TimeSeriesOfEnsembleLocations CloneSubset(int takeCount)
     {
       var retn = new TimeSeriesOfEnsembleLocations();
       //foreach (var ws in _forecasts)
       //{
-      //  List<IEnsemble> ensembleSubset = new List<IEnsemble>();
+      //  List<Ensemble> ensembleSubset = new List<Ensemble>();
         
       //  // Group them by name...
       //  var groupedEnsembles = ws.Locations.GroupBy(e => e.LocationName);
@@ -45,7 +45,7 @@ namespace HEFS_Reader.Implementations
 
     public override bool Equals(object obj)
     {
-      ITimeSeriesOfEnsembleLocations o = obj as ITimeSeriesOfEnsembleLocations;
+      TimeSeriesOfEnsembleLocations o = obj as TimeSeriesOfEnsembleLocations;
       if (o == null) return false;
       if (this.Forecasts.Count != o.Forecasts.Count)
       {
@@ -64,14 +64,14 @@ namespace HEFS_Reader.Implementations
     }
     public override int GetHashCode()
     {
-      return 1866927581 + EqualityComparer<IList<IWatershedForecast>>.Default.GetHashCode(Forecasts);
+      return 1866927581 + EqualityComparer<IList<WatershedForecast>>.Default.GetHashCode(Forecasts);
     }
     private int IndexOfIssueDate(DateTime dt)
     {
 
       if (_forecasts.Count == 0) return -1;
       int idx = 0;
-      foreach (IWatershedForecast w in _forecasts)
+      foreach (WatershedForecast w in _forecasts)
       {
         if (w.IssueDate.Equals(dt)) return idx;
         idx++;
@@ -79,13 +79,13 @@ namespace HEFS_Reader.Implementations
       return -1;
     }
 
-    public void AddEnsembleMember(IEnsembleMember em, int emidx, DateTime issueDate, string locationName, Watersheds watershedName)
+    public void AddEnsembleMember(EnsembleMember em, int emidx, DateTime issueDate, string locationName, Watersheds watershedName)
     {
       int idx = IndexOfIssueDate(issueDate);
       if (idx == -1)
       {
         //need to sort based on issueDate
-        _forecasts.Add(new WatershedForecast(new List<IEnsemble>(), watershedName, issueDate));
+        _forecasts.Add(new WatershedForecast(new List<Ensemble>(), watershedName, issueDate));
         idx = IndexOfIssueDate(issueDate);
 
       }
