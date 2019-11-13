@@ -12,7 +12,7 @@ namespace HEFSConverter
 {
   public static class HDF5ReaderWriter
   {
-    public static void Write(H5Writer h5w, ITimeSeriesOfEnsembleLocations watersheds)
+    public static void Write(H5Writer h5w, TimeSeriesOfEnsembleLocations watersheds)
     {
       int chunkSize = 1;
       string root = H5Reader.Root + "Watersheds";
@@ -20,12 +20,12 @@ namespace HEFSConverter
       long[] dtTicks = null;
 
       // For each [outer] watershed
-      foreach (IWatershedForecast watershed in watersheds.Forecasts)
+      foreach (WatershedForecast watershed in watersheds.Forecasts)
       {
         string watershedPath = root + H5Reader.PathSeparator + watershed.WatershedName;
 
         // For each location
-        foreach (IEnsemble e in watershed.Locations)
+        foreach (Ensemble e in watershed.Locations)
         {
           // I think this isn't unique... needs day/yr as well based on karls code.
           string ensemblePath = watershedPath + H5Reader.PathSeparator + e.LocationName + H5Reader.PathSeparator +
@@ -62,7 +62,7 @@ namespace HEFSConverter
             // Each ensemble member is a time-series of data, add a new column
             for (int ensembleMember = 0; ensembleMember < e.Members.Count; ensembleMember++)
             {
-              IEnsembleMember m = e.Members[ensembleMember];
+              EnsembleMember m = e.Members[ensembleMember];
               float[] vals = m.Values;
 
               h5w.AddRow(valueDset, vals);
@@ -74,7 +74,7 @@ namespace HEFSConverter
     }
 
 
-    public static void WriteParallel(H5Writer h5w, ITimeSeriesOfEnsembleLocations watersheds, int desiredChunkSize)
+    public static void WriteParallel(H5Writer h5w, TimeSeriesOfEnsembleLocations watersheds, int desiredChunkSize)
     {
       string root = H5Reader.Root + "Watersheds";
 
@@ -84,7 +84,7 @@ namespace HEFSConverter
       object grpLock = new object();
 
       // For each [outer] watershed
-      foreach (IWatershedForecast watershed in watersheds.Forecasts)
+      foreach (WatershedForecast watershed in watersheds.Forecasts)
       {
         string watershedPath = root + H5Reader.PathSeparator + watershed.WatershedName;
 
@@ -157,7 +157,7 @@ namespace HEFSConverter
 
             for (int ensembleMember = 0; ensembleMember < e.Members.Count; ensembleMember++)
             {
-              IEnsembleMember m = e.Members[ensembleMember];
+              EnsembleMember m = e.Members[ensembleMember];
               float[] vals = m.Values;
 
               // Copy into our chunkbuffer
@@ -196,7 +196,7 @@ namespace HEFSConverter
 
 
 
-    public static ITimeSeriesOfEnsembleLocations Read(H5Reader h5r)
+    public static TimeSeriesOfEnsembleLocations Read(H5Reader h5r)
     {
       string root = H5Reader.Root + "Watersheds";
 
@@ -213,7 +213,7 @@ namespace HEFSConverter
         string wshedName = group;
 
         // Because for some reason this is an enum here
-        List<IEnsemble> ensembles = new List<IEnsemble>();
+        List<Ensemble> ensembles = new List<Ensemble>();
 
         // Issue date added afterwards - TODO
         WatershedForecast watershedForecast = new WatershedForecast(ensembles, HEFS_Reader.Enumerations.Watersheds.RussianNapa, DateTime.MinValue);

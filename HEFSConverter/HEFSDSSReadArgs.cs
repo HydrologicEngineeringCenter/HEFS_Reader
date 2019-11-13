@@ -7,7 +7,7 @@ using HEFS_Reader.Enumerations;
 
 namespace HEFSConverter
 {
-  class HEFSDSSReadArgs : HEFS_Reader.Interfaces.IHEFSReadArgs
+  class HEFSDSSReadArgs 
   {
     public DateTime ForecastDate { get; set; }
     public Watersheds WatershedLocation { get; set; }

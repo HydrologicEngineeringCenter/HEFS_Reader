@@ -27,7 +27,7 @@ namespace HEFS_Reader.Implementations
       //_cacheDirectory = Path.GetTempPath();
     }
 
-    public IWatershedForecast Read(IHEFSReadArgs args)
+    public WatershedForecast Read(HEFSRequestArgs args)
     {
       //https://www.cnrfc.noaa.gov/csv/2019092312_RussianNapa_hefs_csv_hourly.zip
 
@@ -40,7 +40,7 @@ namespace HEFS_Reader.Implementations
       {
         Log("Found " + csvFileName + " in cache.  Reading...");
 
-        IWatershedForecast w = HEFS_CSV_Parser.ParseCSVData(File.ReadAllText(csvFileName),
+        WatershedForecast w = HEFS_CSV_Parser.ParseCSVData(File.ReadAllText(csvFileName),
            args.ForecastDate, args.WatershedLocation);
 
         return w;
@@ -52,7 +52,7 @@ namespace HEFS_Reader.Implementations
       }
     }
 
-    public ITimeSeriesOfEnsembleLocations ReadDataset(Watersheds watershed, DateTime start, DateTime end, string Path)
+    public TimeSeriesOfEnsembleLocations ReadDataset(Watersheds watershed, DateTime start, DateTime end, string Path)
     {
       var st = Stopwatch.StartNew();
       if (start.Hour != 12)
@@ -76,14 +76,14 @@ namespace HEFS_Reader.Implementations
       args.ForecastDate = start;
       args.Path = Path;
       
-      ITimeSeriesOfEnsembleLocations output = new TimeSeriesOfEnsembleLocations();
+      TimeSeriesOfEnsembleLocations output = new TimeSeriesOfEnsembleLocations();
 
       DateTime current = start;
       DateTime endTimePlus1 = end.AddDays(1.0);
 
       while (!current.Equals(endTimePlus1))
       {
-        IWatershedForecast wtshd = Read(args);
+        WatershedForecast wtshd = Read(args);
         if (wtshd != null)
         {
           output.Forecasts.Add(wtshd);
@@ -102,7 +102,7 @@ namespace HEFS_Reader.Implementations
     }
 
 
-    public ITimeSeriesOfEnsembleLocations ReadParallel(Watersheds watershed, DateTime start, DateTime end, string Path)
+    public TimeSeriesOfEnsembleLocations ReadParallel(Watersheds watershed, DateTime start, DateTime end, string Path)
     {
       var st = Stopwatch.StartNew();
       if (start.Hour != 12)
@@ -136,7 +136,7 @@ namespace HEFS_Reader.Implementations
         args.Path = Path;
 
         // Seems threadsafe at a glance
-        IWatershedForecast wtshd = Read(args);
+        WatershedForecast wtshd = Read(args);
         if (wtshd != null)
         {
           lock(output)

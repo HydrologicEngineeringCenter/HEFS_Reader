@@ -10,21 +10,21 @@ namespace HEFS_Reader.Implementations
 {
 	public class HEFS_CSV_Writer : Interfaces.IEnsembleWriter
 	{
-		public TimeSpan Write(ITimeSeriesOfEnsembleLocations timeSeriesOfEnsembleLocations, string directoryPath)
+		public TimeSpan Write(TimeSeriesOfEnsembleLocations timeSeriesOfEnsembleLocations, string directoryPath)
 		{
       var st = Stopwatch.StartNew();
 
-			foreach (IWatershedForecast watershed in timeSeriesOfEnsembleLocations.Forecasts)//this could be parallel.
+			foreach (WatershedForecast watershed in timeSeriesOfEnsembleLocations.Forecasts)//this could be parallel.
 			{
 				string fileName = watershed.WatershedName.ToString() + "_" + HEFS_CSV_Parser.StringifyDateTime(watershed.Locations.First().IssueDate) + ".csv";
 				string fullPath = System.IO.Path.Combine(directoryPath, fileName);
 				StringBuilder line = new StringBuilder("GMT");
 				using (System.IO.StreamWriter sr = new System.IO.StreamWriter(fullPath))
 				{
-					foreach (IEnsemble e in watershed.Locations)
+					foreach (Ensemble e in watershed.Locations)
 					{
 						Int32 memberCounter = 1;
-						foreach (IEnsembleMember m in e.Members)
+						foreach (EnsembleMember m in e.Members)
 						{
 							line.Append("," + e.LocationName + "_" + memberCounter);
 							memberCounter++;
@@ -37,9 +37,9 @@ namespace HEFS_Reader.Implementations
 					foreach (DateTime t in watershed.Locations.First().Members.First().Times)
 					{
 						line = new StringBuilder(t.ToString());
-						foreach (IEnsemble e in watershed.Locations)
+						foreach (Ensemble e in watershed.Locations)
 						{
-							foreach (IEnsembleMember m in e.Members)
+							foreach (EnsembleMember m in e.Members)
 							{
 								line.Append("," + m.Values[counter]);
 							}

@@ -5,7 +5,7 @@ using HEFS_Reader.Interfaces;
 
 namespace HEFS_Reader.Implementations
 {
-	public class EnsembleMember : Interfaces.IEnsembleMember
+	public class EnsembleMember 
 	{
 		private DateTime[] _times;
 		private float[] _values;
@@ -28,7 +28,7 @@ namespace HEFS_Reader.Implementations
 
 		public override bool Equals(Object other)
 		{
-			IEnsembleMember o = other as IEnsembleMember;
+			EnsembleMember o = other as EnsembleMember;
 			if (o != null)
 			{
 				if (o.Times.Length != this.Times.Length) return false;

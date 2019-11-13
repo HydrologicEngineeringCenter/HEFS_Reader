@@ -2,7 +2,7 @@
 
 namespace HEFS_Reader.Implementations
 {
-	public class HEFSRequestArgs: Interfaces.IHEFSReadArgs
+	public class HEFSRequestArgs
 	{
 		public DateTime ForecastDate { get; set; }
 		public Enumerations.Watersheds WatershedLocation { get; set; }

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HEFS_Reader.Implementations;
 using HEFS_Reader.Interfaces;
 using Reclamation.Core;
 
@@ -19,7 +20,7 @@ namespace HEFSConverter
   /// </summary>
   public class SqlEnsembleWriter
   {
-    public static TimeSpan Write(BasicDBServer server, ITimeSeriesOfEnsembleLocations waterShedData)
+    public static TimeSpan Write(BasicDBServer server, TimeSeriesOfEnsembleLocations waterShedData)
     {
       var sw = Stopwatch.StartNew();
       var enumerator = GetTableEnumerator(waterShedData);
@@ -33,11 +34,11 @@ namespace HEFSConverter
       return sw.Elapsed;
     }
 
-    private static IEnumerable<DataTable> GetTableEnumerator(ITimeSeriesOfEnsembleLocations watersheds)
+    private static IEnumerable<DataTable> GetTableEnumerator(TimeSeriesOfEnsembleLocations watersheds)
     {
-      foreach (IWatershedForecast watershed in watersheds.Forecasts)
+      foreach (WatershedForecast watershed in watersheds.Forecasts)
       {
-        foreach (IEnsemble e in watershed.Locations)
+        foreach (Ensemble e in watershed.Locations)
         {
           var t = e.IssueDate;
           DataTable tbl = new DataTable(watershed.WatershedName + "_" + e.LocationName + "_day_" + t.DayOfYear.ToString() + "_" + t.Year);

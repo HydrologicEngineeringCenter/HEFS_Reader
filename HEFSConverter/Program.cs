@@ -60,7 +60,7 @@ namespace HEFSConverter
 
       Console.WriteLine("Reading CSV Directory (Parallel)...");
       
-      ITimeSeriesOfEnsembleLocations baseWaterShedData = provider.ReadParallel(Watersheds.RussianNapa, StartTime, EndTime, cacheDir);
+      TimeSeriesOfEnsembleLocations baseWaterShedData = provider.ReadParallel(Watersheds.RussianNapa, StartTime, EndTime, cacheDir);
       Console.WriteLine("Finished reading in " + Math.Round(provider.ReadTime.TotalSeconds) + " seconds.");
 
       // Let the JITTER settle down with the smallest case
@@ -100,7 +100,7 @@ namespace HEFSConverter
       Console.WriteLine("Test complete, log-file written to " + logFile);
     }
 
-    private static void WriteAllFormats(ITimeSeriesOfEnsembleLocations waterShedData, int ensembleCount)
+    private static void WriteAllFormats(TimeSeriesOfEnsembleLocations waterShedData, int ensembleCount)
     {
       File.AppendAllText(logFile, NL);
       File.AppendAllText(logFile, "---------- Writing " + ensembleCount.ToString() + " Ensembles ----------" + NL);
@@ -173,7 +173,7 @@ namespace HEFSConverter
       }
     }
 
-    private static void ReadAllFormats(int ensembleCount, ITimeSeriesOfEnsembleLocations validateWatershedDataB)
+    private static void ReadAllFormats(int ensembleCount, TimeSeriesOfEnsembleLocations validateWatershedDataB)
     {
       // TODO - compare validateWatershed data with computed
 
@@ -181,7 +181,7 @@ namespace HEFSConverter
       File.AppendAllText(logFile, "---------- Reading " + ensembleCount.ToString() + " Ensembles ----------" + NL);
       string fn;
 
-      ITimeSeriesOfEnsembleLocations wshedData=null;
+      TimeSeriesOfEnsembleLocations wshedData=null;
       DateTime startTime = DateTime.MinValue;
       DateTime endTime = DateTime.MaxValue;
 
@@ -311,7 +311,7 @@ namespace HEFSConverter
     }
 
 
-    private static void Compare(ITimeSeriesOfEnsembleLocations baseWaterShedData, ITimeSeriesOfEnsembleLocations watershed)
+    private static void Compare(TimeSeriesOfEnsembleLocations baseWaterShedData, TimeSeriesOfEnsembleLocations watershed)
     {
       // compare to reference.
       var locations = watershed.Forecasts[0].Locations;
@@ -324,13 +324,13 @@ namespace HEFSConverter
           LogWarning("Difference found at location " + locations[i].LocationName);
       }
     }
-    private static void DuplicateCheck(ITimeSeriesOfEnsembleLocations baseWaterShedData)
+    private static void DuplicateCheck(TimeSeriesOfEnsembleLocations baseWaterShedData)
     {
       var hs = new Dictionary<string, int>();
       foreach (var wshed in baseWaterShedData.Forecasts)
       {
         var wsName = wshed.WatershedName;
-        foreach (IEnsemble ie in wshed.Locations)
+        foreach (Ensemble ie in wshed.Locations)
         {
           // This is being treated like a unique entity...
           string ensemblePath = ie.LocationName + "|" + ie.IssueDate.Year.ToString() + "_" + ie.IssueDate.DayOfYear.ToString();

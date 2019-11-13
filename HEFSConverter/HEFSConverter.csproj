@@ -5,6 +5,11 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="..\References\SQLite.Interop.dll" Link="SQLite.Interop.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\HEFS_Reader\HEFS_Reader.csproj" />
   </ItemGroup>
   <ItemGroup>
