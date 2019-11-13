@@ -17,7 +17,44 @@ namespace HEFS_Reader.Implementations
       WatershedName = watershedName;
       IssueDate = issueDate;
     }
+    public override bool Equals(object obj)
+    {
+      WatershedForecast o = (WatershedForecast)obj;
+      if (o == null)
+      {
+        return false;
+      }
+      if (this.Locations.Count != o.Locations.Count)
+      {
+        Console.WriteLine(this.ToString() + " Locations.Count does not match");
+        Console.WriteLine("this has " + this.Locations.Count + " , and the other has " + o.Locations.Count);
+        return false;
+      }
+      foreach (Ensemble e in this.Locations)
+      {
+        for (int i = 0; i < o.Locations.Count; i++)
+        {
+          if (e.LocationName.Equals(o.Locations[i].LocationName))
+          {
+            if (!e.Equals(o.Locations[i]))
+            {
+              Console.WriteLine("at o.Locations[" + i + "]." + o.Locations[i].LocationName + " ensemble does not match");
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    }
 
+    public override int GetHashCode()
+    {
+      var hashCode = -1316565584;
+      hashCode = hashCode * -1521134295 + EqualityComparer<IList<Ensemble>>.Default.GetHashCode(Locations);
+      hashCode = hashCode * -1521134295 + WatershedName.GetHashCode();
+      return hashCode;
+
+    }
     public void AddEnsembleMember(EnsembleMember em, int ensembleMemberIndex, string location)
     {
       Ensemble ensembleAtLocation = null;

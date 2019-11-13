@@ -194,8 +194,6 @@ namespace HEFSConverter
         wshedData = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
       });
 
-      if( wshedData == null)
-        Console.WriteLine();
       Compare(validateWatershedDataB, wshedData);
 
       fn = "ensemble_V7_" + ensembleCount + ".dss";
@@ -204,6 +202,8 @@ namespace HEFSConverter
         var reader = new DssEnsembleReader();
         wshedData = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
       });
+      
+      Compare(validateWatershedDataB, wshedData);
 
       fn = "ensemble_V7_profiles_" + ensembleCount + ".dss";
       ReadTimed(fn, ensembleCount, () =>
@@ -314,16 +314,26 @@ namespace HEFSConverter
 
     private static void Compare(TimeSeriesOfEnsembleLocations baseWaterShedData, TimeSeriesOfEnsembleLocations watershed)
     {
-      // compare to reference.
-      var locations = watershed.Forecasts[0].Locations;
-      var refLocations = baseWaterShedData.Forecasts[0].Locations;
-      for (int i = 0; i < locations.Count; i++)
+      Console.WriteLine();
+      Console.Write("checking for any differences..");
+      if (!baseWaterShedData.Equals(watershed))
       {
-        // .Equals was overriden in the default implementation, 
-        // but we can't guarantee that for any other implementation....
-        if (!locations[i].Members.Equals(refLocations[i].Members))
-          LogWarning("Difference found at location " + locations[i].LocationName);
+        Console.WriteLine("WARNING: watershed read form disk was different!");
+        LogWarning("Difference found ");
       }
+      else
+        Console.WriteLine(" ok.");
+
+      //// compare to reference.
+      //var locations = watershed.Forecasts[0].Locations;
+      //var refLocations = baseWaterShedData.Forecasts[0].Locations;
+      //for (int i = 0; i < locations.Count; i++)
+      //{
+      //  // .Equals was overriden in the default implementation, 
+      //  // but we can't guarantee that for any other implementation....
+      //  if (!locations[i].Members.Equals(refLocations[i].Members))
+      //    LogWarning("Difference found at location " + locations[i].LocationName);
+      //}
     }
     private static void DuplicateCheck(TimeSeriesOfEnsembleLocations baseWaterShedData)
     {
