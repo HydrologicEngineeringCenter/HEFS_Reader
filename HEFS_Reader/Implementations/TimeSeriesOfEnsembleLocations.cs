@@ -49,7 +49,8 @@ namespace HEFS_Reader.Implementations
       if (o == null) return false;
       if (this.Forecasts.Count != o.Forecasts.Count)
       {
-        Console.WriteLine("timeSeriesOfEnsembleLocations.Count does not match");
+        Console.WriteLine("Forecasts.Count does not match.");
+        Console.WriteLine("this.Forecasts.Count="+this.Forecasts.Count+" other Count ="+o.Forecasts.Count);
         return false;
       }
       for (int i = 0; i < this.Forecasts.Count; i++)

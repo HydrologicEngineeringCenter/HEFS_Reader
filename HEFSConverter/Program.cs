@@ -174,7 +174,7 @@ namespace HEFSConverter
       }
     }
 
-    private static void ReadAllFormats(int ensembleCount, TimeSeriesOfEnsembleLocations validateWatershedDataB)
+    private static void ReadAllFormats(int ensembleCount, TimeSeriesOfEnsembleLocations csvWaterShedData)
     {
       // TODO - compare validateWatershed data with computed
 
@@ -182,57 +182,53 @@ namespace HEFSConverter
       File.AppendAllText(logFile, "---------- Reading " + ensembleCount.ToString() + " Ensembles ----------" + NL);
       string fn;
 
-      TimeSeriesOfEnsembleLocations wshedData=null;
+     // TimeSeriesOfEnsembleLocations wshedData=null;
       DateTime startTime = DateTime.MinValue;
       DateTime endTime = DateTime.MaxValue;
 
       // DSS
       fn = "ensemble_V6_" + ensembleCount + ".dss";
-      ReadTimed(fn, ensembleCount, () =>
+      ReadTimed(fn, csvWaterShedData, () =>
       {
         var reader = new DssEnsembleReader();
-        wshedData = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
+        return reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
       });
-
-      Compare(validateWatershedDataB, wshedData);
 
       fn = "ensemble_V7_" + ensembleCount + ".dss";
-      ReadTimed(fn, ensembleCount, () =>
+      ReadTimed(fn, csvWaterShedData, () =>
       {
         var reader = new DssEnsembleReader();
-        wshedData = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
+        return reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
       });
       
-      Compare(validateWatershedDataB, wshedData);
-
       fn = "ensemble_V7_profiles_" + ensembleCount + ".dss";
-      ReadTimed(fn, ensembleCount, () =>
+      ReadTimed(fn, csvWaterShedData, () =>
       {
         var reader = new DssEnsembleReader();
-        wshedData = reader.ReadDatasetFromProfiles(Watersheds.RussianNapa, startTime, endTime, fn);
+        return reader.ReadDatasetFromProfiles(Watersheds.RussianNapa, startTime, endTime, fn);
       });
 
       // SQLITE
       fn = "ensemble_sqlite_blob_" + ensembleCount + ".db";
-      ReadTimed(fn, ensembleCount, () =>
+      ReadTimed(fn, csvWaterShedData, () =>
       {
         var reader = new SqlBlobEnsembleReader();
-        wshedData = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
+        return reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
       });
 
       fn = "ensemble_sqlite_blob_compressed_" + ensembleCount + ".db";
-      ReadTimed(fn, ensembleCount, () =>
+      ReadTimed(fn, csvWaterShedData, () =>
       {
         var reader = new SqlBlobEnsembleReader();
-        wshedData = reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
+        return reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
       });
 
       // Serial HDF5
       fn = "ensemble_serial_1RowPerChunk.h5";
-      ReadTimed(fn, ensembleCount, () =>
+      ReadTimed(fn, csvWaterShedData, () =>
       {
         using (var hr = new H5Reader(fn))
-          wshedData = HDF5ReaderWriter.Read(hr);
+          return  HDF5ReaderWriter.Read(hr);
       });
 
 
@@ -240,10 +236,10 @@ namespace HEFSConverter
       foreach (int c in new[] { 1, 10, -1 })
       {
         fn = "ensemble_parallel_" + c.ToString() + "RowsPerChunk.h5";
-        ReadTimed(fn, ensembleCount, () =>
+        ReadTimed(fn, csvWaterShedData, () =>
         {
           using (var hr = new H5Reader(fn))
-            wshedData = HDF5ReaderWriter.Read(hr);
+            return HDF5ReaderWriter.Read(hr);
         });
       }
 
@@ -293,17 +289,17 @@ namespace HEFSConverter
         LogWarning(ex.Message);
       }
     }
-    private static void ReadTimed(string filename, int ensembleCount, Action ReadFile)
+
+    private static void ReadTimed(string filename, TimeSeriesOfEnsembleLocations csvWaterShedData, Func<TimeSeriesOfEnsembleLocations> f)
     {
       try
       {
         // Record the amount of time from start->end, including flushing to disk.
         var sw = Stopwatch.StartNew();
-
-        ReadFile();
-
+        var ensemblesFromDisk = f();
         sw.Stop();
-        LogReadResult(filename, ensembleCount, sw.Elapsed);
+        LogReadResult(filename, ensemblesFromDisk.Forecasts.Count, sw.Elapsed);
+        Compare(filename,csvWaterShedData, ensemblesFromDisk);
       }
       catch (Exception ex)
       {
@@ -312,12 +308,13 @@ namespace HEFSConverter
     }
 
 
-    private static void Compare(TimeSeriesOfEnsembleLocations baseWaterShedData, TimeSeriesOfEnsembleLocations watershed)
+    private static void Compare(string filename, TimeSeriesOfEnsembleLocations baseWaterShedData, TimeSeriesOfEnsembleLocations watershed)
     {
       Console.WriteLine();
       Console.Write("checking for any differences..");
       if (!baseWaterShedData.Equals(watershed))
       {
+        Console.WriteLine(filename);
         Console.WriteLine("WARNING: watershed read form disk was different!");
         LogWarning("Difference found ");
       }
