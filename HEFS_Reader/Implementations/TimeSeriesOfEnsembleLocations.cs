@@ -92,5 +92,11 @@ namespace HEFS_Reader.Implementations
       }
       _forecasts[idx].AddEnsembleMember(em, emidx, locationName);
     }
+
+    public void Add(TimeSeriesOfEnsembleLocations toel)
+    {
+      _forecasts.AddRange(toel.Forecasts);
+    }
+
   }
 }

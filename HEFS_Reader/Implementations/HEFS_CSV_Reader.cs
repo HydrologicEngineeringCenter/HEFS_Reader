@@ -34,6 +34,16 @@ namespace HEFS_Reader.Implementations
       fileName += "_hefs_csv_hourly";
 
       string csvFileName = Path.Combine(args.Path, fileName + ".csv");
+      string zipFileName = Path.Combine(args.Path, fileName + ".zip");
+      if(!File.Exists(csvFileName) &&File.Exists(zipFileName))
+      {
+        Reclamation.Core.ZipFileUtility.UnzipFile(zipFileName, csvFileName);
+      }
+      else
+      {
+        LogWarning("Warning: " + zipFileName + " not found, skipping");
+        return null;
+      }
       if (File.Exists(csvFileName))
       {
         Log("Found " + csvFileName + " in cache.  Reading...");

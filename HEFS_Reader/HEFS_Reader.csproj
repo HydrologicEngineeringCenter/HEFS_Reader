@@ -7,4 +7,9 @@
   <ItemGroup>
     <Compile Remove="Implementations\HEFS_ZIP_Writer.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Reclamation.Core">
+      <HintPath>..\References\Reclamation.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

@@ -14,7 +14,7 @@ namespace HEFS_Downloader
 
         static void Main(string[] args)
         {
-            DateTime startTime = new DateTime(2013, 11, 1, 12, 0, 0);
+            DateTime startTime = new DateTime(2019, 9, 25, 12, 0, 0);
             DateTime endTime = DateTime.Now.Date.AddDays(-1).AddHours(12);
 
             var provider = new HEFS_Reader.Implementations.HEFS_WebReader();

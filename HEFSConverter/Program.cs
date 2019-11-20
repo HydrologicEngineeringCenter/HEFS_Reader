@@ -23,7 +23,7 @@ namespace HEFSConverter
 
     // Global start/end times for the Russian River CSV dataset
     static DateTime StartTime = new DateTime(2013, 11, 1, 12, 0, 0);
-    static DateTime EndTime = new DateTime(2017, 11, 1, 12, 0, 0);
+    static DateTime EndTime = new DateTime(2019, 11, 18, 12, 0, 0);
 
     static string NL = Environment.NewLine;
     const string Separator = " | ";
@@ -60,7 +60,13 @@ namespace HEFSConverter
 
       Console.WriteLine("Reading CSV Directory (Parallel)...");
       var rt = Stopwatch.StartNew();
-      TimeSeriesOfEnsembleLocations baseWaterShedData = provider.ReadParallel(Watersheds.RussianNapa, StartTime, EndTime, cacheDir);
+      TimeSeriesOfEnsembleLocations baseWaterShedData = new TimeSeriesOfEnsembleLocations();
+      var wsheds = new Watersheds[] { Watersheds.RussianNapa, Watersheds.EastSierra, Watersheds.FeatherYuba };
+      foreach (var w in wsheds)
+      {
+        baseWaterShedData.Add(provider.ReadParallel(w, StartTime, EndTime, cacheDir));
+      }
+      
       rt.Stop();
       Console.WriteLine("Finished reading in " + Math.Round(rt.Elapsed.TotalSeconds) + " seconds.");
 
