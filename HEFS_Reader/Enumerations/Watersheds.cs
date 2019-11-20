@@ -12,7 +12,7 @@ namespace HEFS_Reader.Enumerations
 		NorthCoast,
 		RussianNapa,
 		UpperSacramento,
-		FetherYuba,
+		FeatherYuba,
 		cacheputah,
 		american,
 		LowerSacramento,
