@@ -255,7 +255,7 @@ namespace HEFSConverter
             h5r.ReadDataset(valuePath, ref data);
 
             DateTime issueDate = new DateTime(yr, 1, 1);
-            issueDate.AddDays(day - 1);
+            issueDate = issueDate.AddDays(day - 1);
 
             Ensemble e = new Ensemble(location, issueDate, data, dtTicks);
             ensembles.Add(e);
