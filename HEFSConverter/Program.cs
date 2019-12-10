@@ -64,6 +64,16 @@ namespace HEFSConverter
       rt.Stop();
       Console.WriteLine("Finished reading in " + Math.Round(rt.Elapsed.TotalSeconds) + " seconds.");
 
+      rt = Stopwatch.StartNew();
+      Hec.TimeSeries.Ensemble.CsvEnsembleReader r = new Hec.TimeSeries.Ensemble.CsvEnsembleReader(cacheDir);
+
+      //var karl =  r.ReadParallel("RussianNapa", StartTime, EndTime);
+      var karl =  r.Read("RussianNapa", StartTime, EndTime);
+      rt.Stop();
+      Console.WriteLine("Finished reading in " + Math.Round(rt.Elapsed.TotalSeconds) + " seconds.");
+
+
+
       // Let the JITTER settle down with the smallest case
       Console.WriteLine("Warmup time period, results will not be logged.");
       DisableTestReporting = true;

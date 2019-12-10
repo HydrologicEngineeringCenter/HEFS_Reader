@@ -8,10 +8,11 @@ namespace Hec.TimeSeries.Ensemble
 {
   public class Location
   {
-    public Location(string name)
+    public Location(string name, Watershed watershed =null)
     {
       this.Name = name;
       Forecasts = new List<Forecast>();
+      this.Watershed = watershed;
     }
     public string Name { get; set; }
     /// <summary>
@@ -24,5 +25,11 @@ namespace Hec.TimeSeries.Ensemble
     /// </summary>
     public List<Forecast> Forecasts { get; set; }
 
+    internal Forecast AddForecast(DateTime issueDate, float[,] ensemble)
+    {
+      Forecast f = new Forecast(this.Watershed, this, issueDate,ensemble);
+      Forecasts.Add(f);
+      return f;
+    }
   }
 }

@@ -111,12 +111,12 @@ namespace HEFSConverter
 
             for (int m = 0; m < columnNames.Length; m++)
             {
-              int sz = ts.Values.Length;
+              int sz = ts.Values.GetLength(1);
               var memberValues = new float[sz];
              
               for (int row = 0; row < sz; row++)
               {
-                memberValues[row] = ((float)ts.Values[row][m]);
+                memberValues[row] = ((float)ts.Values[row,m]);
               }
 
               var em = new EnsembleMember(memberValues, ts.Times);

@@ -29,13 +29,13 @@ namespace Hec.TimeSeries.Ensemble
     /// Reads list of Forecast
     /// </summary>
     /// <param name="watershedName"></param>
-    /// <param name="forecastDate"></param>
+    /// <param name="issueDate"></param>
     /// <returns></returns>
-    Forecast[] Read(string watershedName, DateTime forecastDate)
+    RfcCsvFile Read(string watershedName, DateTime issueDate)
     {
       //https://www.cnrfc.noaa.gov/csv/2019092312_RussianNapa_hefs_csv_hourly.zip
 
-      string fileName = forecastDate.ToString("yyyyMMddhh") + "_";
+      string fileName = issueDate.ToString("yyyyMMddhh") + "_";
       fileName += watershedName;
       fileName += "_hefs_csv_hourly";
 
@@ -44,10 +44,10 @@ namespace Hec.TimeSeries.Ensemble
       {
         Log("Found " + csvFileName + " in cache.  Reading...");
 
-        var  x = CsvParser.Parse(File.ReadAllText(csvFileName),
-           forecastDate, watershedName);
+        RfcCsvFile csv = new RfcCsvFile(csvFileName);
 
-        return w;
+        return csv;
+
       }
       else
       {
@@ -55,24 +55,37 @@ namespace Hec.TimeSeries.Ensemble
         return null;
       }
     }
-
     public Watershed Read(string watershedName, DateTime startDate, DateTime endDate)
     {
-      if (startDate.Hour != 12)
-      {
-        //start time must be 12 (actually i think it is supposed to be 10AM
+
+      if (!ValidDates(startDate, endDate))
         return null;
-      }
-      if (endDate.Hour != 12)
+      var output = new Watershed(watershedName);
+
+      DateTime t = startDate;
+
+      while(t <=endDate)
       {
-        //end time must be 12 (actually i think it is supposed to be 10AM
-        return null;
+
+        // Seems threadsafe at a glance
+        var csv = Read(watershedName, t);
+        if (csv != null)
+        {
+          foreach (string locName in csv.LocationNames)
+          {
+            Forecast f = output.AddForecast(locName, t, csv.GetEnsemble(locName));
+            f.TimeStamps = csv.TimeStamps;
+          }
+        }
+        t = t.AddDays(1);
       }
-      if (startDate > endDate)
-      {
-        // come on guys..
+      return output;
+    }
+
+    public Watershed ReadParallel(string watershedName, DateTime startDate, DateTime endDate)
+    {
+      if (!ValidDates(startDate, endDate))
         return null;
-      }
 
       var output = new Watershed(watershedName);
 
@@ -84,11 +97,18 @@ namespace Hec.TimeSeries.Ensemble
         DateTime day = startDate.AddDays(i);
 
         // Seems threadsafe at a glance
-        Forecast[] F = Read(args);
-        if (wtshd != null)
+        var csv = Read(watershedName, day);
+
+        if (csv != null)
         {
           lock (output)
-            output.Forecasts.Add(wtshd);
+          {
+            foreach (string locName in csv.LocationNames)
+            {
+              Forecast f = output.AddForecast(locName, day, csv.GetEnsemble(locName));
+              f.TimeStamps = csv.TimeStamps;
+            }
+          }
         }
         else
         {
@@ -99,9 +119,30 @@ namespace Hec.TimeSeries.Ensemble
 
       // I don't know if watershed sorting actually matters here...?
       // Issue-date seems like it should be one level higher?
-      output.SortWatersheds();
+      //output.SortWatersheds();
 
       return output;
+    }
+
+    bool ValidDates(DateTime startDate, DateTime endDate)
+    {
+      if (startDate.Hour != 12)
+      {
+        Console.WriteLine("start time must be 12");
+        return false;
+      }
+      if (endDate.Hour != 12)
+      {
+        Console.WriteLine("end time must be 12");
+        return false;
+      }
+
+      if (startDate > endDate)
+      {
+        return false;
+        Console.WriteLine("end date should be after start date");
+      }
+      return true;
     }
   }
 }

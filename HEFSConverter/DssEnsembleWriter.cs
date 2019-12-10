@@ -118,20 +118,15 @@ namespace HEFSConverter
       return sw.Elapsed;
     }
 
-    private static double[][] ConvertEnsembleToArray(Ensemble e, int numColumns, int numRows)
+    private static double[,] ConvertEnsembleToArray(Ensemble e, int numColumns, int numRows)
     {
-      double[][] data = new double[numRows][];
-      for (int r = 0; r < numRows; r++)
-      {
-        data[r] = new double[numColumns];
-      }
-
+      double[,] data = new double[numRows,numColumns];
       for (int i = 0; i < numColumns; i++)
       {
         var m = e.Members[i].Values;
-        for (int r = 0; r < m.Length; r++)
+        for (int r = 0; r < m.GetLength(0); r++)
         {
-          data[r][i] = m[r];
+          data[r,i] = m[r];
         }
       }
       return data;
