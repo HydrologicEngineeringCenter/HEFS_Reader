@@ -64,31 +64,53 @@ namespace Hec.TimeSeries.Ensemble
       ParseData(rows);
     }
 
+
+    public float[,] GetEnsemble(string locationName)
+    {
+      float[,] rval = null;
+      GetEnsemble(locationName, ref rval);
+      return rval;
+    }
     /// <summary>
     /// Returns 2-D array where each row is an ensemble member
     /// note: this is an axis swap from the CSV on disk
     /// </summary>
     /// <param name="locationName"></param>
+    /// <param name="swapAxis">when true rows represent time steps</param>
     /// <returns></returns>
-    public float[,] GetEnsemble(string locationName)
+    public void GetEnsemble(string locationName,  ref float[,] ensemble, bool swapAxis = false)
     {
       int idx1 = locationStart[locationName];
       int idx2 = locationEnd[locationName];
 
-      int memberCount = idx2 - idx1 + 1;
-      int timeCount = TimeStamps.Length;
-      float[,] rval = new float[memberCount, timeCount];
+      int memberCount = idx2 - idx1 + 1; // height
+      int timeCount = TimeStamps.Length; // width
 
-      // TO DO... block copy
-      for (int m = 0; m < memberCount ; m++)
+
+      if (swapAxis)
       {
-        for (int t = 0; t < timeCount; t++)
+        if (ensemble == null || ensemble.GetLength(1) != memberCount
+       || ensemble.GetLength(0) != timeCount)
+           ensemble = new float[timeCount, memberCount];
+        for (int m = 0; m < memberCount; m++)
         {
-          rval[m, t] = Data[m,t];
+          for (int t = 0; t < timeCount; t++)
+          {
+            ensemble[t, m] = Data[m + idx1, t];
+          }
         }
       }
+      else
+      {
 
-      return rval;
+        if (ensemble == null || ensemble.GetLength(0) != memberCount
+           || ensemble.GetLength(1) != timeCount)
+          ensemble = new float[memberCount, timeCount];
+
+        Buffer.BlockCopy(Data, idx1 * timeCount * sizeof(float), ensemble, 0,
+          memberCount * timeCount * sizeof(float));
+      }
+      
     }
 
     /// <summary>

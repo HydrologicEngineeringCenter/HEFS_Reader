@@ -15,10 +15,10 @@ namespace Hec.TimeSeries.Ensemble
     public static void Write(string dssFileName, Watershed watershed)
     {
       bool saveAsFloat = true;
-
+      float[] ensembleMember = null;
       Console.WriteLine("Saving to " + dssFileName);
       int count = 0;
-      using (var w = new DSSWriter(dssFileName, DSSReader.MethodID.MESS_METHOD_GLOBAL_ID, DSSReader.LevelID.MESS_LEVEL_NONE))
+      using (var w = new DSSWriter(dssFileName, DSSReader.MethodID.MESS_METHOD_GLOBAL_ID, DSSReader.LevelID.MESS_LEVEL_CRITICAL))
       {
         foreach (Location loc in watershed.Locations)
         {
@@ -31,7 +31,7 @@ namespace Hec.TimeSeries.Ensemble
             int size = f.Ensemble.GetLength(0);
             for (int i = 0; i < size; i++)
             {
-              float[] ensembleMember = f.EnsembleMember(i);
+              f.EnsembleMember(i,ref ensembleMember);
 
               memberCounter++;
               ///   A/B/FLOW//1 Hour/<FPART></FPART>
@@ -94,7 +94,7 @@ namespace Hec.TimeSeries.Ensemble
             ts.Path = path;
             int numColumns = ensemble.GetLength(0);
             int numRows = ensemble.GetLength(1);
-            double[,] d = new double[ensemble.GetLength(0), ensemble.GetLength(1)];
+            double[,] d = new double[numRows, numColumns];
             Array.Copy(ensemble, d, ensemble.Length);
             ts.Values = d;
 

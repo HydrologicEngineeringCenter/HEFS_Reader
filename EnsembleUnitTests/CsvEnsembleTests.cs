@@ -6,7 +6,7 @@ using System.IO;
 namespace EnsembleUnitTests
 {
   [TestClass]
-  public class UnitTest1
+  public class CsvEnsembleTests
   {
 
     [TestMethod]
@@ -31,8 +31,17 @@ namespace EnsembleUnitTests
       string fileName = Path.Combine(EnsembleTester.CacheDir, "test.csv");
       RfcCsvFile csv = new RfcCsvFile(fileName);
 
-      var data = csv.GetEnsemble("SCRN2");
-      Console.WriteLine(data);
+      float[,] data = csv.GetEnsemble("SCRN2");
+      int member = 0;
+      Assert.AreEqual(-1.0f, data[member, 0]);
+      Assert.AreEqual(-2.1f, data[member, 1]);
+      Assert.AreEqual(-3.1f, data[member, 2]);
+      member = 58;
+      Assert.AreEqual(-59.0f, data[member, 0]);
+      Assert.AreEqual(-59.1f, data[member, 1]);
+      Assert.AreEqual(-59.2f, data[member, 2]);
+
+
     }
   }
 }

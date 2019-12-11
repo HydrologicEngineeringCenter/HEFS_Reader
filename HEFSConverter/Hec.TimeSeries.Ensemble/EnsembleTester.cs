@@ -47,15 +47,15 @@ namespace Hec.TimeSeries.Ensemble
       var watershedNames = new string[] { "RussianNapa", "EastSierra", "FeatherYuba" };
       Watershed[] baseWaterShedData = ReadCsvFiles(watershedNames);
 
-      Warmup(baseWaterShedData);
+      //Warmup(baseWaterShedData);
 
       Console.WriteLine("Starting test:");
 
       int count = 0;
       foreach (var w in baseWaterShedData)
       {
-        bool append = count > 0;
-        WriteAllFormats(w,append);
+        bool delete = count == 0;
+        WriteAllFormats(w, delete);
         count++;
       }
 
@@ -103,24 +103,24 @@ namespace Hec.TimeSeries.Ensemble
       return rval.ToArray();
     }
 
-    private static void WriteAllFormats(Watershed waterShedData, bool append )
+    private static void WriteAllFormats(Watershed waterShedData, bool delete )
     {
       File.AppendAllText(logFile, NL);
       string fn, dir;
       string tag = "round3"; 
       // DSS 6/7
       fn = "ensemble_V7_" + tag + ".dss";
-      if( !append) File.Delete(fn);
+      if( delete) File.Delete(fn);
       WriteTimed(fn, tag, () => DssEnsemble.Write(fn, waterShedData));
 
       fn = "ensemble_V7_profiles_" + tag + ".dss";
-      if (!append) File.Delete(fn);
+      if (delete) File.Delete(fn);
       WriteTimed(fn, tag, () => DssEnsemble.WriteToTimeSeriesProfiles(fn, waterShedData));
 
       
       // SQLITE
       fn = "ensemble_sqlite_blob_compressed_" + tag + ".pdb";
-      if (!append) File.Delete(fn);
+      if (delete) File.Delete(fn);
       WriteTimed(fn, tag, () =>
       {
         string connectionString = "Data Source=" + fn + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
@@ -228,7 +228,7 @@ namespace Hec.TimeSeries.Ensemble
     {
       try
       {
-        File.Delete(filename);
+        //File.Delete(filename);
 
         // Record the amount of time from start->end, including flushing to disk.
         var sw = Stopwatch.StartNew();
