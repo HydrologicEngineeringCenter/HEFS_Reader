@@ -1,8 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net472</TargetFrameworks>
-    <Platforms>x64</Platforms>
+    <Platforms>AnyCPU</Platforms>
     <OutputType>Exe</OutputType>
+    <StartupObject>Hec.TimeSeries.Ensemble.EnsembleTester</StartupObject>
+    <ApplicationIcon />
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net472|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\References\bin64\hdf5.dll" Link="hdf5.dll">
@@ -20,6 +26,9 @@
     <None Include="..\References\SQLite.Interop.dll" Link="SQLite.Interop.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MSTest.TestFramework" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HEFS_Reader\HEFS_Reader.csproj" />

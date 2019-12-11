@@ -73,7 +73,7 @@ namespace Hec.TimeSeries.Ensemble
         {
           foreach (string locName in csv.LocationNames)
           {
-            Forecast f = output.AddForecast(locName, t, csv.GetEnsemble(locName));
+            Forecast f = output.AddForecast(locName, t, csv.GetEnsemble(locName),csv.TimeStamps);
             f.TimeStamps = csv.TimeStamps;
           }
         }
@@ -96,7 +96,6 @@ namespace Hec.TimeSeries.Ensemble
       {
         DateTime day = startDate.AddDays(i);
 
-        // Seems threadsafe at a glance
         var csv = Read(watershedName, day);
 
         if (csv != null)
@@ -105,21 +104,13 @@ namespace Hec.TimeSeries.Ensemble
           {
             foreach (string locName in csv.LocationNames)
             {
-              Forecast f = output.AddForecast(locName, day, csv.GetEnsemble(locName));
+              Forecast f = output.AddForecast(locName, day, csv.GetEnsemble(locName),csv.TimeStamps);
               f.TimeStamps = csv.TimeStamps;
             }
           }
         }
-        else
-        {
-          //dont add null data?
-        }
 
       });
-
-      // I don't know if watershed sorting actually matters here...?
-      // Issue-date seems like it should be one level higher?
-      //output.SortWatersheds();
 
       return output;
     }
@@ -139,8 +130,8 @@ namespace Hec.TimeSeries.Ensemble
 
       if (startDate > endDate)
       {
-        return false;
         Console.WriteLine("end date should be after start date");
+        return false;
       }
       return true;
     }

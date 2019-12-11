@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Hec.TimeSeries.Ensemble
 {
-  class RfcCsvFile
+  public class RfcCsvFile
   {
     public List<string> LocationNames { get; private set; }
 
-    public List<DateTime> TimeStamps { get; private set; }
+    public DateTime[] TimeStamps { get; private set; }
 
-    private List<List<float>> Data;
+    private float[,] Data;
 
     /// <summary>
     /// index to start of each location in Data
@@ -23,6 +23,8 @@ namespace Hec.TimeSeries.Ensemble
     /// index to end of each location in Data
     /// </summary>
     Dictionary<string, int> locationEnd = new Dictionary<string, int>();
+    
+    private string[] header;
 
     // example:
     /*
@@ -74,45 +76,67 @@ namespace Hec.TimeSeries.Ensemble
       int idx2 = locationEnd[locationName];
 
       int memberCount = idx2 - idx1 + 1;
-      int timeCount = TimeStamps.Count;
+      int timeCount = TimeStamps.Length;
       float[,] rval = new float[memberCount, timeCount];
 
-      for (int m = 0; m <memberCount ; m++)
+      // TO DO... block copy
+      for (int m = 0; m < memberCount ; m++)
       {
         for (int t = 0; t < timeCount; t++)
         {
-          rval[m, t] = Data[t][m];
-         }
+          rval[m, t] = Data[m,t];
+        }
       }
 
-      return null;
+      return rval;
     }
 
+    /// <summary>
+    /// Parse data swaping axis
+    /// rows represent timesteps
+    /// columns represent locations
+    /// </summary>
+    /// <param name="rows"></param>
     private void ParseData(string[] rows)
     {
-
-      TimeStamps = new List<DateTime>(rows.Length);
-      Data = new List<List<float>>(rows.Length);
-      for (int j = 2; j < rows.Length; j++)
+      int idx2 = FindLastRowIndex(rows);
+      int idx1 = 2; // data starts after two header lines
+      int rowCount = idx2 - idx1 + 1;
+      int columnCount = header.Length - 1; // date column will not be part of data
+      TimeStamps = new DateTime[rowCount];
+      Data = new float[columnCount,rowCount]; // swap axis
+      for (int rowIdx = 0; rowIdx < rowCount; rowIdx++)
       {
-        if (rows[j].Trim() == "")
-          continue;
-        string[] values = rows[j].Split(',');
-        DateTime dt = ParseDateTime(values[0]); // first colum is DateTime
-        TimeStamps.Add(dt);
-        var f = new List<float>(values.Length - 1);
-        for (int columnIndex = 1; columnIndex < values.Length; columnIndex++)
+        string[] values = rows[rowIdx+idx1].Split(',');
+        TimeStamps[rowIdx] = ParseDateTime(values[0]); // first column is DateTime
+        for (int columnIdx = 0; columnIdx < columnCount; columnIdx++)
         {
-          f.Add(float.Parse(values[columnIndex]));
+          var f = float.Parse(values[columnIdx + 1]);
+          Data[columnIdx,rowIdx] = f;
         }
-        Data.Add(f);
       }
     }
+    /// <summary>
+    /// find last row of data.
+    /// some files have empty lines at the bottom.
+    /// </summary>
+    /// <param name="rows"></param>
+    /// <returns></returns>
+    private int FindLastRowIndex(string[] rows)
+    {
+      for (int i = rows.Length-1; i>0;  i--)
+      {
+        if (rows[i].Trim() != "")
+          return i;
+      }
+      return -1;
+    }
+
 
     private void ParseHeader(string line)
     {
      
-      string[] header = line.Split(',');
+      header = line.Split(',');
       string currHeader = "";
     
       LocationNames = new List<string>();
@@ -131,11 +155,11 @@ namespace Hec.TimeSeries.Ensemble
 
         }
       }
-
     }
 
     public static DateTime ParseDateTime(string dt)
     {
+      return DateTime.Parse(dt);
       string[] dateTime = dt.Split(' ');
       string[] yyyymmdd = dateTime[0].Split('-');
       string[] hhmmss = dateTime[1].Split(':');

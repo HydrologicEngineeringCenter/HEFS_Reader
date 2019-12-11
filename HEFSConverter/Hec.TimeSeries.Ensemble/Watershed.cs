@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Hec.TimeSeries.Ensemble
 {
+  [DebuggerDisplay("{Name}")]
   public class Watershed
   {
 
@@ -18,7 +20,7 @@ namespace Hec.TimeSeries.Ensemble
 
     public List<Location> Locations { get; set; }
 
-    internal Forecast AddForecast(string locName, DateTime issueDate, float[,] ensemble)
+    internal Forecast AddForecast(string locName, DateTime issueDate, float[,] ensemble, DateTime[] timeStamps)
     {
       int idx = Locations.FindIndex(x => x.Name.Equals(locName));
       Location loc = null;
@@ -30,8 +32,25 @@ namespace Hec.TimeSeries.Ensemble
         Locations.Add(loc);
       }
 
-      var rval= loc.AddForecast(issueDate,  ensemble);
+      var rval= loc.AddForecast(issueDate,  ensemble,timeStamps);
       return rval;
+    }
+    public Watershed CloneSubset(int takeCount)
+    {
+      int count = 0;
+      var retn = new Watershed(this.Name);
+      foreach (Location loc in this.Locations)
+      {
+        foreach (Forecast f in loc.Forecasts)
+        {
+          retn.AddForecast(f.Location.Name, f.IssueDate, f.Ensemble,f.TimeStamps);
+          count++;
+          if( count >= takeCount)
+            break;
+        }
+      }
+      return retn;
+
     }
   }
 }
