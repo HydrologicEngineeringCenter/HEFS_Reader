@@ -9,6 +9,7 @@ namespace Hec.TimeSeries.Ensemble
 {
   public class RfcCsvFile
   {
+    public string FileName;
     public List<string> LocationNames { get; private set; }
 
     public DateTime[] TimeStamps { get; private set; }
@@ -59,6 +60,7 @@ namespace Hec.TimeSeries.Ensemble
     /// <param name="fileName"></param>
     public RfcCsvFile(string fileName)
     {
+      this.FileName = fileName;
       var rows = File.ReadAllLines(fileName);
       ParseHeader(rows[0]);
       ParseData(rows);
@@ -133,8 +135,10 @@ namespace Hec.TimeSeries.Ensemble
         TimeStamps[rowIdx] = ParseDateTime(values[0]); // first column is DateTime
         for (int columnIdx = 0; columnIdx < columnCount; columnIdx++)
         {
+          // if (columnIdx >= values.Length)
+          //  Console.WriteLine("Error: was file truncated? " + FileName);
           var f = float.Parse(values[columnIdx + 1]);
-          Data[columnIdx,rowIdx] = f;
+          Data[columnIdx, rowIdx] = f;
         }
       }
     }

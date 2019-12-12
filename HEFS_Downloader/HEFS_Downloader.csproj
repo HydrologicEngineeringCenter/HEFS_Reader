@@ -53,11 +53,5 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\HEFS_Reader\HEFS_Reader.csproj">
-      <Project>{1860e5c4-5058-4d5f-b531-c08f2a3853ab}</Project>
-      <Name>HEFS_Reader</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
