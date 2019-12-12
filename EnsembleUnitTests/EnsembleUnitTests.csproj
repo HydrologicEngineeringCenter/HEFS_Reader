@@ -43,6 +43,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\DSSIO.dll</HintPath>
     </Reference>
+    <Reference Include="H5Assist, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\H5Assist.dll</HintPath>
+    </Reference>
     <Reference Include="Hec.Dss">
       <HintPath>..\References\Hec.Dss.dll</HintPath>
     </Reference>
@@ -68,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CsvEnsembleTests.cs" />
+    <Compile Include="HDF5Test.cs" />
     <Compile Include="PiscesTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DssTest.cs" />
@@ -82,6 +87,22 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\References\bin64\hdf5.dll">
+      <Link>hdf5.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\References\bin64\hdf5_hl.dll">
+      <Link>hdf5_hl.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\References\bin64\szip.dll">
+      <Link>szip.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\References\bin64\zlib.dll">
+      <Link>zlib.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\References\SQLite.Interop.dll">
       <Link>SQLite.Interop.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

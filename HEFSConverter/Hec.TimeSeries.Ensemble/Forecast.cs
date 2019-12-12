@@ -10,7 +10,6 @@ namespace Hec.TimeSeries.Ensemble
   [DebuggerDisplay("Forecast [{Ensemble.GetLength(0)},{Ensemble.GetLength(1)}]")]
   public class Forecast
   {
-
     public Forecast(Location location, DateTime issueDate, float[,] ensemble,DateTime[] timeStamps)
     {
       this.Location = location;

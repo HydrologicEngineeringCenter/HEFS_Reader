@@ -66,7 +66,7 @@ namespace Hec.TimeSeries.Ensemble
     /// <param name="saveAsFloat"></param>
     /// <param name="version"></param>
     /// <returns></returns>
-    internal static void WriteToTimeSeriesProfiles(string dssFileName, Watershed watershed)
+    public static void WriteToTimeSeriesProfiles(string dssFileName, Watershed watershed)
     {
       bool saveAsFloat = true;
 
@@ -104,6 +104,100 @@ namespace Hec.TimeSeries.Ensemble
           }
         }
       }
+    }
+    public static Watershed Read(string watershedName, DateTime start, DateTime end, string dssPath)
+    {
+      Watershed rval = new Watershed(watershedName);
+      DSSReader.UseTrainingWheels = false;
+
+      using (DSSReader dss = new DSSReader(dssPath, DSSReader.MethodID.MESS_METHOD_GENERAL_ID, DSSReader.LevelID.MESS_LEVEL_NONE))
+      {
+        Console.WriteLine("Reading " + dssPath);
+        DSSPathCollection dssPaths = dss.GetCatalog(); // sorted
+        int size = dssPaths.Count;
+        if (size == 0)
+        {
+          throw new Exception("Empty DSS catalog");
+        }
+
+        // /RUSSIANNAPA/APCC1/FLOW/01SEP2019/1HOUR/C:000002|T:0212019/
+
+        var seriesList = new List<DSSTimeSeries>();
+        for (int i = 0; i < size; i++)
+        {
+          if (i % 100 == 0)
+            Console.Write(".");
+
+          DSSPath path = dssPaths[i];
+          string location = path.Bpart;
+          float[,] ensemble = null;
+          ParseFPart(path.Fpart,out int memberidx,out DateTime issueDate );
+
+          if (issueDate >= start && issueDate <= end && string.Equals(path.Apart, watershedName, StringComparison.OrdinalIgnoreCase))
+          {
+            // Passing in 'path' (not the dateless string) is important, path without date triggers a heinous case in the dss low-level code
+            var ts = dss.GetTimeSeries(path);
+
+            if (NextForecast(seriesList, ts) || i == size-1)
+            {
+              if (i == size - 1)
+                seriesList.Add(ts);
+              ConvertListToEnsembleArray(seriesList, ref ensemble);
+              rval.AddForecast(path.Bpart, issueDate, ensemble, ts.Times);
+              seriesList.Clear();
+            }
+            seriesList.Add(ts);
+          }
+        }
+      }
+
+      return rval;
+    }
+
+    private static float[,] ConvertListToEnsembleArray(List<DSSTimeSeries> seriesList, ref float[,] data)
+    {
+      int width = seriesList[0].Values.Length;
+      int height = seriesList.Count;
+      if( data == null || data.GetLength(0) != height || data.GetLength(1) != width)
+         data = new float[height,width];
+
+      for (int r = 0; r < height; r++)
+      {
+        var vals = seriesList[r].Values;
+        for (int c = 0; c < width; c++)
+        {
+          data[r, c] = (float)vals[c];
+        }
+      }
+
+      return data;
+    }
+
+    private static bool NextForecast(List<DSSTimeSeries> seriesList, DSSTimeSeries ts)
+    {
+      return seriesList.Count > 0 && seriesList[0].StartDateTime != ts.StartDateTime;
+    }
+
+    /// <summary>
+    /// C:000002|T:0212019
+    /// </summary>
+    /// <param name="Fpart"></param>
+    /// <returns></returns>
+    private static void ParseFPart(string Fpart, out int memberidx, out DateTime issueDate)
+    {
+      memberidx = int.Parse(Fpart.Split('|')[0].Split(':').Last().TrimStart('0'));
+      int idx = Fpart.IndexOf("T:");
+      if (idx < 0)
+        throw new Exception("Could not parse issue date from '" + Fpart + "'");
+
+      Fpart = Fpart.Substring(idx + 2);
+
+      int year = Convert.ToInt32(Fpart.Substring(3));
+      string sday = Fpart.Substring(0, 3);
+      int day = Convert.ToInt32(sday);
+      issueDate = new DateTime(year, 1, 1).AddDays(day - 1).AddHours(12);
+
+
     }
 
   }

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "HEFSConverter": {
+      "commandName": "Project",
+      "workingDirectory": "c:\\temp"
+    }
+  }
+}

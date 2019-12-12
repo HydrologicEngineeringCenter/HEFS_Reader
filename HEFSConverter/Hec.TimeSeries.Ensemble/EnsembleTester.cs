@@ -21,9 +21,9 @@ namespace Hec.TimeSeries.Ensemble
     static string logFile = "Ensemble_testing.log";
 
     // Global start/end times 
-    static DateTime StartTime = new DateTime(2013, 11, 1, 12, 0, 0);
-    static DateTime EndTime = new DateTime(2013, 11, 5, 12, 0, 0);
-    //static DateTime EndTime = new DateTime(2017, 11, 1, 12, 0, 0);
+    static DateTime StartTime = new DateTime(2013, 11, 3, 12, 0, 0);
+    static DateTime EndTime = new DateTime(2018, 11, 3, 12, 0, 0);
+    
 
     static string NL = Environment.NewLine;
     const string Separator = " | ";
@@ -36,6 +36,10 @@ namespace Hec.TimeSeries.Ensemble
 
     static void Main(string[] args)
     {
+
+      if (SPEEDRUN)
+        EndTime = StartTime.AddDays(365);
+
       DSSIO.DSSReader.UseTrainingWheels = false;
 
       Log(NL + NL + "------" + DateTime.Now.ToString() + "-------" + NL + NL);
@@ -44,10 +48,10 @@ namespace Hec.TimeSeries.Ensemble
           "Seconds".PadRight(TimeColSize) + Separator +
           "File Size".PadRight(FileSzColSize) + NL);
 
+      Warmup("RussianNapa");
+
       var watershedNames = new string[] { "RussianNapa", "EastSierra", "FeatherYuba" };
       Watershed[] baseWaterShedData = ReadCsvFiles(watershedNames);
-
-      //Warmup(baseWaterShedData);
 
       Console.WriteLine("Starting test:");
 
@@ -55,33 +59,31 @@ namespace Hec.TimeSeries.Ensemble
       foreach (var w in baseWaterShedData)
       {
         bool delete = count == 0;
+        Console.WriteLine("Writing Watershed: "+w.Name);
         WriteAllFormats(w, delete);
         count++;
       }
 
-      count = 0;
       foreach (var w in baseWaterShedData)
       {
-        count++;
-        //ReadAllFormats(w, count == 1);
+        ReadAllFormats(w.Name);
       }
 
       Console.WriteLine("Test complete, log-file written to " + logFile);
     }
 
-    private static void Warmup(Watershed[] baseWaterShedData)
+    private static void Warmup(string watershedName)
     {
       // Let the JITTER settle down with the smallest case
       Console.WriteLine("Warmup time period, results will not be logged.");
       DisableTestReporting = true;
 
       // I'd like to warmup more, but it's SO FREAKING SLOW
-      int warmupEnsembleCount = 1;
-      foreach (Watershed ws in baseWaterShedData)
-      {
-        var warmupWatershed = ws.CloneSubset(warmupEnsembleCount);
-        WriteAllFormats(warmupWatershed, false);
-      }
+      int daysWarmup = 3;
+      CsvEnsembleReader r = new CsvEnsembleReader(CacheDir);
+      Watershed w = r.Read(watershedName, StartTime, StartTime.AddDays(daysWarmup));
+      WriteAllFormats(w,true);
+      
       DisableTestReporting = false;
       Console.WriteLine("Finished Warmup.");
     }
@@ -117,23 +119,31 @@ namespace Hec.TimeSeries.Ensemble
       if (delete) File.Delete(fn);
       WriteTimed(fn, tag, () => DssEnsemble.WriteToTimeSeriesProfiles(fn, waterShedData));
 
-      
+
+      bool compress = true;
       // SQLITE
-      fn = "ensemble_sqlite_blob_compressed_" + tag + ".pdb";
+      fn = "ensemble_sqlite_" + tag + ".db";
       if (delete) File.Delete(fn);
       WriteTimed(fn, tag, () =>
       {
-        SqLiteEnsemble.Write(fn, waterShedData, true);
+        SqLiteEnsemble.Write(fn, waterShedData, compress,false);
+      });
+
+      fn = "ensemble_pisces_" + tag + ".pdb";
+      if (delete) File.Delete(fn);
+      WriteTimed(fn, tag, () =>
+      {
+        SqLiteEnsemble.Write(fn, waterShedData, compress,true);
       });
 
 
       // Serial HDF5
-      //fn = "ensemble_serial_1RowPerChunk.h5";
-      //WriteTimed(fn, ensembleCount, () =>
-      //{
-      //  using (var h5w = new H5Writer(fn))
-      //    HDF5ReaderWriter.Write(h5w, waterShedData);
-      //});
+      fn = "ensemble_serial_1RowPerChunk.h5";
+      WriteTimed(fn, tag, () =>
+      {
+        using (var h5w = new H5Writer(fn))
+          HDF5ReaderWriter.Write(h5w, waterShedData);
+      });
 
 
       //// Parallel HDF5
@@ -148,26 +158,19 @@ namespace Hec.TimeSeries.Ensemble
       //}
     }
 
-    private static void ReadAllFormats(int ensembleCount, TimeSeriesOfEnsembleLocations csvWaterShedData)
+    private static void ReadAllFormats(string watershedName)
     {
-      // TODO - compare validateWatershed data with computed
+      //TODO - compare validateWatershed data with computed
 
-      //File.AppendAllText(logFile, NL);
-      //File.AppendAllText(logFile, "---------- Reading " + ensembleCount.ToString() + " Ensembles ----------" + NL);
-      //string fn;
+      File.AppendAllText(logFile, NL);
+      File.AppendAllText(logFile, "---------- Reading  Ensembles ----------" + NL);
+      string fn;
 
-      //// TimeSeriesOfEnsembleLocations wshedData=null;
-      //DateTime startTime = DateTime.MinValue;
-      //DateTime endTime = DateTime.MaxValue;
+      // TimeSeriesOfEnsembleLocations wshedData=null;
+      DateTime startTime = DateTime.MinValue;
+      DateTime endTime = DateTime.MaxValue;
 
-      //// DSS
-      //fn = "ensemble_V6_" + ensembleCount + ".dss";
-      //ReadTimed(fn, csvWaterShedData, () =>
-      //{
-      //  var reader = new DssEnsembleReader();
-      //  return reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
-      //});
-
+      // DSS
       //fn = "ensemble_V7_" + ensembleCount + ".dss";
       //ReadTimed(fn, csvWaterShedData, () =>
       //{
@@ -184,13 +187,6 @@ namespace Hec.TimeSeries.Ensemble
 
       //// SQLITE
       //fn = "ensemble_sqlite_blob_" + ensembleCount + ".db";
-      //ReadTimed(fn, csvWaterShedData, () =>
-      //{
-      //  var reader = new SqlBlobEnsembleReader();
-      //  return reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
-      //});
-
-      //fn = "ensemble_sqlite_blob_compressed_" + ensembleCount + ".db";
       //ReadTimed(fn, csvWaterShedData, () =>
       //{
       //  var reader = new SqlBlobEnsembleReader();

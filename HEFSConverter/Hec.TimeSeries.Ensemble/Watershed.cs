@@ -22,19 +22,27 @@ namespace Hec.TimeSeries.Ensemble
 
     public Forecast AddForecast(string locName, DateTime issueDate, float[,] ensemble, DateTime[] timeStamps)
     {
+      Location loc = GetOrCreateLocation(locName);
+
+      var rval = loc.AddForecast(issueDate, ensemble, timeStamps);
+      return rval;
+    }
+
+    private Location GetOrCreateLocation(string locName)
+    {
       int idx = Locations.FindIndex(x => x.Name.Equals(locName));
       Location loc = null;
       if (idx >= 0)
         loc = Locations[idx];
       else
       {
-        loc = new Location(locName,this);
+        loc = new Location(locName, this);
         Locations.Add(loc);
       }
 
-      var rval= loc.AddForecast(issueDate,  ensemble,timeStamps);
-      return rval;
+      return loc;
     }
+
     public Watershed CloneSubset(int takeCount)
     {
       int count = 0;
@@ -52,5 +60,6 @@ namespace Hec.TimeSeries.Ensemble
       return retn;
 
     }
+
   }
 }

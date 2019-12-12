@@ -13,9 +13,13 @@ namespace pipe_cutter
   {
     static void Main(string[] args)
     {
-
+      bool piscesFormat = false;
       Stopwatch swTotal = Stopwatch.StartNew();
-      var fn = @"c:\temp\pisces-ensemble-test.pdb";
+      var fn = @"c:\temp\sqlite-ensemble-test.db";
+      if( piscesFormat)
+         fn = @"c:\temp\pisces-ensemble-test.pdb";
+
+
       File.Delete(fn);
       CsvEnsembleReader r = new CsvEnsembleReader(EnsembleTester.CacheDir);
 
@@ -29,12 +33,12 @@ namespace pipe_cutter
         var ws = r.Read(name, t1, t2);
 
         sw.Start();
-        bool piscesFormat = true;
+       
         SqLiteEnsemble.Write(fn, ws, true, piscesFormat);
         sw.Stop();
       }
 
-      Console.WriteLine(sw.Elapsed.TotalSeconds.ToString("F1")+" Pisces: elapsed seconds");
+      Console.WriteLine(sw.Elapsed.TotalSeconds.ToString("F1")+" sqlite elapsed seconds");
       Console.WriteLine(swTotal.Elapsed.TotalSeconds.ToString("F1")+" Total elapsed seconds");
 
     }
