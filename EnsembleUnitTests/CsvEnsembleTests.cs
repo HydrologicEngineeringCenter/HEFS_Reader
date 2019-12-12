@@ -13,7 +13,6 @@ namespace EnsembleUnitTests
     public void EastSierra_SCRN2()
     {
       CsvEnsembleReader r = new CsvEnsembleReader(EnsembleTester.CacheDir);
-
     
       var t1 = new DateTime(2013, 11, 3, 12, 0, 0);
       var ws = r.Read("EastSierra", t1, t1.AddDays(1));

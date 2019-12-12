@@ -20,7 +20,7 @@ namespace Hec.TimeSeries.Ensemble
     public static string CacheDir = @"C:\Temp\hefs_cache";
     static string logFile = "Ensemble_testing.log";
 
-    // Global start/end times for the Russian River CSV dataset
+    // Global start/end times 
     static DateTime StartTime = new DateTime(2013, 11, 1, 12, 0, 0);
     static DateTime EndTime = new DateTime(2013, 11, 5, 12, 0, 0);
     //static DateTime EndTime = new DateTime(2017, 11, 1, 12, 0, 0);
@@ -123,10 +123,7 @@ namespace Hec.TimeSeries.Ensemble
       if (delete) File.Delete(fn);
       WriteTimed(fn, tag, () =>
       {
-        string connectionString = "Data Source=" + fn + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
-        var server = new Reclamation.Core.SQLiteServer(connectionString);
-        server.CloseAllConnections();
-        SqLiteEnsemble.Write(server, waterShedData, true);
+        SqLiteEnsemble.Write(fn, waterShedData, true);
       });
 
 

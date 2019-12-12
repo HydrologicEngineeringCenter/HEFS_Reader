@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Hec.TimeSeries.Ensemble
 {
-  public class CsvEnsembleReader : EnsembleReader
+  public class CsvEnsembleReader 
   {
 
     string path; // path to csv files

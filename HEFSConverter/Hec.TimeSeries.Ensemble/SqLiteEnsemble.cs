@@ -8,50 +8,62 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Reclamation.Core;
+using Reclamation.TimeSeries;
 
 namespace Hec.TimeSeries.Ensemble
 {
   /// <summary>
-  /// Writes HEFS data to SQL tables
+  /// Reads/Writes Ensemble data to SQL tables
   /// each ensemble member is written to a blob
   /// with optional compressions
   /// </summary>
   public class SqLiteEnsemble
   {
-    public static string TableName = "timeseries_blob";
-    public static string DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-    internal static void Write(SQLiteServer server, Watershed watershed, bool compress = false, bool createPiscesDB = false)
+    static SQLiteServer GetServer(string filename)
     {
+      string connectionString = "Data Source=" + filename + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
+      SQLiteServer server = new SQLiteServer(connectionString);
+      server.CloseAllConnections();
+      return server;
+    }
+
+
+
+    static string TableName = "timeseries_blob";
+    static string DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+    public static void Write(string filename, Watershed watershed, bool compress = false, bool createPiscesDB = false)
+    {
+      var server = SqLiteEnsemble.GetServer(filename);
       int index = 0;
       byte[] uncompressed = null;
 
       Reclamation.TimeSeries.TimeSeriesDatabase db;
-      int folderIndex = 1;
+      int locIdx = 1;
+      int WatershedFolderIndex = 1;
       int scIndex = 0;
       Reclamation.TimeSeries.TimeSeriesDatabaseDataSet.SeriesCatalogDataTable sc = null;
 
       if (createPiscesDB)
       {
         db = new Reclamation.TimeSeries.TimeSeriesDatabase(server);
-        sc = db.GetSeriesCatalog();
-        folderIndex = 1;
-        scIndex = sc.NextID();
-        folderIndex = sc.AddFolder(watershed.Name.ToString(), scIndex, scIndex);
-        scIndex++;
+        // limit how much we query.
+        var where = "id = (select max(id) from seriescatalog) or id = parentid";
+        sc = db.GetSeriesCatalog(where);
+        WatershedFolderIndex = sc.AddFolder(watershed.Name); // creates root level folder
+        scIndex = WatershedFolderIndex + 2;
       }
 
       var timeSeriesTable = GetEmptyBlobTable(server);
 
-      //var newRowLock = new object();
-
       foreach (Location loc in watershed.Locations)
       {
-        
-          if (createPiscesDB)
-          {
-            folderIndex = sc.AddFolder(loc.Name.ToString(), scIndex++, folderIndex);
-          }
+
+        if (createPiscesDB)
+        {
+          locIdx = sc.AddFolder(loc.Name, ++scIndex,WatershedFolderIndex);
+        }
         foreach (Forecast f in loc.Forecasts)
         {
           var t = f.IssueDate;
@@ -71,26 +83,11 @@ namespace Hec.TimeSeries.Ensemble
 
           if (createPiscesDB)
           {
-            int folderID = sc.GetOrCreateFolder(watershed.Name, loc.Name, f.IssueDate.ToString("yyyy-MM-dd"));
-            scIndex += 3;// increment enough for folders
-         
-            for (int i = 0; i < f.Ensemble.GetLength(0); i++)
-            {
-              var ps = new Reclamation.TimeSeries.EnsembleSeries(timeseries_start_date, index, i);
-
-              var scrow = sc.NewSeriesCatalogRow();
-              scrow.id = scIndex++;
-              scrow.Provider = "EnsembleSeries";
-              scrow.ConnectionString = ps.ConnectionString;
-              scrow.ParentID = folderID;
-              scrow.siteid = loc.Name;
-              scrow.Name = loc.Name+" member" + (i + 1);
-              scrow.TimeInterval = Reclamation.TimeSeries.TimeInterval.Hourly.ToString();
-              scrow.Units = "cfs";
-              scrow.Parameter = "flow";
-
-              sc.Rows.Add(scrow);
-            }
+            string connectionString = "timeseries_blobs.id=" + index
+        + ";member_length=" + f.Ensemble.GetLength(1)
+        + ";ensemble_member_index={member_index}" 
+        + ";timeseries_start_date=" + timeseries_start_date.ToString("yyyy-MM-dd HH:mm:ss");
+            scIndex = AddPiscesSeries(loc.Name, scIndex, sc, f, locIdx, connectionString);
           }
 
           timeSeriesTable.Rows.Add(row); 
@@ -103,7 +100,33 @@ namespace Hec.TimeSeries.Ensemble
       server.SaveTable(timeSeriesTable);
     }
 
-    
+    private static int AddPiscesSeries(string name, int scIndex, 
+      TimeSeriesDatabaseDataSet.SeriesCatalogDataTable sc, Forecast f, int parentID, string connectionString)
+    {
+      string folderName = f.IssueDate.ToString("yyyy-MM-dd");
+      int folderID =++scIndex;
+      sc.AddFolder(folderName, folderID, parentID);
+
+      int memberCount = f.Ensemble.GetLength(0);
+      for (int i = 0; i < memberCount; i++)
+      {
+        var scrow = sc.NewSeriesCatalogRow();
+        scrow.id = ++scIndex;
+        scrow.Provider = "EnsembleSeries";
+        scrow.ConnectionString = connectionString.Replace("{member_index}",(i+1).ToString());
+        scrow.ParentID = folderID;
+        scrow.siteid = name;
+        scrow.Name = name + " member" + (i + 1);
+        scrow.TimeInterval = Reclamation.TimeSeries.TimeInterval.Hourly.ToString();
+        scrow.Units = "cfs";
+        scrow.Parameter = "flow";
+
+        sc.Rows.Add(scrow);
+      }
+
+      return scIndex;
+    }
+
     static byte[] ConvertToBytes(float[,] ensemble, bool compress, ref byte[] uncompressed)
     {
       int width = ensemble.GetLength(1);
@@ -121,7 +144,7 @@ namespace Hec.TimeSeries.Ensemble
     }
 
 
-    public static byte[] Compress(byte[] bytes)
+     static byte[] Compress(byte[] bytes)
     {
       using (var msi = new MemoryStream(bytes))
       using (var mso = new MemoryStream())

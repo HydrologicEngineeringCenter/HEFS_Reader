@@ -20,7 +20,7 @@ namespace Hec.TimeSeries.Ensemble
 
     public List<Location> Locations { get; set; }
 
-    internal Forecast AddForecast(string locName, DateTime issueDate, float[,] ensemble, DateTime[] timeStamps)
+    public Forecast AddForecast(string locName, DateTime issueDate, float[,] ensemble, DateTime[] timeStamps)
     {
       int idx = Locations.FindIndex(x => x.Name.Equals(locName));
       Location loc = null;
