@@ -4,7 +4,4 @@
     <Platforms>AnyCPU</Platforms>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="Implementations\HEFS_ZIP_Writer.cs" />
-  </ItemGroup>
 </Project>

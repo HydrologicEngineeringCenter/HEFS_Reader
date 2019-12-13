@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29326.143
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HEFS_Reader", "HEFS_Reader\HEFS_Reader.csproj", "{1860E5C4-5058-4D5F-B531-C08F2A3853AB}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HEFSConverter", "HEFSConverter\HEFSConverter.csproj", "{7F88DF79-5DF9-4845-B96A-9755B06EE35F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HEFS_Downloader", "HEFS_Downloader\HEFS_Downloader.csproj", "{53B8C758-A300-4B91-BB7F-460355DAA6E7}"
@@ -23,10 +21,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1860E5C4-5058-4D5F-B531-C08F2A3853AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1860E5C4-5058-4D5F-B531-C08F2A3853AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1860E5C4-5058-4D5F-B531-C08F2A3853AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1860E5C4-5058-4D5F-B531-C08F2A3853AB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7F88DF79-5DF9-4845-B96A-9755B06EE35F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7F88DF79-5DF9-4845-B96A-9755B06EE35F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F88DF79-5DF9-4845-B96A-9755B06EE35F}.Release|Any CPU.ActiveCfg = Release|Any CPU

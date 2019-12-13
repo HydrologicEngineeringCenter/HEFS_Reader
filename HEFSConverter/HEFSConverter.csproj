@@ -28,9 +28,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HEFS_Reader\HEFS_Reader.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="DSSIO">
       <HintPath>..\References\DSSIO.dll</HintPath>
     </Reference>

@@ -1,15 +1,9 @@
-﻿using System;
+﻿using H5Assist;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
 using System.IO;
-using DSSIO;
-using HEFS_Reader.Interfaces;
-using HEFS_Reader.Implementations;
-using HEFS_Reader.Enumerations;
-using H5Assist;
+using System.Linq;
 
 namespace Hec.TimeSeries.Ensemble
 {
@@ -260,7 +254,7 @@ namespace Hec.TimeSeries.Ensemble
       }
     }
 
-    private static void ReadTimed(string filename, TimeSeriesOfEnsembleLocations csvWaterShedData, Func<TimeSeriesOfEnsembleLocations> f)
+    private static void ReadTimed(string filename, Watershed csvWaterShedData, Func<Watershed> f)
     {
       try
       {
@@ -268,7 +262,7 @@ namespace Hec.TimeSeries.Ensemble
         var sw = Stopwatch.StartNew();
         var ensemblesFromDisk = f();
         sw.Stop();
-        LogReadResult(filename, ensemblesFromDisk.Forecasts.Count, sw.Elapsed);
+        LogReadResult(filename,0, sw.Elapsed);
         Compare(filename, csvWaterShedData, ensemblesFromDisk);
       }
       catch (Exception ex)
@@ -278,7 +272,7 @@ namespace Hec.TimeSeries.Ensemble
     }
 
 
-    private static void Compare(string filename, TimeSeriesOfEnsembleLocations baseWaterShedData, TimeSeriesOfEnsembleLocations watershed)
+    private static void Compare(string filename, Watershed baseWaterShedData, Watershed watershed)
     {
       Console.WriteLine();
       Console.Write("checking for any differences..");
@@ -302,7 +296,7 @@ namespace Hec.TimeSeries.Ensemble
       //    LogWarning("Difference found at location " + locations[i].LocationName);
       //}
     }
-    private static void DuplicateCheck(TimeSeriesOfEnsembleLocations baseWaterShedData)
+    private static void DuplicateCheck(Watershed baseWaterShedData)
     {
       //var hs = new Dictionary<string, int>();
       //foreach (var wshed in baseWaterShedData.Forecasts)
