@@ -142,7 +142,7 @@ namespace Hec.TimeSeries.Ensemble
       WriteTimed(fn, tag, () =>
       {
         using (var h5w = new H5Writer(fn))
-          HDF5ReaderWriter.Write(h5w, waterShedData);
+          HDF5Ensemble.Write(h5w, waterShedData);
       });
 
 
