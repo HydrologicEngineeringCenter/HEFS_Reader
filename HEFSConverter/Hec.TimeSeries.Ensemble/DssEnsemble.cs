@@ -196,8 +196,15 @@ namespace Hec.TimeSeries.Ensemble
       string sday = Fpart.Substring(0, 3);
       int day = Convert.ToInt32(sday);
       issueDate = new DateTime(year, 1, 1).AddDays(day - 1).AddHours(12);
+    }
 
 
+    public static Watershed ReadTimeSeriesProfiles(string dssFileName, string watershedName)
+    {
+      Watershed rval = new Watershed(watershedName);
+
+
+      return rval;
     }
 
   }

@@ -31,7 +31,7 @@ namespace Hec.TimeSeries.Ensemble
 
 
     static string TableName = "timeseries_blob";
-    static string DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+    //static string DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
     public static void Write(string filename, Watershed watershed, bool compress = false, bool createPiscesDB = false)
     {
@@ -43,13 +43,15 @@ namespace Hec.TimeSeries.Ensemble
       int locIdx = 1;
       int WatershedFolderIndex = 1;
       int scIndex = 0;
+      int rowCounter = 0;
       Reclamation.TimeSeries.TimeSeriesDatabaseDataSet.SeriesCatalogDataTable sc = null;
 
       if (createPiscesDB)
       {
         db = new Reclamation.TimeSeries.TimeSeriesDatabase(server);
         // limit how much we query.
-        var where = "id = (select max(id) from seriescatalog) or id = parentid";
+        //var where = "id = (select max(id) from seriescatalog) or id = parentid";
+        var where = "id = (select max(id) from seriescatalog)";
         sc = db.GetSeriesCatalog(where);
         WatershedFolderIndex = sc.AddFolder(watershed.Name); // creates root level folder
         scIndex = WatershedFolderIndex + 2;
@@ -90,7 +92,14 @@ namespace Hec.TimeSeries.Ensemble
             scIndex = AddPiscesSeries(loc.Name, scIndex, sc, f, locIdx, connectionString);
           }
 
-          timeSeriesTable.Rows.Add(row); 
+          timeSeriesTable.Rows.Add(row);
+          rowCounter++;
+          if( rowCounter %1000 == 0)
+          {
+            server.SaveTable(timeSeriesTable);
+            timeSeriesTable.Rows.Clear();
+            timeSeriesTable.AcceptChanges();
+          }
         }
         
       }
@@ -172,7 +181,6 @@ namespace Hec.TimeSeries.Ensemble
     }
 
 
-
     /// <summary>
     /// Returns and empty timeseries_hourly table for storing blobs
     /// </summary>
@@ -198,9 +206,5 @@ namespace Hec.TimeSeries.Ensemble
       server.RunSqlCommand("DELETE from " + TableName);
       return server.Table(TableName, "select * from " + TableName + " where 1=0");
     }
-
-
-
-
   }
 }
