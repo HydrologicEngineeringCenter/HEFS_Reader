@@ -29,16 +29,14 @@ namespace EnsembleUnitTests
     {
       string fileName = Path.Combine(EnsembleTester.CacheDir, "test.csv");
       RfcCsvFile csv = new RfcCsvFile(fileName);
-
-      float[,] data = csv.GetEnsemble("SCRN2");
-      int member = 0;
-      Assert.AreEqual(-1.0f, data[member, 0]);
-      Assert.AreEqual(-2.1f, data[member, 1]);
-      Assert.AreEqual(-3.1f, data[member, 2]);
-      member = 58;
-      Assert.AreEqual(-59.0f, data[member, 0]);
-      Assert.AreEqual(-59.1f, data[member, 1]);
-      Assert.AreEqual(-59.2f, data[member, 2]);
+      float[,] data = null;
+       csv.GetEnsemble("SCRN2",ref data);
+      Assert.AreEqual(-1.0f, data[0, 0]);
+      Assert.AreEqual(-2.1f, data[0, 1]);
+      Assert.AreEqual(-3.1f, data[0, 2]);
+      Assert.AreEqual(-59.0f, data[58, 0]);
+      Assert.AreEqual(-59.1f, data[58, 1]);
+      Assert.AreEqual(-59.2f, data[58, 2]);
 
 
     }

@@ -29,6 +29,8 @@ namespace Hec.TimeSeries.Ensemble
 
     public float[,] Ensemble { get; set; }
 
+   
+
     public float[] EnsembleMember(int index)
     {
       float[] rval = null;
