@@ -35,8 +35,30 @@ namespace Hec.TimeSeries.Ensemble
 
     public static void Write(string filename, Watershed watershed, bool compress = false, bool createPiscesDB = false)
     {
+      using (SqLiteEnsembleWriter server = new SqLiteEnsembleWriter(filename))
+      {
+        int index = server.MaxID();
+        
+        byte[] uncompressed = null;
+
+        Reclamation.TimeSeries.TimeSeriesDatabase db;
+
+        foreach (Location loc in watershed.Locations)
+        {
+          foreach (Forecast f in loc.Forecasts)
+          {
+            index++;
+            server.InsertEnsemble(index, f.IssueDate, watershed.Name, loc.Name, f.TimeStamps[0],
+              f.Ensemble.GetLength(1), f.Ensemble.GetLength(0), compress, ConvertToBytes(f.Ensemble, compress, ref uncompressed));
+          }
+
+        }
+      }
+    }
+
+    public static void WriteWithDataTable(string filename, Watershed watershed, bool compress = false, bool createPiscesDB = false)
+    {
       var server = SqLiteEnsemble.GetServer(filename);
-      int index = 0;
       byte[] uncompressed = null;
 
       Reclamation.TimeSeries.TimeSeriesDatabase db;
@@ -45,6 +67,7 @@ namespace Hec.TimeSeries.Ensemble
       int scIndex = 0;
       int rowCounter = 0;
       Reclamation.TimeSeries.TimeSeriesDatabaseDataSet.SeriesCatalogDataTable sc = null;
+      
 
       if (createPiscesDB)
       {
@@ -56,15 +79,19 @@ namespace Hec.TimeSeries.Ensemble
         WatershedFolderIndex = sc.AddFolder(watershed.Name); // creates root level folder
         scIndex = WatershedFolderIndex + 2;
       }
+      else
+      {
 
-      var timeSeriesTable = GetEmptyBlobTable(server);
+      }
 
+      var timeSeriesTable = GetBlobTable(server);
+      int index = server.NextID("timeseries_blob", "id");
       foreach (Location loc in watershed.Locations)
       {
 
         if (createPiscesDB)
         {
-          locIdx = sc.AddFolder(loc.Name, ++scIndex,WatershedFolderIndex);
+          locIdx = sc.AddFolder(loc.Name, ++scIndex, WatershedFolderIndex);
         }
         foreach (Forecast f in loc.Forecasts)
         {
@@ -87,21 +114,21 @@ namespace Hec.TimeSeries.Ensemble
           {
             string connectionString = "timeseries_blobs.id=" + index
         + ";member_length=" + f.Ensemble.GetLength(1)
-        + ";ensemble_member_index={member_index}" 
+        + ";ensemble_member_index={member_index}"
         + ";timeseries_start_date=" + timeseries_start_date.ToString("yyyy-MM-dd HH:mm:ss");
             scIndex = AddPiscesSeries(loc.Name, scIndex, sc, f, locIdx, connectionString);
           }
 
           timeSeriesTable.Rows.Add(row);
           rowCounter++;
-          if( rowCounter %1000 == 0)
+          if (rowCounter % 1000 == 0)
           {
             server.SaveTable(timeSeriesTable);
             timeSeriesTable.Rows.Clear();
             timeSeriesTable.AcceptChanges();
           }
         }
-        
+
       }
       if (createPiscesDB)
         server.SaveTable(sc);
@@ -186,25 +213,15 @@ namespace Hec.TimeSeries.Ensemble
     /// </summary>
     /// <param name="server"></param>
     /// <returns></returns>
-    static DataTable GetEmptyBlobTable(Reclamation.Core.BasicDBServer server)
+    static DataTable GetBlobTable(Reclamation.Core.BasicDBServer server)
     {
-      if (!server.TableExists(TableName))
-      {
-        string sql = "CREATE TABLE " + TableName
-        + " ( id integer not null primary key,"
-        + "    issue_date datetime, "
-        + "   watershed NVARCHAR(100) ,"
-        + "   location_name NVARCHAR(100) ,"
-        + "   timeseries_start_date datetime ,"
-        + "   member_length integer    ,"
-        + "   member_count integer    ,"
-        + "   compressed integer    ,"
-        + "  byte_value_array BLOB NULL )";
-        server.RunSqlCommand(sql);
-      }
+      string sql = SqLiteEnsembleWriter.GetCreateTableSQL(TableName);
+      server.RunSqlCommand(sql);
 
-      server.RunSqlCommand("DELETE from " + TableName);
+      //server.RunSqlCommand("DELETE from " + TableName);
       return server.Table(TableName, "select * from " + TableName + " where 1=0");
     }
+
+  
   }
 }
