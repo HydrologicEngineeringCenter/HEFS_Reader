@@ -19,7 +19,7 @@ namespace Hec.TimeSeries.Ensemble
   /// </summary>
   public class SqLiteEnsemble
   {
-
+    public static string DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
     static SQLiteServer GetServer(string filename)
     {
       string connectionString = "Data Source=" + filename + ";Synchronous=Off;Pooling=True;Journal Mode=Off";
@@ -179,8 +179,101 @@ namespace Hec.TimeSeries.Ensemble
       return compressed;
     }
 
+    public static Watershed Read(string watershedName, DateTime startTime, DateTime endTime,string fileName)
+    {
+      SQLiteServer server = GetServer(fileName);
+      var rval = new Watershed(watershedName);
 
-     static byte[] Compress(byte[] bytes)
+        var sql = "select * from " + TableName +
+          " WHERE issue_date >= '" + startTime.ToString(DateTimeFormat) + "' "
+          + " AND issue_date <= '" + endTime.ToString(DateTimeFormat) + "' "
+          + " AND watershed = '" + watershedName + "' ";
+        sql += " order by watershed,issue_date,location_name";
+
+        var table = server.Table(TableName, sql);
+        if (table.Rows.Count == 0)
+        {
+          throw new Exception("no data");
+        }
+        DateTime prevIssueDate = Convert.ToDateTime(table.Rows[0]["issue_date"]);
+        DateTime currentDate = Convert.ToDateTime(table.Rows[0]["issue_date"]);
+      float[,] values = null;
+        foreach (DataRow row in table.Rows)
+        {
+          currentDate = Convert.ToDateTime(row["issue_date"]);
+
+          var times = GetTimes(row);
+          GetValues(row,ref values);
+
+        rval.AddForecast(row["location_name"].ToString(),
+                                             currentDate,
+                                             values,
+                                             times);
+
+        }
+      return rval;
+      }
+      private static DateTime[] GetTimes(DataRow row)
+      {
+        DateTime t = Convert.ToDateTime(row["timeseries_start_date"]);
+        int count = Convert.ToInt32(row["member_length"]);
+        var rval = new DateTime[count];
+        for (int i = 0; i < count; i++)
+        {
+          rval[i] = t;
+          t = t.AddHours(1); // hardcode hourly
+        }
+        return rval;
+      }
+
+      //https://stackoverflow.com/questions/7013771/decompress-byte-array-to-string-via-binaryreader-yields-empty-string
+      static byte[] Decompress(byte[] data)
+      {
+        using (var compressedStream = new MemoryStream(data))
+        using (var zipStream = new GZipStream(compressedStream, CompressionMode.Decompress))
+        using (var resultStream = new MemoryStream())
+        {
+          zipStream.CopyTo(resultStream);
+          return resultStream.ToArray();
+        }
+      }
+
+      private static void GetValues(DataRow row, ref float[,] data)
+      {
+        int compressed = Convert.ToInt32(row["compressed"]);
+        var rval = new List<List<float>>();
+        int member_count = Convert.ToInt32(row["member_count"]);
+        int member_length = Convert.ToInt32(row["member_length"]);
+
+        byte[] byte_values = (byte[])row["byte_value_array"];
+
+        if (compressed != 0)
+        {
+          byte_values = Decompress(byte_values);
+        }
+
+      if (data == null || data.GetLength(0) != member_count || data.GetLength(1) != member_length)
+         data = new float[member_count, member_length];
+
+        var numBytesPerMember = byte_values.Length / member_count;
+
+      Buffer.BlockCopy(byte_values, 0, data, 0, data.Length * sizeof(float));
+
+        //for (int i = 0; i < member_count; i++)
+        //{
+        //  var floatValues = new float[member_length];
+        //  Buffer.BlockCopy(byte_values, i * numBytesPerMember, floatValues, 0, numBytesPerMember);
+        //  var values = new List<float>();
+        //  values.AddRange(floatValues);
+        //  rval.Add(values);
+        //}
+
+       // return rval;
+      }
+
+    
+
+    static byte[] Compress(byte[] bytes)
     {
       using (var msi = new MemoryStream(bytes))
       using (var mso = new MemoryStream())

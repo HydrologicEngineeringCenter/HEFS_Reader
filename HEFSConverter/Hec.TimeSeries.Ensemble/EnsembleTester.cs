@@ -175,38 +175,35 @@ namespace Hec.TimeSeries.Ensemble
       fn = "ensemble_V7_profiles_" + tag + ".dss";
       ReadTimed(fn,  () =>
       {
-        return null;
-        //return DssEnsemble.ReadProfile()
-        //return reader.ReadDatasetFromProfiles(Watersheds.RussianNapa, startTime, endTime, fn);
+        return DssEnsemble.ReadTimeSeriesProfiles(watershedName, startTime, endTime, fn);
       });
 
-      //// SQLITE
-      //fn = "ensemble_sqlite_blob_" + ensembleCount + ".db";
-      //ReadTimed(fn, csvWaterShedData, () =>
-      //{
-      //  var reader = new SqlBlobEnsembleReader();
-      //  return reader.ReadDataset(Watersheds.RussianNapa, startTime, endTime, fn);
-      //});
+      // SQLITE
+      fn = "ensemble_sqlite_blob_" + tag + ".db";
+      ReadTimed(fn, () =>
+      {
+        return SqLiteEnsemble.Read(watershedName, startTime, endTime,fn);
+      });
 
-      //// Serial HDF5
-      //fn = "ensemble_serial_1RowPerChunk.h5";
-      //ReadTimed(fn, csvWaterShedData, () =>
-      //{
-      //  using (var hr = new H5Reader(fn))
-      //    return HDF5ReaderWriter.Read(hr);
-      //});
+      // Serial HDF5
+      fn = "ensemble_serial_1RowPerChunk.h5";
+      ReadTimed(fn, () =>
+      {
+        using (var hr = new H5Reader(fn))
+          return HDF5Ensemble.Read(hr,watershedName);
+      });
 
 
-      //// Parallel HDF5
-      //foreach (int c in new[] { 1, 10, -1 })
-      //{
-      //  fn = "ensemble_parallel_" + c.ToString() + "RowsPerChunk.h5";
-      //  ReadTimed(fn, csvWaterShedData, () =>
-      //  {
-      //    using (var hr = new H5Reader(fn))
-      //      return HDF5ReaderWriter.Read(hr);
-      //  });
-      //}
+      // Parallel HDF5
+      foreach (int c in new[] { 1, 10, -1 })
+      {
+        fn = "ensemble_parallel_" + c.ToString() + "RowsPerChunk.h5";
+        ReadTimed(fn,() =>
+        {
+          using (var hr = new H5Reader(fn))
+            return HDF5Ensemble.Read(hr,watershedName);
+        });
+      }
 
     }
 
@@ -216,7 +213,8 @@ namespace Hec.TimeSeries.Ensemble
     {
       try
       {
-        //File.Delete(filename);
+
+        Console.WriteLine("Saving to " + filename);
 
         // Record the amount of time from start->end, including flushing to disk.
         var sw = Stopwatch.StartNew();

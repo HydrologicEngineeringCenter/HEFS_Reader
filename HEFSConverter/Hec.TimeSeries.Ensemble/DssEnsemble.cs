@@ -16,7 +16,6 @@ namespace Hec.TimeSeries.Ensemble
     {
       bool saveAsFloat = true;
       float[] ensembleMember = null;
-      Console.WriteLine("Saving to " + dssFileName);
       int count = 0;
       using (var w = new DSSWriter(dssFileName, DSSReader.MethodID.MESS_METHOD_GLOBAL_ID, DSSReader.LevelID.MESS_LEVEL_CRITICAL))
       {
@@ -70,7 +69,6 @@ namespace Hec.TimeSeries.Ensemble
     {
       bool saveAsFloat = true;
 
-      Console.WriteLine("Saving to " + dssFileName);
       int count = 0;
       double[,] ensemble = null;
       using (var w = new DSSWriter(dssFileName, DSSReader.MethodID.MESS_METHOD_GLOBAL_ID, DSSReader.LevelID.MESS_LEVEL_NONE))
