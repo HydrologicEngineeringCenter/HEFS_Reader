@@ -128,7 +128,7 @@ namespace Hec.TimeSeries.Ensemble
       if (delete) File.Delete(fn);
       WriteTimed(fn, tag, () =>
       {
-        SqLiteEnsemble.Write(fn, waterShedData, compress,true);
+        SqLiteEnsemble.WriteWithDataTable(fn, waterShedData, compress,true);
       });
 
 
@@ -183,6 +183,13 @@ namespace Hec.TimeSeries.Ensemble
       ReadTimed(fn, () =>
       {
         return SqLiteEnsemble.Read(watershedName, startTime, endTime,fn);
+      });
+
+      // Pisces
+      fn = "ensemble_pisces_" + tag + ".pdb";
+      ReadTimed(fn, () =>
+      {
+        return SqLiteEnsemble.Read(watershedName, startTime, endTime, fn);
       });
 
       // Serial HDF5
