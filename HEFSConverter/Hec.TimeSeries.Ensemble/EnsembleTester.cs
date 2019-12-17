@@ -10,7 +10,7 @@ namespace Hec.TimeSeries.Ensemble
   public class EnsembleTester
   {
     // So I can test this reliably at work....
-    const bool SPEEDRUN = false;
+    const bool SPEEDRUN = true;
     const bool SkipDSS = true;
     public static string CacheDir = @"C:\Temp\hefs_cache";
     static string logFile = "Ensemble_testing.log";

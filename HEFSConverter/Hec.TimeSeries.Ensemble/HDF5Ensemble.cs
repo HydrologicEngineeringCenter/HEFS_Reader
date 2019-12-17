@@ -88,7 +88,9 @@ namespace Hec.TimeSeries.Ensemble
       {
         string locationPath = Path(root, loc.Name);
 
-        Parallel.ForEach(loc.Forecasts, f =>
+        var dbg = new ParallelOptions();
+        dbg.MaxDegreeOfParallelism = 1;
+        Parallel.ForEach(loc.Forecasts, dbg, f =>
         {
           string forecastPath = Path(locationPath,
             f.IssueDate.Year.ToString() + "_" + f.IssueDate.DayOfYear.ToString());
@@ -156,7 +158,7 @@ namespace Hec.TimeSeries.Ensemble
             {
               // Copy into our chunkbuffer
               int ensembleOffset = rowIndex * nColumns * sizeof(float);
-              Buffer.BlockCopy(f.Ensemble, 0, buf, relativeRow * nColumns * sizeof(float), nColumns * sizeof(float));
+              Buffer.BlockCopy(f.Ensemble, ensembleOffset, buf, relativeRow * nColumns * sizeof(float), nColumns * sizeof(float));
 
               relativeRow++;
 
