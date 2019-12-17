@@ -9,12 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HEFS_Downloader", "HEFS_Dow
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnsembleUnitTests", "EnsembleUnitTests\EnsembleUnitTests.csproj", "{FDC1C6B1-3910-47FD-A9C7-E31F911B03AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pipe-cutter", "pipe-cutter\pipe-cutter.csproj", "{9A52A8E3-2EAD-452A-A773-73C3F03E2039}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reclamation.Core", "..\Pisces\Core\Reclamation.Core.csproj", "{80C73D4C-43CF-42DE-ADDC-7B0F06ECF086}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reclamation.TimeSeries", "..\Pisces\TimeSeries\Reclamation.TimeSeries.csproj", "{5DD20A8A-4037-4885-AB91-2F5A3D1F48B4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,18 +27,6 @@ Global
 		{FDC1C6B1-3910-47FD-A9C7-E31F911B03AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDC1C6B1-3910-47FD-A9C7-E31F911B03AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDC1C6B1-3910-47FD-A9C7-E31F911B03AA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9A52A8E3-2EAD-452A-A773-73C3F03E2039}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9A52A8E3-2EAD-452A-A773-73C3F03E2039}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9A52A8E3-2EAD-452A-A773-73C3F03E2039}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9A52A8E3-2EAD-452A-A773-73C3F03E2039}.Release|Any CPU.Build.0 = Release|Any CPU
-		{80C73D4C-43CF-42DE-ADDC-7B0F06ECF086}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80C73D4C-43CF-42DE-ADDC-7B0F06ECF086}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80C73D4C-43CF-42DE-ADDC-7B0F06ECF086}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{80C73D4C-43CF-42DE-ADDC-7B0F06ECF086}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{5DD20A8A-4037-4885-AB91-2F5A3D1F48B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5DD20A8A-4037-4885-AB91-2F5A3D1F48B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5DD20A8A-4037-4885-AB91-2F5A3D1F48B4}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{5DD20A8A-4037-4885-AB91-2F5A3D1F48B4}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
