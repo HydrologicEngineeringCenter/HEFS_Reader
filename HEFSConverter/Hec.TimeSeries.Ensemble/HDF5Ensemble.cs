@@ -10,12 +10,10 @@ namespace Hec.TimeSeries.Ensemble
 {
   public static class HDF5Ensemble
   {
-    public static string Path(params string[] items)
-    {
-      return String.Join(H5Reader.PathSeparator, items);
-    }
+    public static string Path(params string[] items) => string.Join(H5Reader.PathSeparator, items);
     public static void Write(H5Writer h5w, Watershed watershed)
     {
+      // Previous impl
       int chunkSize = 1;
       string root = Path(H5Reader.Root, "Watersheds", watershed.Name);
 
@@ -74,8 +72,12 @@ namespace Hec.TimeSeries.Ensemble
       }
     }
 
+    public static void WriteSerial(H5Writer h5w, Watershed watershed, int chunkSize)
+    {
+      WriteParallel(h5w, watershed, chunkSize, 1);
+    }
 
-    public static void WriteParallel(H5Writer h5w, Watershed watershed, int desiredChunkSize)
+    public static void WriteParallel(H5Writer h5w, Watershed watershed, int desiredChunkSize, int parallelLimit = 0)
     {
       string root = Path(H5Reader.Root, "Watersheds", watershed.Name);
 
@@ -84,13 +86,14 @@ namespace Hec.TimeSeries.Ensemble
 
       object grpLock = new object();
 
+      var po = new ParallelOptions();
+      if (parallelLimit > 0)
+        po.MaxDegreeOfParallelism = parallelLimit;
+      
       foreach (Location loc in watershed.Locations)
       {
         string locationPath = Path(root, loc.Name);
-
-        var dbg = new ParallelOptions();
-        dbg.MaxDegreeOfParallelism = 1;
-        Parallel.ForEach(loc.Forecasts, dbg, f =>
+        Parallel.ForEach(loc.Forecasts, po, f =>
         {
           string forecastPath = Path(locationPath,
             f.IssueDate.Year.ToString() + "_" + f.IssueDate.DayOfYear.ToString());
@@ -216,6 +219,42 @@ namespace Hec.TimeSeries.Ensemble
 
           h5r.ReadDataset(Path(forecastPath, "Times"), ref dtTicks);
           h5r.ReadDataset(Path(forecastPath, "Values"), ref data);
+          var _times = dtTicks.Select(t => new DateTime(t)).ToArray();
+          retn.AddForecast(loc, issueDate, data, _times);
+        }
+      }
+
+      return retn;
+    }
+
+    /// <summary>
+    /// Read the same row (RussianNapa has 59) out of EVERY single location/forecast/ensemble
+    /// </summary>
+    public static Watershed ReadRow(H5Reader h5r, string watershedName, int rowIndex)
+    {
+      string root = Path(H5Reader.Root, "Watersheds", watershedName);
+      long[] dtTicks = null;
+      float[,] data = null;
+
+      Watershed retn = new Watershed(watershedName);
+
+      var locationNames = h5r.GetGroupNames(root);
+      foreach (var loc in locationNames)
+      {
+        var forecastNames = h5r.GetGroupNames(Path(root, loc));
+
+        foreach (var forecastDate in forecastNames)
+        {
+          //Watersheds/EastSierra/BCAC1/2013_307
+          string forecastPath = Path(root, loc, forecastDate);
+          if (!TryParseIssueDate(forecastDate, out DateTime issueDate))
+          {
+            Console.WriteLine("ERROR IN HDF5 PATH: " + forecastPath);
+            continue;
+          }
+
+          h5r.ReadDataset(Path(forecastPath, "Times"), ref dtTicks);
+          h5r.ReadRow(Path(forecastPath, "Values"), rowIndex, ref data);
           var _times = dtTicks.Select(t => new DateTime(t)).ToArray();
           retn.AddForecast(loc, issueDate, data, _times);
         }

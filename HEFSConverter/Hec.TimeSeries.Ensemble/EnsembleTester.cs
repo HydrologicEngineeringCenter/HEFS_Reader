@@ -10,8 +10,9 @@ namespace Hec.TimeSeries.Ensemble
   public class EnsembleTester
   {
     // So I can test this reliably at work....
-    const bool SPEEDRUN = true;
+    const bool SPEEDRUN = false;
     const bool SkipDSS = true;
+
     public static string CacheDir = @"C:\Temp\hefs_cache";
     static string logFile = "Ensemble_testing.log";
     static string tag = "round3";
@@ -63,7 +64,8 @@ namespace Hec.TimeSeries.Ensemble
         bool delete = count == 0;
         Console.WriteLine("Writing Watershed: " + w.Name);
         WriteAllFormats(w, delete);
-        count++;      }
+        count++;      
+      }
 
       foreach (var w in baseWaterShedData)
       {
@@ -71,6 +73,14 @@ namespace Hec.TimeSeries.Ensemble
           continue;
         
         ReadAllFormats(w.Name);
+      }
+
+      foreach (var w in baseWaterShedData)
+      {
+        if (w.Locations.Count == 0)
+          continue;
+
+        ReadOneRowAllFormats(w.Name);
       }
 
       Console.WriteLine("Test complete, log-file written to " + logFile);
@@ -143,17 +153,20 @@ namespace Hec.TimeSeries.Ensemble
       });
 
 
-      // Serial HDF5
-      fn = "ensemble_serial_1RowPerChunk.h5";
-      if (delete) File.Delete(fn);
-      WriteTimed(fn, tag, () =>
+      // Serial HDF5 - inverting to do things in serial (for a 1:1 comparison) and have a single parallel test case
+      foreach (int c in new[] { 1, 10, -1 })
       {
-        using (var h5w = new H5Writer(fn))
-          HDF5Ensemble.Write(h5w, waterShedData);
-      });
+        fn = "ensemble_serial_" + c.ToString() + "RowsPerChunk.h5";
+        if (delete) File.Delete(fn);
+        WriteTimed(fn, tag, () =>
+        {
+          using (var h5w = new H5Writer(fn))
+            HDF5Ensemble.WriteSerial(h5w, waterShedData, c);
+        });
+      }
 
       // Parallel HDF5
-      foreach (int c in new[] { 1, 10, -1 })
+      foreach (int c in new[] { -1 })
       {
         fn = "ensemble_parallel_" + c.ToString() + "RowsPerChunk.h5";
         if (delete) File.Delete(fn);
@@ -208,26 +221,56 @@ namespace Hec.TimeSeries.Ensemble
       });
 
       // Serial HDF5
-      fn = "ensemble_serial_1RowPerChunk.h5";
-      ReadTimed(fn, () =>
-      {
-        using (var hr = new H5Reader(fn))
-          return HDF5Ensemble.Read(hr, watershedName);
-      });
-
-
-      // Parallel HDF5
       foreach (int c in new[] { 1, 10, -1 })
       {
-        fn = "ensemble_parallel_" + c.ToString() + "RowsPerChunk.h5";
+        fn = "ensemble_serial_" + c.ToString() + "RowsPerChunk.h5";
         ReadTimed(fn, () =>
-         {
-           using (var hr = new H5Reader(fn))
-             return HDF5Ensemble.Read(hr, watershedName);
-         });
+        {
+          using (var hr = new H5Reader(fn))
+            return HDF5Ensemble.Read(hr, watershedName);
+        });
+      }
+    }
+
+    /// <summary>
+    /// Read the first row from each ensemble - testing psuedo random access
+    /// </summary>
+    private static void ReadOneRowAllFormats(string watershedName)
+    {
+      //TODO - compare validateWatershed data with computed
+
+      File.AppendAllText(logFile, NL);
+      File.AppendAllText(logFile, "---------- Reading  Ensembles ONE ROW AT A TIME ----------" + NL);
+      string fn;
+
+      // TimeSeriesOfEnsembleLocations wshedData=null;
+      DateTime startTime = DateTime.MinValue;
+      DateTime endTime = DateTime.MaxValue;
+
+      if (!SkipDSS)
+      {
+        // DSS
+        fn = "ensemble_V7_" + tag + ".dss";
+        // TODO
+
+        fn = "ensemble_V7_profiles_" + tag + ".dss";
+        // TODO
       }
 
+      Log("SQLITE Skipped" + Environment.NewLine);
+
+      // HDF5
+      foreach (int c in new[] { 1, 10, -1 })
+      {
+        fn = "ensemble_serial_" + c.ToString() + "RowsPerChunk.h5";
+        ReadTimed(fn, () =>
+        {
+          using (var hr = new H5Reader(fn))
+            return HDF5Ensemble.ReadRow(hr, watershedName, 0);
+        });
+      }
     }
+
 
 
     // Writer helpers
