@@ -1,4 +1,4 @@
-﻿using DSSIO;
+﻿using Hec.Dss;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,7 +17,7 @@ namespace Hec.TimeSeries.Ensemble
       bool saveAsFloat = true;
       float[] ensembleMember = null;
       int count = 0;
-      using (var w = new DSSWriter(dssFileName, DSSReader.MethodID.MESS_METHOD_GLOBAL_ID, DSSReader.LevelID.MESS_LEVEL_CRITICAL))
+      using (var w = new DssWriter(dssFileName, DssReader.MethodID.MESS_METHOD_GLOBAL_ID, DssReader.LevelID.MESS_LEVEL_CRITICAL))
       {
         foreach (Location loc in watershed.Locations)
         {
@@ -41,12 +41,12 @@ namespace Hec.TimeSeries.Ensemble
                     t.DayOfYear.ToString().PadLeft(3, '0') + t.Year.ToString();
 
               var path = "/" + watershed.Name.ToString() + "/" + loc.Name + "/Flow//1Hour/" + F + "/";
-              DSSTimeSeries timeseries = new DSSTimeSeries
+              Hec.Dss.TimeSeries timeseries = new Hec.Dss.TimeSeries
               {
                 Values = Array.ConvertAll(ensembleMember, item => (double)item),
                 Units = "",
                 DataType = "INST-VAL",
-                Path = path,
+                Path = new DssPath(path),
                 StartDateTime = f.TimeStamps[0]
               };
               w.Write(timeseries, saveAsFloat);
@@ -71,7 +71,7 @@ namespace Hec.TimeSeries.Ensemble
 
       int count = 0;
       double[,] ensemble = null;
-      using (var w = new DSSWriter(dssFileName, DSSReader.MethodID.MESS_METHOD_GLOBAL_ID, DSSReader.LevelID.MESS_LEVEL_NONE))
+      using (var w = new DssWriter(dssFileName, DssReader.MethodID.MESS_METHOD_GLOBAL_ID, DssReader.LevelID.MESS_LEVEL_NONE))
       {
         foreach (Location loc in watershed.Locations)
         {
@@ -91,8 +91,10 @@ namespace Hec.TimeSeries.Ensemble
 
             ts.ColumnValues = Array.ConvertAll(Enumerable.Range(1, ensemble.GetLength(1)).ToArray(), x => (double)x);
             ts.DataType = "INST-VAL";
-            ts.Path = path;
+            ts.Path = new DssPath(path);
             ts.Values = ensemble;
+            ts.ColumnUnits = "cfs";
+
 
             w.Write(ts, saveAsFloat);
             count++;
@@ -104,12 +106,12 @@ namespace Hec.TimeSeries.Ensemble
     public static Watershed Read(string watershedName, DateTime start, DateTime end, string dssPath)
     {
       Watershed rval = new Watershed(watershedName);
-      DSSReader.UseTrainingWheels = false;
+     // DssReader.UseTrainingWheels = false;
 
-      using (DSSReader dss = new DSSReader(dssPath, DSSReader.MethodID.MESS_METHOD_GENERAL_ID, DSSReader.LevelID.MESS_LEVEL_NONE))
+      using (DssReader dss = new DssReader(dssPath, DssReader.MethodID.MESS_METHOD_GENERAL_ID, DssReader.LevelID.MESS_LEVEL_NONE))
       {
         Console.WriteLine("Reading " + dssPath);
-        DSSPathCollection dssPaths = dss.GetCatalog(); // sorted
+        DssPathCollection dssPaths = dss.GetCatalog(); // sorted
         int size = dssPaths.Count;
         if (size == 0)
         {
@@ -118,13 +120,13 @@ namespace Hec.TimeSeries.Ensemble
 
         // /RUSSIANNAPA/APCC1/FLOW/01SEP2019/1HOUR/C:000002|T:0212019/
 
-        var seriesList = new List<DSSTimeSeries>();
+        var seriesList = new List<Hec.Dss.TimeSeries>();
         for (int i = 0; i < size; i++)
         {
           if (i % 100 == 0)
             Console.Write(".");
 
-          DSSPath path = dssPaths[i];
+          DssPath path = dssPaths[i];
           string location = path.Bpart;
           float[,] ensemble = null;
           ParseFPart(path.Fpart, out int memberidx, out DateTime issueDate);
@@ -150,7 +152,7 @@ namespace Hec.TimeSeries.Ensemble
       return rval;
     }
 
-    private static float[,] ConvertListToEnsembleArray(List<DSSTimeSeries> seriesList, ref float[,] data)
+    private static float[,] ConvertListToEnsembleArray(List<Hec.Dss.TimeSeries> seriesList, ref float[,] data)
     {
       int width = seriesList[0].Values.Length;
       int height = seriesList.Count;
@@ -169,7 +171,7 @@ namespace Hec.TimeSeries.Ensemble
       return data;
     }
 
-    private static bool NextForecast(List<DSSTimeSeries> seriesList, DSSTimeSeries ts)
+    private static bool NextForecast(List<Hec.Dss.TimeSeries> seriesList, Hec.Dss.TimeSeries ts)
     {
       return seriesList.Count > 0 && seriesList[0].StartDateTime != ts.StartDateTime;
     }
@@ -200,10 +202,10 @@ namespace Hec.TimeSeries.Ensemble
       Watershed rval = new Watershed(watershedName);
       float[,] profile = null;
 
-      using (DSSReader dss = new DSSReader(dssFileName, DSSReader.MethodID.MESS_METHOD_GENERAL_ID, DSSReader.LevelID.MESS_LEVEL_NONE))
+      using (DssReader dss = new DssReader(dssFileName, DssReader.MethodID.MESS_METHOD_GENERAL_ID, DssReader.LevelID.MESS_LEVEL_NONE))
       {
         Console.WriteLine("Reading" + dssFileName);
-        DSSPathCollection dssPaths = dss.GetCatalog(); // sorted
+        DssPathCollection dssPaths = dss.GetCatalog(); // sorted
                                                        // var dssPaths = rawDssPaths.OrderBy(a => a, new PathComparer()).ToArray(); // sorted
         int size = dssPaths.Count();
         if (size == 0)
@@ -216,7 +218,7 @@ namespace Hec.TimeSeries.Ensemble
           if (i % 100 == 0)
             Console.Write(".");
 
-          DSSPath path = dssPaths[i];
+          DssPath path = dssPaths[i];
           DateTime issueDate = ParseIssueDate(path.Fpart);
 
           if (issueDate >= start && issueDate <= end

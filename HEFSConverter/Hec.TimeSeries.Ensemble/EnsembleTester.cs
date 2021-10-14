@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Hec.Dss;
 
 namespace Hec.TimeSeries.Ensemble
 {
@@ -35,7 +36,7 @@ namespace Hec.TimeSeries.Ensemble
       if (SPEEDRUN)
         EndTime = StartTime.AddDays(365);
 
-      DSSIO.DSSReader.UseTrainingWheels = false;
+      //DssReader.UseTrainingWheels = false;
 
       Log(NL + NL + "------" + DateTime.Now.ToString() + "-------" + NL + NL);
       Log("Filename".PadRight(FileNameColSize) + Separator +

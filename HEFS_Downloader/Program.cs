@@ -19,8 +19,8 @@ namespace HEFS_Downloader
 
       System.IO.Directory.CreateDirectory(cacheDir);
       var watershedNames = new string[] { "RussianNapa", "EastSierra", "FeatherYuba" };
-      DateTime t1 = new DateTime(2013, 11, 1, 12, 0, 0);
-      DateTime t2 = new DateTime(2019, 11, 18, 12, 0,0);
+      DateTime t1 = new DateTime(2021, 10, 1, 12, 0, 0);
+      DateTime t2 = endTime;
 
       var t = t1;
       while (t <= t2)

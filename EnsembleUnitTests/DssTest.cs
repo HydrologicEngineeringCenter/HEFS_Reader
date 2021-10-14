@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Hec.TimeSeries.Ensemble;
 using System.IO;
-using DSSIO;
+using Hec.Dss;
 using System.Linq;
 
 namespace EnsembleUnitTests
@@ -60,12 +60,12 @@ namespace EnsembleUnitTests
 
       DssEnsemble.Write(fn, w);
 
-      using (DSSReader r = new DSSReader(fn))
+      using (DssReader r = new DssReader(fn))
       {
         var catalog = r.GetCatalog();
         Assert.AreEqual(59, catalog.Count);
         string path = "/test/SCRN2/Flow/01Nov2013/1Hour/C:000059|T:3192001/";
-        var ts = r.GetTimeSeries(path);
+        var ts = r.GetTimeSeries(new DssPath(path));
         Assert.AreEqual(-59.0, ts[0].Value);
 
       }

@@ -28,9 +28,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="DSSIO">
-      <HintPath>..\References\DSSIO.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Hec.Dss" Version="1.0.27" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="H5Assist">
       <HintPath>..\References\H5Assist.dll</HintPath>
     </Reference>
