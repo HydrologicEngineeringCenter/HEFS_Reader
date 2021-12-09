@@ -52,7 +52,7 @@ namespace EnsembleUnitTests
     private static Watershed ReadTestWaterShed( DateTime t)
     {
       string fileName = Path.Combine(EnsembleTester.CacheDir, "test.csv");
-      RfcCsvFile csv = new RfcCsvFile(fileName);
+      MultiLocationRfcCsvFile csv = new MultiLocationRfcCsvFile(fileName);
 
       float[,] scrn2 = csv.GetEnsemble("SCRN2");
       var rval = new Watershed("simple");

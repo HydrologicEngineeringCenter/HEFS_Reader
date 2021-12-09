@@ -31,7 +31,7 @@ namespace Hec.TimeSeries.Ensemble
     /// <param name="watershedName"></param>
     /// <param name="issueDate"></param>
     /// <returns></returns>
-    RfcCsvFile Read(string watershedName, DateTime issueDate)
+    MultiLocationRfcCsvFile Read(string watershedName, DateTime issueDate)
     {
       //https://www.cnrfc.noaa.gov/csv/2019092312_RussianNapa_hefs_csv_hourly.zip
 
@@ -44,7 +44,7 @@ namespace Hec.TimeSeries.Ensemble
       {
         Log("Found " + csvFileName + " in cache.  Reading...");
 
-        RfcCsvFile csv = new RfcCsvFile(csvFileName);
+        MultiLocationRfcCsvFile csv = new MultiLocationRfcCsvFile(csvFileName);
 
         return csv;
 

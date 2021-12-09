@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Hec.TimeSeries.Ensemble
 {
-  public class RfcCsvFile
+  public class MultiLocationRfcCsvFile
   {
     public string FileName;
     public List<string> LocationNames { get; private set; }
@@ -58,7 +58,7 @@ namespace Hec.TimeSeries.Ensemble
     /// First column is date/time
     /// </summary>
     /// <param name="fileName"></param>
-    public RfcCsvFile(string fileName)
+    public MultiLocationRfcCsvFile(string fileName)
     {
       this.FileName = fileName;
       var rows = File.ReadAllLines(fileName);

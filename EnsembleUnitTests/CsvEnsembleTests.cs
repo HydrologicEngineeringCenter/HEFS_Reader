@@ -28,7 +28,7 @@ namespace EnsembleUnitTests
     public void CsvTest()
     {
       string fileName = Path.Combine(EnsembleTester.CacheDir, "test.csv");
-      RfcCsvFile csv = new RfcCsvFile(fileName);
+      MultiLocationRfcCsvFile csv = new MultiLocationRfcCsvFile(fileName);
       float[,] data = null;
        csv.GetEnsemble("SCRN2",ref data);
       Assert.AreEqual(-1.0f, data[0, 0]);

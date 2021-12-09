@@ -22,7 +22,7 @@ namespace EnsembleUnitTests
       var fn = @"c:\temp\ensemble-single.h5";
       File.Delete(fn);
       string fileName = Path.Combine(EnsembleTester.CacheDir, "test.csv");
-      RfcCsvFile csv = new RfcCsvFile(fileName);
+      MultiLocationRfcCsvFile csv = new MultiLocationRfcCsvFile(fileName);
 
       float[,] data = csv.GetEnsemble("SCRN2");
        Watershed ws = new Watershed("simple");

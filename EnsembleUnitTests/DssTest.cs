@@ -18,7 +18,7 @@ namespace EnsembleUnitTests
 
 
       string csvFilename = Path.Combine(EnsembleTester.CacheDir, "test.csv");
-      RfcCsvFile csv = new RfcCsvFile(csvFilename);
+      MultiLocationRfcCsvFile csv = new MultiLocationRfcCsvFile(csvFilename);
 
       float[,] ensemble = null;
 
@@ -52,7 +52,7 @@ namespace EnsembleUnitTests
 
 
       string fileName = Path.Combine(EnsembleTester.CacheDir, "test.csv");
-      RfcCsvFile csv = new RfcCsvFile(fileName);
+      MultiLocationRfcCsvFile csv = new MultiLocationRfcCsvFile(fileName);
       float[,] ensemble = null;
       csv.GetEnsemble("SCRN2", ref ensemble);
       Watershed w = new Watershed("test");
