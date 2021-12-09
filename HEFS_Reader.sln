@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reclamation.TimeSeries", ".
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HEFS_To_DSS", "HEFS_To_DSS\HEFS_To_DSS.csproj", "{2B7DFF6D-8E42-41A5-A8AD-A5127FB412D4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "espf2dss", "espf2dss\espf2dss.csproj", "{858BB2AD-F330-4023-AA6D-3548522FB293}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,14 @@ Global
 		{2B7DFF6D-8E42-41A5-A8AD-A5127FB412D4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2B7DFF6D-8E42-41A5-A8AD-A5127FB412D4}.Release|x64.ActiveCfg = Release|x64
 		{2B7DFF6D-8E42-41A5-A8AD-A5127FB412D4}.Release|x64.Build.0 = Release|x64
+		{858BB2AD-F330-4023-AA6D-3548522FB293}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{858BB2AD-F330-4023-AA6D-3548522FB293}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{858BB2AD-F330-4023-AA6D-3548522FB293}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{858BB2AD-F330-4023-AA6D-3548522FB293}.Debug|x64.Build.0 = Debug|Any CPU
+		{858BB2AD-F330-4023-AA6D-3548522FB293}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{858BB2AD-F330-4023-AA6D-3548522FB293}.Release|Any CPU.Build.0 = Release|Any CPU
+		{858BB2AD-F330-4023-AA6D-3548522FB293}.Release|x64.ActiveCfg = Release|Any CPU
+		{858BB2AD-F330-4023-AA6D-3548522FB293}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

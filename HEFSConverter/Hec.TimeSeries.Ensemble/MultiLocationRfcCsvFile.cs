@@ -183,14 +183,14 @@ namespace Hec.TimeSeries.Ensemble
       }
     }
 
-    public static DateTime ParseDateTime(string dt)
+      /// <summary>
+      /// parse date in this format: 2021-10-04 12:00:00
+      /// </summary>
+      /// <param name="dt"></param>
+      /// <returns></returns>
+      public static DateTime ParseDateTime(string dt)
     {
       return DateTime.Parse(dt);
-      string[] dateTime = dt.Split(' ');
-      string[] yyyymmdd = dateTime[0].Split('-');
-      string[] hhmmss = dateTime[1].Split(':');
-      DateTime output = new DateTime(int.Parse(yyyymmdd[0]), int.Parse(yyyymmdd[1]), int.Parse(yyyymmdd[2]), int.Parse(hhmmss[0]), int.Parse(hhmmss[1]), int.Parse(hhmmss[2]));
-      return output;
     }
   }
 }
